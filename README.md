@@ -6,7 +6,7 @@ Thailand Disaster Watch is a planned situation-monitoring and decision-support w
 
 ## Current status
 
-- Current Phase: **0.5 — Architecture Stabilization + GitHub Bootstrap**
+- Current Phase: **1 — National GIS Command Center (human review pending)**
 - Real Data: **NOT CONNECTED**
 - Operational Use: **NOT APPROVED**
 - Production: **NOT DEPLOYED**
@@ -16,8 +16,9 @@ Thailand Disaster Watch is a planned situation-monitoring and decision-support w
 - React 19, TypeScript, and Vite client application
 - Static frontend target for Cloudflare Pages
 - Isolated Cloudflare Worker API Gateway
-- Tailwind CSS
-- ESLint, TypeScript type checking, Node test runner
+- MapLibre GL JS with a local, licensed Thailand ADM1 boundary file
+- Tailwind CSS baseline plus project CSS
+- ESLint, TypeScript type checking, Node test runner, and Vitest
 - pnpm with dependency build-script allowlist
 
 ## Local development
@@ -28,6 +29,8 @@ Requirements: Node.js 22.13 or newer and pnpm 11.
 pnpm install
 pnpm dev
 ```
+
+The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states; PHASE 1 connects no live disaster, warning, forecast, CCTV, river, rain, or dam source.
 
 Copy `.env.example` to `.env.local` only when local configuration is required. Never commit real secrets.
 
@@ -47,6 +50,7 @@ pnpm build
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [GIS architecture](docs/GIS-ARCHITECTURE.md)
 - [Data sources](docs/DATA-SOURCES.md)
 - [Data license registry](docs/DATA-LICENSE-REGISTRY.md)
 - [API contract](docs/API-CONTRACT.md)

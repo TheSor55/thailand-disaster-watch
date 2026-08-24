@@ -1,8 +1,8 @@
-# Architecture baseline — PHASE 0.5
+# Architecture — PHASE 1
 
 ## Status
 
-Architecture stabilized. No external data integrations are implemented, operational use is not approved, and production is not deployed.
+The PHASE 0.5 separation remains intact. PHASE 1 adds a client-only GIS navigation layer. No disaster-data integration is implemented, operational use is not approved, and production is not deployed.
 
 ## Context
 
@@ -12,7 +12,8 @@ Browser / PWA
       v
 React + TypeScript + Vite (Cloudflare Pages)
       |-- dashboard
-      |-- GIS and visualization
+      |-- MapLibre GIS navigation
+      |-- local THA ADM1 GeoJSON boundary
       `-- client state
       |
       v
@@ -31,7 +32,9 @@ GitHub is intended to be the single source of truth. Production target: `disaste
 ## Boundaries
 
 - `src/app/`: client application composition.
-- `src/features/`, `src/map/`: future Phase 1 feature and GIS modules.
+- `src/map/`: MapLibre view, style contract, boundary selection, fit-bounds, and source failure states.
+- `src/config/regions.ts`: replaceable application navigation grouping; not an official jurisdiction.
+- `src/domain/navigation.ts`: URL-derived national, region, province, and quick-view state.
 - `src/domain/`: source-independent data types and rules.
 - `src/services/`: adapters for verified external sources; one directory per owner.
 - `src/components/`: reusable presentation components.
@@ -56,9 +59,15 @@ The client builds as static assets through Vite for a future Cloudflare Pages de
 
 Vinext, Next.js, React Server Components, and SSR were removed in PHASE 0.5. The approved requirements are a client-side Web GIS/dashboard, REST integrations, PWA behavior, and a separate edge API Gateway. The baseline contains no server-rendering, server-action, cookie/header, or framework-routing requirement that justifies a beta production dependency.
 
+## PHASE 1 decisions
+
+- MapLibre GL JS is the approved client GIS engine.
+- Browser routes are parsed without a routing dependency and restored on refresh via the static-host rewrite in `public/_redirects`.
+- The geoBoundaries file is local and pinned; OpenStreetMap raster tiles remain a network dependency and have no availability SLA.
+
 ## Architecture decisions still open
 
-- MapLibre GL JS is the preferred Phase 1 map engine; dependency addition remains gated by Phase 1 approval.
+- Production-grade basemap provider or self-hosting before production approval.
 - Cache TTL and stale thresholds per approved dataset.
 - Persistent storage needs after source audit and retention requirements.
 - Authentication/authorization requirements for any non-public operational features.

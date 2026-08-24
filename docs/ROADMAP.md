@@ -4,7 +4,7 @@
 |---:|---|---|---|
 | 0 | Repository, architecture, docs, baseline, checks | Project approval | Checks pass; risks documented |
 | 0.5 | Architecture stabilization and GitHub bootstrap | Phase 0 approval | Vinext removed, GitHub/CI and local quality gates pass |
-| 1 | UI shell and GIS map | Phase 0 review/approval | Responsive states and map shell verified; no unlabeled mock data |
+| 1 | UI shell and GIS map | Phase 0.5 review/approval | Implemented on feature branch; quality gate and human review required before completion |
 | 2 | Official data source audit | Source-owner candidates confirmed | Evidence, license, attribution, schema, timestamp, and production status recorded |
 | 3 | GISTDA integration | Approved GISTDA dataset/service | Adapter, contract, attribution, fallback, tests |
 | 4 | Rain/weather | Approved TMD dataset/service | Observed/forecast/model/warning separated and tested |

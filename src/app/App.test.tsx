@@ -1,0 +1,43 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { App } from './App';
+
+vi.mock('../map/ThailandMap', () => ({
+  ThailandMap: ({ selectedIsoCodes }: { selectedIsoCodes: readonly string[] }) => (
+    <div aria-label="mock map">selected:{selectedIsoCodes.join(',')}</div>
+  ),
+}));
+
+describe('command-center navigation', () => {
+  beforeEach(() => window.history.replaceState({}, '', '/'));
+
+  it('selects a region, exposes its province list, and resets nationally without reload', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: /^เหนือ17$/ }));
+    expect(window.location.pathname).toBe('/region/north');
+    expect(screen.getByRole('navigation', { name: 'ตำแหน่งปัจจุบัน' })).toHaveTextContent('ภาคเหนือ');
+    expect(screen.getByRole('button', { name: 'เชียงใหม่' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Reset Thailand/ }));
+    expect(window.location.pathname).toBe('/');
+    expect(screen.getByLabelText('mock map')).toHaveTextContent('selected:');
+  });
+
+  it('restores province deep links and keeps all situation modules explicitly disconnected', () => {
+    window.history.replaceState({}, '', '/province/chiang-mai');
+    render(<App />);
+    expect(screen.getByRole('heading', { name: 'Chiang Mai Situation' })).toBeInTheDocument();
+    expect(screen.getByText('เชียงใหม่', { selector: '.situation-panel h2' })).toBeInTheDocument();
+    expect(screen.getAllByText('DATA SOURCE NOT CONNECTED')).toHaveLength(8);
+    expect(screen.getByLabelText('mock map')).toHaveTextContent('selected:TH-50');
+  });
+
+  it('opens mobile navigation as an accessible dialog', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'เปิดเมนูมือถือ' }));
+    expect(screen.getByRole('dialog', { name: 'Mobile command panel' })).toBeInTheDocument();
+    expect(screen.getByText('เลือกพื้นที่')).toBeInTheDocument();
+  });
+});
