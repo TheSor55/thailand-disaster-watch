@@ -1,23 +1,46 @@
-# Data source audit register
+# Official data source audit — PHASE 2
 
-No source is approved or connected in PHASE 0. Names below are audit candidates supplied in the project brief, not verified integrations.
+Review date: **2026-08-24**. This register records discovery evidence; it does not authorize a live connection. Every production adapter remains **disabled** until its exact dataset, license, schema, timestamp semantics, operating limits, security review, and named human approval are recorded.
 
-| Priority | Candidate owner/source | Intended category | Status | Production connection |
-|---:|---|---|---|---|
-| 1 | GISTDA | Satellite/flood layers | `UNKNOWN` | Disabled |
-| 2 | Thai Meteorological Department (TMD) | Rain/weather | `UNKNOWN` | Disabled |
-| 3 | Royal Irrigation Department (RID) | River/dam/reservoir | `UNKNOWN` | Disabled |
-| 4 | Hydro-Informatics Institute / ThaiWater | Water monitoring | `UNKNOWN` | Disabled |
-| 5 | Authorized CCTV provider | Surveillance images/streams | `UNKNOWN` | Disabled |
+`Not documented` means the official material reviewed did not state the item. It is not an invitation to infer a value.
 
-## Minimum evidence required before integration
+## Audit matrix
 
-- Official owner and dataset name
-- Official URL and API/service documentation
-- Authentication and key-handling requirements
-- Format, schema, unit, coordinate reference system, and timestamp semantics
-- Rate limits, availability expectations, CORS behavior, and update frequency
-- License, commercial/public reuse terms, and attribution requirements
-- Production endpoint authorization and named human approval
+| Owner / candidate | Intended role | Official evidence and protocol | Coverage / cadence / time | Auth, limits, CORS, availability | License / attribution evidence | Production status |
+|---|---|---|---|---|---|---|
+| GISTDA Disaster Platform | Flood extent and satellite-derived layers | [Official Open API](https://disaster.gistda.or.th/services/open-api): OAS3/JSON and map services | Thailand; 1/3/7/30-day flood products are listed; observation-time semantics require schema review | Authentication, rate limit, CORS, SLA: not documented in reviewed page | [Official catalog](https://opendata.gistda.or.th/dataset/?groups=disaster) labels disaster resources as open data; exact dataset terms/version and attribution need confirmation | `PENDING` |
+| Thai Meteorological Department (TMD) | Rain, weather, forecast, official warning | [Official data services](https://www.tmd.go.th/service/serviceData) list API/RSS/Open Data; [Open Data portal](https://data.tmd.go.th/) | Thailand; cadence and observed/issued/valid times vary by product and must remain separate | Dataset-specific auth, limits, CORS, SLA: not verified | [TMD service terms](https://www.tmd.go.th/service/tmdData) require attribution for stated public/non-commercial republication; commercial/production scope needs written confirmation | `PENDING` |
+| Royal Irrigation Department (RID) | River, reservoir, irrigation operations | [Official data.go.th organization](https://data.go.th/organization/rid) lists water datasets and some API resources | Thailand; varies by dataset; operational time semantics not verified | Auth, limits, CORS, SLA: not verified | Dataset-specific license and attribution must be confirmed from the selected resource | `PENDING` |
+| Hydro-Informatics Institute / ThaiWater | Water monitoring and standardized exchange | [ThaiWater standard](https://standard.thaiwater.net/) documents JSON exchange patterns and schemas | Thailand; example times and paths are specifications/mock examples, not a confirmed public production feed | Security/auth are described conceptually; endpoint access, limits, CORS, SLA need owner confirmation | [HII data catalog](https://data.go.th/organization/hii) is official; selected-resource terms still required | `PENDING` |
+| EGAT | Reservoir situation and historical inflow | [Official water site](https://water.egat.co.th/); [annual inflow dataset](https://data.go.th/dataset/volume_of_water_reservoir) is CSV | Named EGAT reservoirs; public dataset is annual and unsuitable as a live operational feed | No verified real-time API contract, auth, limit, CORS, or SLA | Annual dataset states CC BY; attribution required | `APPROVED_WITH_CONDITIONS` for historical/reference dataset only; live use `PENDING` |
+| Bangkok Metropolitan Administration (BMA) | Bangkok flood-risk / monitoring locations | [Official Bangkok resource](https://data.bangkok.go.th/dataset/risk-flood-bangkok-area/resource/b719945f-f10b-4b4c-afd2-2e8b43d21726) provides a CSV resource | Bangkok; resource update cadence and timestamp meaning need confirmation | Auth, limits, CORS, SLA: not verified | Exact reuse terms and required attribution need dataset-owner confirmation | `PENDING` |
+| Department of Disaster Prevention and Mitigation (DDPM) | National official warnings / coordination | [Official DDPM site](https://www.disaster.go.th/) | Thailand; no documented machine-readable operational warning API was verified | Protocol, auth, limits, CORS, cadence, SLA: unknown | Reuse license: unknown | `UNKNOWN` — human/owner review required |
+| USGS Earthquake Hazards Program | Observed earthquake events | [FDSN Event API](https://earthquake.usgs.gov/fdsnws/event/1/) and official real-time GeoJSON feeds | Global; event origin/update times must be preserved; records can be revised | Public service; exact client rate policy/CORS/SLA must be confirmed before production | [USGS licensing guidance](https://www.usgs.gov/data-management/data-licensing) and [credit guidance](https://www.usgs.gov/information-policies-and-instructions/acknowledging-or-crediting-usgs); attribute USGS | `APPROVED_WITH_CONDITIONS` — observations only, not Thai official warnings |
+| European-Mediterranean Seismological Centre (EMSC) | Observed earthquake events / corroboration | [Seismic Portal FDSN API](https://www.seismicportal.eu/fdsnws/event/1/) | Global / Euro-Mediterranean focus; times and revisions must be retained | Public endpoint exists; production rate/CORS/SLA not verified | [Terms](https://www.seismicportal.eu/terms.html) limit general use and require dataset-specific permission/terms for production use | `RESTRICTED` pending written permission or applicable license |
+| GEOFON / GFZ | Observed earthquake events / corroboration | [FDSN Event service](https://geofon.gfz-potsdam.de/fdsnws/event/1/) | Global; event/update semantics require adapter validation | Open/restricted access differs by service; rate/CORS/SLA not verified | [Citation guidance](https://geofon.gfz.de/citation/) exists; explicit production reuse terms for the event feed require confirmation | `PENDING` |
+| TMD Earthquake Observation Division | Thai official earthquake information | [Official site](https://earthquake.tmd.go.th/) and [RSS page](https://earthquake.tmd.go.th/rss.html) | Thailand and nearby events; RSS publication time must not be treated as event origin time | RSS paths are published; rate, CORS, SLA not stated | Reuse/commercial terms for these feeds not verified | `PENDING` — preferred Thai authority after approval |
+| NOAA / Pacific Tsunami Warning Center | Tsunami products / scientific context | [NOAA/NCEI tsunami products](https://www.ncei.noaa.gov/products/natural-hazards/tsunamis-earthquakes-volcanoes/tsunamis) | Pacific/global archives and products; a machine-readable operational bulletin feed for this use was not verified | Protocol, auth, rate, CORS, SLA for intended bulletin integration: unknown | Product-specific terms/attribution require confirmation | `PENDING` |
+| Global Disaster Alert and Coordination System (GDACS) | External model-based advisory | [Official API](https://www.gdacs.org/gdacsapi/swagger/index.html) | Global; event/model issue/update times must stay distinct | Public API; production limits/CORS/SLA need confirmation | [Terms of use](https://www.gdacs.org/Documents/2025/GDACS_Terms_of_use_Mar_25.pdf) require attribution and warn against critical decisions without validation | `APPROVED_WITH_CONDITIONS` — `SYSTEM_ADVISORY` only, never official warning |
+| Thailand official tsunami authority/feed | Thai official warning | TMD/DDPM public sites were reviewed; no verified public machine-readable feed contract was found | Thailand | Unknown | Unknown | `UNKNOWN` — owner confirmation required |
 
-If any required evidence is missing, mark the integration `BLOCKED — REQUIRE HUMAN REVIEW`. Phase 2 must record evidence links and review dates.
+## Binding integration rules
+
+- No adapter may be enabled merely because an endpoint is reachable.
+- The exact resource—not only the organization—must have an approved license record and attribution string.
+- Adapters preserve source ID, observed/origin time, issued time, valid period, received time, timezone, unit, revision/status, and verification state when supplied.
+- Observations, forecasts, models, external advisories, and official warnings are separate record classes.
+- Public CORS proxies, scraping undocumented pages, and secrets in the browser are prohibited.
+- A failed, delayed, stale, or unknown-time source is visible and isolated; it never crashes the application or silently becomes current.
+- GDACS and AI outputs cannot override TMD/DDPM or another competent official authority.
+- Production eligibility is decided by a named human reviewer after legal, security, operational, and data-quality evidence is complete.
+
+## Evidence still required before any live integration
+
+1. Dataset/resource owner and canonical endpoint confirmed in writing or official documentation.
+2. Machine schema, units, CRS, pagination, revisions, and all timestamp semantics.
+3. Authentication/key handling, rate limits, CORS, availability/SLA, cache policy, and fallback behavior.
+4. License version, commercial/public-display permission, attribution, retention, redistribution, and derived-work terms.
+5. Source-specific freshness policy and authoritative thresholds. No threshold is supplied by this audit.
+6. Security/privacy classification and approved production owner.
+
+The field-complete, dataset-level records are maintained in [Provider audit records](PROVIDER-AUDIT-RECORDS.md). The matrix above is the decision summary and must not replace those records during an integration review.

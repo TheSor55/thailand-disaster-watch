@@ -7,9 +7,14 @@ const requiredFiles = [
   'README.md',
   'docs/ARCHITECTURE.md',
   'docs/DATA-SOURCES.md',
+  'docs/PROVIDER-AUDIT-RECORDS.md',
   'docs/DATA-LICENSE-REGISTRY.md',
   'docs/API-CONTRACT.md',
   'docs/SECURITY.md',
+  'docs/SAFETY-ARCHITECTURE.md',
+  'docs/BCM-ARCHITECTURE.md',
+  'docs/EXPORT-SHARING.md',
+  'docs/SEISMOWATCH-MIGRATION.md',
   'docs/DESIGN-SYSTEM.md',
   'docs/ROADMAP.md',
   'docs/DISCLAIMER.md',
@@ -54,14 +59,35 @@ test('Worker baseline contains no external provider integration', async () => {
   assert.doesNotMatch(worker, /fetch\(['"]https?:\/\//);
 });
 
-test('all candidate data sources remain disabled pending audit', async () => {
+test('PHASE 2 audit does not enable a live provider', async () => {
   const registry = await readFile(
     new URL('../docs/DATA-SOURCES.md', import.meta.url),
     'utf8',
   );
+  const worker = await readFile(
+    new URL('../worker/src/index.ts', import.meta.url),
+    'utf8',
+  );
 
-  assert.doesNotMatch(registry, /\| `APPROVED` \|/);
-  assert.match(registry, /No source is approved or connected in PHASE 0/);
+  assert.match(registry, /Every production adapter remains \*\*disabled\*\*/);
+  assert.match(registry, /public CORS proxies/i);
+  assert.match(worker, /realDataConnected: false/);
+  assert.doesNotMatch(worker, /fetch\(['"]https?:\/\//);
+});
+
+test('governance documentation preserves official authority over AI', async () => {
+  const contract = await readFile(
+    new URL('../docs/API-CONTRACT.md', import.meta.url),
+    'utf8',
+  );
+  const safety = await readFile(
+    new URL('../docs/SAFETY-ARCHITECTURE.md', import.meta.url),
+    'utf8',
+  );
+
+  assert.match(contract, /OFFICIAL_WARNING > OFFICIAL_OBSERVATION/);
+  assert.match(safety, /AI is advisory only/);
+  assert.match(safety, /authenticated human approval/);
 });
 
 test('example environment file contains no secret-shaped assignment', async () => {

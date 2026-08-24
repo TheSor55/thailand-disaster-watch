@@ -1,4 +1,4 @@
-# Design system — PHASE 1
+# Design system — PHASE 2 foundation
 
 ## Direction
 
@@ -28,6 +28,21 @@ Color is always secondary. Every status requires visible text and, where useful,
 - Stale: show `STALE DATA` plus the last known observation time.
 - Unknown timestamp: show `UPDATE TIME UNKNOWN`.
 - Demo/no-source content: label `DEMO / NO LIVE DATA`, `No live data`, or `DATA SOURCE NOT CONNECTED` at the data surface. No fabricated values are permitted.
+- Conflict: show `CONFLICTING SOURCES` with each source/time; never hide the disagreement.
+- Degraded/offline: show system mode and last synchronization persistently; cached data never appears live.
+- Exercise: persistent `EXERCISE / การฝึกซ้อม` banner and export watermark.
+
+## Responsive validation matrix
+
+| Class | Reference widths | Required behavior |
+|---|---|---|
+| Small phone | 320, 360 px | no horizontal page scroll; bottom dock; sheets fit viewport; source/time readable |
+| Phone | 375, 390, 414, 430 px | full-width map, touch targets, one-column cards |
+| Tablet | 768, 820, 1024 px | map first; panels below/overlay without obscuring controls |
+| Desktop | 1280–1439 px | command-center rails and map remain legible |
+| Wide | 1440 px and above | bounded reading width; no excessive information density |
+
+Keyboard, screen-reader, 200% zoom, reduced motion, Thai line wrapping, portrait/landscape, iOS safe-area insets, excessive re-render, and mobile-memory checks are release gates. Test targets include iPhone, Android Phone, iPad, Android Tablet, Desktop, and current supported Safari, Chrome, and Edge. Horizontal overflow, clipped/overlapping controls, off-viewport map controls, and broken bottom sheets fail the gate. These are validation targets, not a claim that all PHASE 2 UI has been implemented.
 
 ## Interaction and accessibility
 

@@ -1,29 +1,68 @@
-# Internal API contract baseline
+# Internal API and governance contract — PHASE 2
 
-This document defines proposed internal conventions only. It does not describe or imply any external provider endpoint, and no endpoint is implemented in PHASE 0.
+This is a source-independent design contract. It neither documents nor enables an external provider endpoint.
 
-## Normalized observation envelope
+## Controlled vocabulary
 
 ```ts
-type VerificationStatus = 'VERIFIED' | 'UNVERIFIED';
-type AvailabilityStatus = 'AVAILABLE' | 'TEMPORARILY_UNAVAILABLE';
+type DataClassification = 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
+type DataKind = 'OBSERVED' | 'FORECAST' | 'MODEL' | 'OFFICIAL_WARNING' | 'SYSTEM_ADVISORY' | 'BCM_RECOMMENDATION';
+type FreshnessState = 'FRESH' | 'DELAYED' | 'STALE' | 'UNAVAILABLE' | 'UNKNOWN';
+type ConflictState = 'CONSISTENT' | 'PARTIAL_AGREEMENT' | 'CONFLICT' | 'INSUFFICIENT_DATA';
+type Confidence = 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN';
+type SourceAuthority = 'OFFICIAL_WARNING' | 'OFFICIAL_OBSERVATION' | 'VERIFIED_MODEL' | 'SYSTEM_ADVISORY' | 'AI_SUMMARY';
+type IncidentLifecycle = 'DETECTED' | 'MONITORING' | 'ESCALATED' | 'BCM_REVIEW' | 'ACTIVATED_BY_HUMAN' | 'STABILIZED' | 'RECOVERY' | 'CLOSED' | 'POST_INCIDENT_REVIEW';
+type SystemMode = 'ONLINE' | 'DEGRADED' | 'OFFLINE' | 'EXERCISE';
+```
 
-interface Observation<T> {
+Authority order is binding: `OFFICIAL_WARNING > OFFICIAL_OBSERVATION > VERIFIED_MODEL > SYSTEM_ADVISORY > AI_SUMMARY`. Authority is not a numerical confidence score and does not resolve conflicts automatically.
+
+## Governed record envelope
+
+```ts
+interface GovernedRecord<T> {
+  id: string;
+  hazard: 'FLOOD' | 'HEAVY_RAIN' | 'RIVER' | 'DAM' | 'STORM' | 'EARTHQUAKE' | 'TSUNAMI' | 'LANDSLIDE' | 'DROUGHT' | 'WILDFIRE' | 'OTHER';
+  kind: DataKind;
   value: T;
   unit: string | null;
+  classification: DataClassification;
+  authority: SourceAuthority;
+  confidence: Confidence;
+  conflictState: ConflictState;
+  freshness: FreshnessState;
   source: {
     id: string;
     name: string;
+    recordId: string | null;
     attribution: string;
+    productionStatus: 'APPROVED' | 'APPROVED_WITH_CONDITIONS' | 'PENDING' | 'RESTRICTED' | 'UNKNOWN' | 'REJECTED';
   };
   observedAt: string | null;
+  issuedAt: string | null;
+  validFrom: string | null;
+  validUntil: string | null;
   receivedAt: string;
-  verificationStatus: VerificationStatus;
-  availabilityStatus: AvailabilityStatus;
+  sourceTimezone: string | null;
+  revision: string | null;
+  verificationStatus: 'VERIFIED' | 'UNVERIFIED';
 }
 ```
 
-`observedAt = null` must render as `UPDATE TIME UNKNOWN`. `receivedAt` is not a substitute for observation time.
+All times use ISO 8601 at the internal boundary. Missing source time remains `null` and renders `UPDATE TIME UNKNOWN`; receipt time is never substituted. Original timezone/offset and source payload revision must be retained in protected provenance storage when available.
+
+## Freshness and availability
+
+Freshness is calculated only from an approved per-source policy. No global operational threshold exists in code or this document. Invalid/missing times or policy return `UNKNOWN`; unreachable/disabled sources return `UNAVAILABLE`. `FRESH` data may move to `DELAYED` or `STALE` while the system is `DEGRADED` or `OFFLINE`. Critical `STALE` records are excluded from automated risk evaluation and cannot create a BCM trigger.
+
+## Conflict and confidence
+
+- Differences between providers are retained as separate records; values are never averaged silently.
+- Conflict detection rules are hazard-, measurement-, unit-, location-, and time-window-specific and require owner approval.
+- UI displays source, time, status, and conflict state together.
+- `CONFLICT` renders `DATA SOURCES DISAGREE — HUMAN REVIEW RECOMMENDED`.
+- `UNKNOWN` is required when evidence is insufficient.
+- AI may summarize labeled records but may not alter confidence, authority, lifecycle, warning status, or action state.
 
 ## Error envelope
 
@@ -33,15 +72,14 @@ interface Observation<T> {
     "code": "SOURCE_TEMPORARILY_UNAVAILABLE",
     "message": "DATA TEMPORARILY UNAVAILABLE",
     "sourceId": "source-identifier",
+    "occurredAt": "2026-08-24T00:00:00Z",
     "retryable": true
   }
 }
 ```
 
-## Contract rules
+One provider failure is isolated. Aggregate responses include health per source and must not represent partial results as complete.
 
-- Keep observed, forecast, model, and warning payloads distinct.
-- Units and coordinate reference systems are explicit; adapters must not silently infer them.
-- Upstream timestamps must retain their original timezone/offset semantics before normalization.
-- Unknown or unverified external schemas must fail closed and remain unavailable to production.
-- Internal routes, pagination, filtering, cache metadata, and detailed schemas will be versioned only when their Phase implementation is approved.
+## Incident and BCM extension points
+
+Future incident records link governed hazards to exposure, business impact, evaluated trigger rule/version, recommendation, human approval, action, recovery state, owner, and audit events. The model is defined in `BCM-ARCHITECTURE.md`; PHASE 2 implements no automated action engine.

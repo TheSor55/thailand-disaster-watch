@@ -2,11 +2,12 @@
 
 Production target: `https://disaster.futuregreennet.com`
 
-Thailand Disaster Watch is a planned situation-monitoring and decision-support web application for water and flood conditions in Thailand. It is not an official government warning system.
+Thailand Disaster Watch is a planned multi-hazard situation-monitoring and business-continuity decision-support platform. Flood/water remains the first operational domain; PHASE 2 defines safe extension points for earthquake and tsunami without connecting live data. It is not an official government warning system.
 
 ## Current status
 
-- Current Phase: **1 — National GIS Command Center (human review pending)**
+- Current Phase: **2 — Official Data, Safety & Governance Foundation (implementation branch)**
+- PHASE 1: **MERGED to `main` via PR #1**
 - Real Data: **NOT CONNECTED**
 - Operational Use: **NOT APPROVED**
 - Production: **NOT DEPLOYED**
@@ -30,7 +31,7 @@ pnpm install
 pnpm dev
 ```
 
-The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states; PHASE 1 connects no live disaster, warning, forecast, CCTV, river, rain, or dam source.
+The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. The PHASE 2 audit records candidate official sources and governance contracts but connects no live provider.
 
 Copy `.env.example` to `.env.local` only when local configuration is required. Never commit real secrets.
 
@@ -52,13 +53,18 @@ pnpm build
 - [Architecture](docs/ARCHITECTURE.md)
 - [GIS architecture](docs/GIS-ARCHITECTURE.md)
 - [Data sources](docs/DATA-SOURCES.md)
+- [Provider audit records](docs/PROVIDER-AUDIT-RECORDS.md)
 - [Data license registry](docs/DATA-LICENSE-REGISTRY.md)
 - [API contract](docs/API-CONTRACT.md)
 - [Security](docs/SECURITY.md)
+- [Safety architecture](docs/SAFETY-ARCHITECTURE.md)
+- [BCM architecture](docs/BCM-ARCHITECTURE.md)
+- [Export and sharing](docs/EXPORT-SHARING.md)
+- [SeismoWatch migration](docs/SEISMOWATCH-MIGRATION.md)
 - [Design system](docs/DESIGN-SYSTEM.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Disclaimer](docs/DISCLAIMER.md)
 
 ## Data policy
 
-External datasets must not be connected to production until ownership, official documentation, schema, timestamps, license/reuse terms, attribution, and operational constraints have been verified and recorded as `APPROVED`.
+External datasets must not be connected to production until ownership, official documentation, schema, timestamps, license/reuse terms, attribution, operational constraints, security, and human approval are verified for the exact intended scope. `APPROVED_WITH_CONDITIONS` is not blanket approval.

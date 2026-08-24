@@ -1,27 +1,32 @@
 # Data license registry
 
-PHASE 1 includes one boundary dataset for navigation and one public raster basemap service for interactive development. Neither contains disaster observations. Approval is scoped to the usage stated below and does not approve operational use or production deployment.
+Review date: **2026-08-24**. Status is scoped to the named resource and use. It does not approve deployment or a different dataset from the same owner.
 
-| Dataset | Owner | License/reuse evidence | Attribution | Review date | Reviewer | Status |
-|---|---|---|---|---|---|---|
-| GISTDA dataset — to be identified | GISTDA | Not yet reviewed | Unknown | — | — | `UNKNOWN` |
-| TMD dataset — to be identified | TMD | Not yet reviewed | Unknown | — | — | `UNKNOWN` |
-| RID dataset — to be identified | RID | Not yet reviewed | Unknown | — | — | `UNKNOWN` |
-| ThaiWater dataset — to be identified | HII/ThaiWater | Not yet reviewed | Unknown | — | — | `UNKNOWN` |
-| CCTV dataset — to be identified | To be confirmed | Not yet reviewed | Unknown | — | — | `UNKNOWN` |
-| geoBoundaries THA ADM1 simplified boundary, boundary ID `THA-ADM1-36821470`, 77 units, source vintage 2017 | William & Mary geoLab; underlying OpenStreetMap contributors | [geoBoundaries API record](https://www.geoboundaries.org/api/current/gbOpen/THA/ADM1/) identifies gbOpen terms as CC BY 4.0 and the underlying THA source as ODbL 1.0; file pinned to repository commit `9469f09` | `geoBoundaries; © OpenStreetMap contributors` | 2026-08-24 | Project engineering review | `APPROVED` — PHASE 1 boundary navigation only |
-| OpenStreetMap Standard raster tiles | OpenStreetMap Foundation / OpenStreetMap contributors | [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) permits interactive use subject to attribution, correct URL, caching, referer, and no bulk/offline access | `© OpenStreetMap contributors` linked to copyright page | 2026-08-24 | Project engineering review | `APPROVED` — PHASE 1 interactive development only; production provider review required |
+| Resource | Owner | Evidence / attribution | Approved scope | Status |
+|---|---|---|---|---|
+| geoBoundaries THA ADM1, boundary ID `THA-ADM1-36821470`, pinned at commit `9469f09` | William & Mary geoLab / OSM contributors | [API record](https://www.geoboundaries.org/api/current/gbOpen/THA/ADM1/): CC BY 4.0; underlying OSM ODbL. Attribution: `geoBoundaries; © OpenStreetMap contributors` | PHASE 1 navigation/display only | `APPROVED` |
+| OpenStreetMap Standard raster tiles | OSMF / OSM contributors | [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/). Attribution: `© OpenStreetMap contributors` | PHASE 1 interactive development; no bulk/offline packaging | `APPROVED_WITH_CONDITIONS` |
+| GISTDA Disaster Platform flood resources | GISTDA | [Official catalog](https://opendata.gistda.or.th/dataset/?groups=disaster); exact resource terms/version/attribution incomplete | Audit only | `PENDING` |
+| TMD weather/rain/forecast/warning resources | TMD | [Service terms](https://www.tmd.go.th/service/tmdData); commercial/production scope and resource-level terms incomplete | Audit only | `PENDING` |
+| RID water resources | RID | [Official catalog](https://data.go.th/organization/rid); resource-specific terms incomplete | Audit only | `PENDING` |
+| HII/ThaiWater resources | HII | [Official catalog](https://data.go.th/organization/hii); standard documentation is not a reuse license | Audit only | `PENDING` |
+| EGAT annual reservoir inflow CSV | EGAT | [Dataset record](https://data.go.th/dataset/volume_of_water_reservoir): CC BY; retain owner/dataset attribution | Historical/reference analytics only; not live monitoring | `APPROVED_WITH_CONDITIONS` |
+| EGAT live reservoir situation | EGAT | No verified API reuse contract | Audit only | `PENDING` |
+| BMA Bangkok flood-risk/monitoring CSV | BMA | [Official resource](https://data.bangkok.go.th/dataset/risk-flood-bangkok-area/resource/b719945f-f10b-4b4c-afd2-2e8b43d21726); exact terms incomplete | Audit only | `PENDING` |
+| DDPM operational warning feed | DDPM | No verified public machine-readable feed or reuse license | None | `UNKNOWN` |
+| USGS earthquake event feeds | USGS | [Licensing](https://www.usgs.gov/data-management/data-licensing), [credit](https://www.usgs.gov/information-policies-and-instructions/acknowledging-or-crediting-usgs); attribute USGS and preserve revisions | Future observed-event adapter after operational review | `APPROVED_WITH_CONDITIONS` |
+| EMSC Seismic Portal event feed | EMSC | [Terms](https://www.seismicportal.eu/terms.html); production/commercial right not established | None beyond audit/development allowed by applicable terms | `RESTRICTED` |
+| GEOFON event feed | GFZ | [Citation guidance](https://geofon.gfz.de/citation/); explicit resource reuse terms incomplete | Audit only | `PENDING` |
+| TMD earthquake RSS | TMD | [Official RSS page](https://earthquake.tmd.go.th/rss.html); feed reuse terms incomplete | Audit only | `PENDING` |
+| NOAA/PTWC tsunami products/feed | NOAA | Official product pages reviewed; intended machine-feed terms incomplete | Audit only | `PENDING` |
+| GDACS API | European Commission / UN partners | [Terms](https://www.gdacs.org/Documents/2025/GDACS_Terms_of_use_Mar_25.pdf); attribution required; model advisory limitations apply | Future external `SYSTEM_ADVISORY`, validated and never an official warning | `APPROVED_WITH_CONDITIONS` |
+| Thailand official tsunami machine feed | To be confirmed | No verified contract/license | None | `UNKNOWN` |
 
-## Boundary artifact
+Allowed statuses are `APPROVED`, `APPROVED_WITH_CONDITIONS`, `PENDING`, `RESTRICTED`, `UNKNOWN`, and `REJECTED`. A production connection additionally requires security, schema, freshness, operational, and named human approval recorded in the change review.
 
-- Repository file: `public/thailand-provinces.geojson`
-- Source URL: `https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/THA/ADM1/geoBoundaries-THA-ADM1_simplified.geojson`
-- Geometry role: application navigation and map display only.
-- Limitation: not an official Thai disaster jurisdiction or authoritative emergency boundary.
-- Verification: automated tests require 77 unique `shapeISO` values matching `src/config/regions.ts`.
+## Existing boundary artifact
 
-## Basemap operational restriction
-
-The OpenStreetMap Standard service is best-effort and can block heavy or non-compliant use. The application performs no prefetch, bulk download, or offline tile packaging. Production approval requires a separate availability/capacity decision, even though PHASE 1 development use is recorded above.
-
-Allowed statuses are `APPROVED`, `PENDING`, `UNKNOWN`, and `RESTRICTED`. Scope qualifiers are binding: a PHASE 1 approval does not authorize live-data integration or production deployment. Evidence must be an official or otherwise authorized source; assumptions and copied third-party summaries are insufficient.
+- Repository: `public/thailand-provinces.geojson`
+- Source: `https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/THA/ADM1/geoBoundaries-THA-ADM1_simplified.geojson`
+- Role: navigation/display, not an official Thai emergency jurisdiction.
+- Automated verification: 77 unique `shapeISO` values match `src/config/regions.ts`.
