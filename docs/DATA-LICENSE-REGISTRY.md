@@ -6,7 +6,7 @@ Review date: **2026-08-24**. Status is scoped to the named resource and use. It 
 |---|---|---|---|---|
 | geoBoundaries THA ADM1, boundary ID `THA-ADM1-36821470`, pinned at commit `9469f09` | William & Mary geoLab / OSM contributors | [API record](https://www.geoboundaries.org/api/current/gbOpen/THA/ADM1/): CC BY 4.0; underlying OSM ODbL. Attribution: `geoBoundaries; © OpenStreetMap contributors` | PHASE 1 navigation/display only | `APPROVED` |
 | OpenStreetMap Standard raster tiles | OSMF / OSM contributors | [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/). Attribution: `© OpenStreetMap contributors` | PHASE 1 interactive development; no bulk/offline packaging | `APPROVED_WITH_CONDITIONS` |
-| GISTDA Disaster Platform flood resources | GISTDA | [Official catalog](https://opendata.gistda.or.th/dataset/?groups=disaster); exact resource terms/version/attribution incomplete | Audit only | `PENDING` |
+| GISTDA flood extent dataset `disasters-03` and Disaster Platform 1/3/7/30-day services | GISTDA | [Dataset record](https://opendata.gistda.or.th/th/dataset/disasters-03) labels `Open Data Common` and public data; [OpenAPI](https://disaster.gistda.or.th/services/open-api?type=flood) documents services. Full license/version, commercial/redistribution permission and mandatory attribution are not stated | Verification and disabled adapter tests only; no data/display/cache/production use | `PENDING` |
 | TMD weather/rain/forecast/warning resources | TMD | [Service terms](https://www.tmd.go.th/service/tmdData); commercial/production scope and resource-level terms incomplete | Audit only | `PENDING` |
 | RID water resources | RID | [Official catalog](https://data.go.th/organization/rid); resource-specific terms incomplete | Audit only | `PENDING` |
 | HII/ThaiWater resources | HII | [Official catalog](https://data.go.th/organization/hii); standard documentation is not a reuse license | Audit only | `PENDING` |
@@ -23,6 +23,21 @@ Review date: **2026-08-24**. Status is scoped to the named resource and use. It 
 | Thailand official tsunami machine feed | To be confirmed | No verified contract/license | None | `UNKNOWN` |
 
 Allowed statuses are `APPROVED`, `APPROVED_WITH_CONDITIONS`, `PENDING`, `RESTRICTED`, `UNKNOWN`, and `REJECTED`. A production connection additionally requires security, schema, freshness, operational, and named human approval recorded in the change review.
+
+## GISTDA PHASE 2.5 license record
+
+- Provider / Dataset / Owner: GISTDA / ข้อมูลขอบเขตพื้นที่น้ำท่วม (`disasters-03`) and related Disaster Platform flood services / GISTDA.
+- Official URL: `https://opendata.gistda.or.th/th/dataset/disasters-03` and `https://disaster.gistda.or.th/services/open-api?type=flood`.
+- License / License Evidence: catalog label `Open Data Common`; complete license text/version not located in reviewed official evidence.
+- API Key Required: yes; current OpenAPI uses `API-Key` header.
+- Attribution: GISTDA is the verified owner; mandatory wording is `UNKNOWN`.
+- Reuse Condition: key registration required; other conditions `UNKNOWN`.
+- Public Use: dataset category is public; exact display/redistribution/cache rights require confirmation.
+- Commercial Use: `UNKNOWN — DO NOT USE IN PRODUCTION`.
+- Verification Date / Reviewer: 2026-08-24 / project engineering review; human approval pending.
+- Production Status: `PENDING`.
+- Notes: OpenAPI response schema/timestamps/rate/SLA incomplete; catalog and current OpenAPI disagree on key transport. A key-like catalog example was not used and should be rotated/removed by its owner.
+- Controlled Pilot Evidence: Worker-only authentication and TMS transport returned HTTP 200 with `image/png` on 2026-08-24. This technical result does not supply missing license evidence and does not change any `UNKNOWN` field or the `PENDING` production status.
 
 ## Existing boundary artifact
 

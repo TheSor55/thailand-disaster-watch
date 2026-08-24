@@ -64,6 +64,12 @@ GitHub is intended to be the single source of truth. Production target: `disaste
 - `bcm` owns future exposure, impact, trigger evaluation, recommendation, approval, action, and recovery boundaries.
 - `exports` renders permission-filtered, attributed snapshots/reports without changing operational state.
 
+## PHASE 2.5 GISTDA pilot boundary
+
+`worker/src/providers/gistda/` contains a disabled TMS transport adapter selected for potential MapLibre efficiency. It follows the current official `API-Key` header contract and validates only facts documented by the provider: success status, PNG content type, and non-empty bytes. No Feature API schema, timestamp, freshness, cache TTL, rate, or severity is inferred. React has no live source/layer; the Layer Control exposes a disabled `PENDING` item only.
+
+The pilot has no default timeout or cache TTL. An authorized operator must configure a reviewed timeout and key in Worker bindings before isolated testing. Production enablement requires a separate approved change after legal and data-contract review.
+
 ## Online, degraded, and offline modes
 
 - `ONLINE`: current network paths available; freshness still evaluated per source.

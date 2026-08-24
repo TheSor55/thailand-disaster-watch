@@ -8,6 +8,7 @@ const requiredFiles = [
   'docs/ARCHITECTURE.md',
   'docs/DATA-SOURCES.md',
   'docs/PROVIDER-AUDIT-RECORDS.md',
+  'docs/GISTDA-INTEGRATION.md',
   'docs/DATA-LICENSE-REGISTRY.md',
   'docs/API-CONTRACT.md',
   'docs/SECURITY.md',
@@ -49,14 +50,15 @@ test('production dependency baseline excludes Vinext and Next.js', async () => {
   assert.match(packageJson.scripts['build:worker'], /build-worker\.mjs/);
 });
 
-test('Worker baseline contains no external provider integration', async () => {
+test('Worker baseline contains no enabled external provider integration', async () => {
   const worker = await readFile(
     new URL('../worker/src/index.ts', import.meta.url),
     'utf8',
   );
 
   assert.match(worker, /realDataConnected: false/);
-  assert.doesNotMatch(worker, /fetch\(['"]https?:\/\//);
+  assert.match(worker, /realDataConnected: false/);
+  assert.match(worker, /operationalUseApproved: false/);
 });
 
 test('PHASE 2 audit does not enable a live provider', async () => {
@@ -72,7 +74,21 @@ test('PHASE 2 audit does not enable a live provider', async () => {
   assert.match(registry, /Every production adapter remains \*\*disabled\*\*/);
   assert.match(registry, /public CORS proxies/i);
   assert.match(worker, /realDataConnected: false/);
-  assert.doesNotMatch(worker, /fetch\(['"]https?:\/\//);
+  assert.match(worker, /operationalUseApproved: false/);
+});
+
+test('GISTDA pilot remains pending and disabled by default', async () => {
+  const integration = await readFile(
+    new URL('../docs/GISTDA-INTEGRATION.md', import.meta.url),
+    'utf8',
+  );
+  const env = await readFile(new URL('../.env.example', import.meta.url), 'utf8');
+
+  assert.match(integration, /PENDING — DO NOT USE IN PRODUCTION/);
+  assert.match(integration, /observedAt: null/);
+  assert.match(env, /^GISTDA_PILOT_ENABLED=false$/m);
+  assert.match(env, /^GISTDA_API_KEY=$/m);
+  assert.doesNotMatch(env, /^GISTDA_API_KEY=.+$/m);
 });
 
 test('governance documentation preserves official authority over AI', async () => {

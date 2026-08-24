@@ -1,7 +1,6 @@
 import type { BasemapMode } from '../map/ThailandMap';
 
 const futureLayers = [
-  'Satellite Flood',
   'Rain Radar',
   'Flood Forecast',
   'River',
@@ -40,6 +39,13 @@ export function LayerControl({
       <div className="layer-row"><span><i className="layer-swatch layer-swatch--region" />Region highlight</span><span>Auto</span></div>
 
       <h3>Disaster</h3>
+      <div className="layer-row is-disabled" aria-disabled="true">
+        <span>
+          Satellite / GISTDA Flood Extent
+          <small>License and response schema require human verification</small>
+        </span>
+        <b>PENDING</b>
+      </div>
       {futureLayers.map((layer) => (
         <div className="layer-row is-disabled" key={layer}><span>{layer}</span><b>PHASE 2+</b></div>
       ))}

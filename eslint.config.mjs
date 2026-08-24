@@ -10,6 +10,7 @@ const eslintConfig = defineConfig([
     '.next/**',
     '.vinext/**',
     '**/dist/**',
+    '**/.wrangler/**',
     'node_modules/**',
     'coverage/**',
   ]),

@@ -40,4 +40,14 @@ describe('command-center navigation', () => {
     expect(screen.getByRole('dialog', { name: 'Mobile command panel' })).toBeInTheDocument();
     expect(screen.getByText('เลือกพื้นที่')).toBeInTheDocument();
   });
+
+  it('exposes the pending GISTDA layer in the mobile layer panel without enabling it', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: /Layers/ }));
+    const dialog = screen.getByRole('dialog', { name: 'Mobile command panel' });
+    expect(dialog).toHaveTextContent('Satellite / GISTDA Flood Extent');
+    expect(dialog).toHaveTextContent('PENDING');
+    expect(dialog.querySelector('[aria-disabled="true"]')).toBeInTheDocument();
+  });
 });

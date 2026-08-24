@@ -31,6 +31,15 @@ No secrets or external integrations are present. `.env*` and `.dev.vars*` files 
 
 Business-continuity records may contain employee, supplier, customer, site, route, inventory, and contractual information. They default to `CONFIDENTIAL` or `RESTRICTED` until an authorized data owner classifies them. They must never be exposed through the public disaster map by inheritance or convenience.
 
+## GISTDA pilot controls
+
+- `GISTDA_API_KEY` is Worker-only; it is never accepted from the browser, placed in a URL, response, cache key, or log.
+- `GISTDA_PILOT_ENABLED` defaults false and missing key/timeout configuration fails closed.
+- Request logs contain provider, outcome, status code, latency, and time only.
+- The pilot returns `no-store`; no TTL is invented before rate/update/license review.
+- Current OpenAPI uses an `API-Key` header. Older catalog query-key examples are not followed.
+- A key-like value was observed in official catalog metadata during verification. It was neither used nor committed. GISTDA should remove/rotate it through an authorized security channel.
+
 ## Human review gates
 
 Architecture, authentication, paid services, production data, DNS, GitHub settings, deployment, and any write-capable external integration require explicit approval.
