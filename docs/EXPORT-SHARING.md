@@ -24,3 +24,5 @@ PHASE 2 specifies safe outputs; it does not enable public sharing or external de
 - No generated file is uploaded, published, or sent externally without explicit user action and authorization.
 
 Export-document classification is `PUBLIC`, `INTERNAL`, `DRAFT`, or `EXERCISE`; it is separate from field-level security classification. Every export carries Generated At, Observed At, Source, Incident ID, Document Version, Data Status, Disclaimer, and Classification. Unknown values remain visibly unknown.
+
+PHASE 2.6 implements the source-independent `ExportDocument` and mobile share capability contracts only. Native Web Share, download, and copy-summary support are detected independently; future authorization and classification checks remain mandatory. No export rendering, share link, QR code, GISTDA image redistribution, upload, or external send is enabled.

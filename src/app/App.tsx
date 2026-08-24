@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   BANGKOK_METRO_PROVINCE_CODES,
   PROVINCE_BY_ISO,
@@ -14,10 +22,29 @@ import {
   provinceCodesForNavigation,
   type NavigationState,
 } from '../domain/navigation';
-import { ThailandMap, type BasemapMode } from '../map/ThailandMap';
+import type { BasemapMode } from '../map/ThailandMap';
 import { DataProvenance } from '../components/DataProvenance';
 import { LayerControl } from '../components/LayerControl';
+import { ModuleErrorBoundary } from '../components/ModuleErrorBoundary';
 import { NavigationSearch } from '../components/NavigationSearch';
+import { SafetyBanner } from '../components/SafetyBanner';
+import { SystemHealthPanel } from '../components/SystemHealthPanel';
+
+const ThailandMap = lazy(() =>
+  import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
+);
+
+const providerHealth = [
+  {
+    providerId: 'GISTDA Disaster Platform',
+    status: 'DISABLED' as const,
+    lastSuccessAt: null,
+    lastFailureAt: null,
+    latencyMs: null,
+    consecutiveFailures: 0,
+    freshness: 'UNKNOWN' as const,
+  },
+];
 
 const situationModules = ['Flood', 'Rain', 'River', 'Dam', 'Alerts', 'CCTV'] as const;
 
@@ -38,6 +65,7 @@ export function App() {
   const [mobileSheet, setMobileSheet] = useState<
     'navigation' | 'layers' | 'situation' | null
   >(null);
+  const mobileSheetTrigger = useRef<HTMLElement | null>(null);
 
   const navigate = useCallback((nextState: NavigationState) => {
     const path = pathForNavigation(nextState);
@@ -50,6 +78,18 @@ export function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    if (!mobileSheet) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileSheet(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      mobileSheetTrigger.current?.focus();
+    };
+  }, [mobileSheet]);
 
   const selectedIsoCodes = useMemo(
     () => provinceCodesForNavigation(navigation),
@@ -93,14 +133,24 @@ export function App() {
           >
             {basemapMode === 'dark' ? '☀' : '◐'}
           </button>
-          <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileSheet('navigation')} aria-label="เปิดเมนูมือถือ">☰</button>
+          <button className="icon-button mobile-menu-button" type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('navigation'); }} aria-label="เปิดเมนูมือถือ">☰</button>
         </div>
       </header>
+
+      <SafetyBanner
+        state="NO_LIVE_DATA"
+        detail="Provider approval gates remain closed. Decision-support information only."
+        compact
+      />
 
       {settingsOpen && (
         <aside className="settings-popover" aria-label="การตั้งค่า">
           <strong>Display settings</strong>
           <p>Theme preference applies to this session. Persistent preferences will be evaluated in a later phase.</p>
+          <SystemHealthPanel
+            providers={providerHealth}
+            operationalStatusByProviderId={{ 'GISTDA Disaster Platform': 'PENDING' }}
+          />
         </aside>
       )}
 
@@ -194,13 +244,17 @@ export function App() {
             </div>
             <button type="button" onClick={() => navigate({ viewLevel: 'national' })}>⌂ Reset Thailand</button>
           </div>
-          <ThailandMap
-            basemapMode={basemapMode}
-            selectedIsoCodes={selectedIsoCodes}
-            selectedProvinceIso={selectedProvinceIso}
-            showProvinces={showProvinces}
-            onProvinceSelect={handleProvinceSelect}
-          />
+          <ModuleErrorBoundary moduleName="Map">
+            <Suspense fallback={<div className="map-shell map-loading" role="status">Loading map module…</div>}>
+              <ThailandMap
+                basemapMode={basemapMode}
+                selectedIsoCodes={selectedIsoCodes}
+                selectedProvinceIso={selectedProvinceIso}
+                showProvinces={showProvinces}
+                onProvinceSelect={handleProvinceSelect}
+              />
+            </Suspense>
+          </ModuleErrorBoundary>
           <div className="summary-strip" aria-label="Situation summary">
             {situationModules.map((module) => (
               <article key={module} className="summary-card">
@@ -211,7 +265,8 @@ export function App() {
           </div>
         </section>
 
-        <aside className="right-rail" aria-label="Situation information">
+        <ModuleErrorBoundary moduleName="Situation panels">
+          <aside className="right-rail" aria-label="Situation information">
           <section className="panel situation-panel">
             <span className="eyebrow">SITUATION OVERVIEW</span>
             <h2>{navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย'}</h2>
@@ -237,7 +292,8 @@ export function App() {
               {['Station', 'Location', 'Owner', 'Observed', 'Status'].map((field) => <div key={field}><dt>{field}</dt><dd>—</dd></div>)}
             </dl>
           </section>
-        </aside>
+          </aside>
+        </ModuleErrorBoundary>
       </main>
 
       <footer className="timeline-bar">
@@ -248,15 +304,15 @@ export function App() {
       </footer>
 
       <nav className="mobile-dock" aria-label="Mobile command center navigation">
-        <button type="button" onClick={() => setMobileSheet('navigation')}><span aria-hidden="true">⌕</span>พื้นที่</button>
-        <button type="button" onClick={() => setMobileSheet('layers')}><span aria-hidden="true">▱</span>Layers</button>
-        <button type="button" onClick={() => setMobileSheet('situation')}><span aria-hidden="true">○</span>สถานการณ์</button>
+        <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('navigation'); }}><span aria-hidden="true">⌕</span>พื้นที่</button>
+        <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('layers'); }}><span aria-hidden="true">▱</span>Layers</button>
+        <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('situation'); }}><span aria-hidden="true">○</span>สถานการณ์</button>
       </nav>
 
       {mobileSheet && (
         <div className="mobile-sheet-backdrop" role="presentation" onClick={() => setMobileSheet(null)}>
           <section className="mobile-sheet" role="dialog" aria-modal="true" aria-label="Mobile command panel" onClick={(event) => event.stopPropagation()}>
-            <div className="mobile-sheet-heading"><strong>{mobileSheet === 'navigation' ? 'เลือกพื้นที่' : mobileSheet === 'layers' ? 'Map Layers' : 'Situation overview'}</strong><button type="button" onClick={() => setMobileSheet(null)} aria-label="ปิดแผง">×</button></div>
+            <div className="mobile-sheet-heading"><strong>{mobileSheet === 'navigation' ? 'เลือกพื้นที่' : mobileSheet === 'layers' ? 'Map Layers' : 'Situation overview'}</strong><button type="button" onClick={() => setMobileSheet(null)} aria-label="ปิดแผง" autoFocus>×</button></div>
             {mobileSheet === 'navigation' && (
               <>
                 <NavigationSearch onProvinceSelect={(province) => { handleProvinceSelect(province); setMobileSheet(null); }} onRegionSelect={(region) => { navigate({ viewLevel: 'region', region }); setMobileSheet(null); }} />

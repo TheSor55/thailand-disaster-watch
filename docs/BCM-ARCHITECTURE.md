@@ -39,6 +39,8 @@ Hazard evidence
 
 Future extensions include BIA, MTPD/MAO, RTO, RPO, Critical Process, Dependencies, My Sites, Geofence, Action Owner, and Escalation Matrix. Definitions, ownership, units, and acceptance rules require business approval before implementation.
 
+PHASE 2.6 adds type-only preparation for `SiteDefinition`, `BusinessImpact`, and `BcmRecommendation`. No organization, site, supplier, warehouse, customer, utility, employee, contact, MTPD, RTO, RPO, or action record is stored. A recommendation always retains `HumanDecision`; it cannot become activation automatically.
+
 No customer, employee, supplier-contract, personal-location, or commercially sensitive record belongs in a public map or share link. Organization/tenant isolation, field-level classification, RBAC, redaction, retention, and deletion policy are prerequisites.
 
 ## Incident lifecycle

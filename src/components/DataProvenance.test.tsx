@@ -7,7 +7,7 @@ describe('DataProvenance', () => {
     render(<DataProvenance />);
     expect(screen.getByText('Not connected')).toBeInTheDocument();
     expect(screen.getByText('No live data')).toBeInTheDocument();
-    expect(screen.getAllByText('—')).toHaveLength(3);
+    expect(screen.getAllByText('—')).toHaveLength(4);
   });
 
   it('renders all required pilot provenance fields without inventing observation time', () => {
@@ -15,11 +15,15 @@ describe('DataProvenance', () => {
       <DataProvenance
         record={{
           source: 'GISTDA',
+          provider: 'GISTDA Disaster Platform',
           dataset: 'Flood extent 1 day',
+          authority: 'Official observation candidate',
           dataType: 'Observed Flood Extent',
           observedAt: null,
+          publishedAt: null,
           retrievedAt: '2026-08-24T07:30:00Z',
           freshness: 'UNKNOWN',
+          confidence: 'UNKNOWN',
           attribution: 'GISTDA · license review pending',
           status: 'PENDING — PILOT DISABLED',
         }}
@@ -28,8 +32,30 @@ describe('DataProvenance', () => {
 
     expect(screen.getByText('GISTDA')).toBeInTheDocument();
     expect(screen.getByText('Observed Flood Extent')).toBeInTheDocument();
-    expect(screen.getByText('UNKNOWN')).toBeInTheDocument();
+    expect(screen.getAllByText('UNKNOWN')).toHaveLength(2);
     expect(screen.getByText('PENDING — PILOT DISABLED')).toBeInTheDocument();
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getAllByText('—')).toHaveLength(2);
+  });
+
+  it('renders missing attribution explicitly', () => {
+    render(
+      <DataProvenance
+        record={{
+          source: 'Example',
+          provider: 'Example provider',
+          dataset: 'Example dataset',
+          authority: 'SYSTEM_ADVISORY',
+          dataType: 'MODEL',
+          observedAt: null,
+          publishedAt: null,
+          retrievedAt: null,
+          freshness: 'UNKNOWN',
+          confidence: 'UNKNOWN',
+          attribution: null,
+          status: 'PENDING',
+        }}
+      />,
+    );
+    expect(screen.getByText('Not provided')).toBeInTheDocument();
   });
 });

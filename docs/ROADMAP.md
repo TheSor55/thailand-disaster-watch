@@ -7,6 +7,7 @@
 | 1 | UI shell and GIS map | Phase 0.5 review/approval | **Complete:** PR #1 merged to `main`; checks and human review passed |
 | 2 | Official data, safety, governance, BCM and multi-hazard extension contracts | Phase 1 merged | **Complete:** PR #2 merged to `main`; CI and human review passed |
 | 2.5 | GISTDA dataset verification and controlled pilot | Phase 2 merged | **Controlled Local Pilot: COMPLETE. Production Approval: PENDING.** Sanitized evidence recorded; disabled Worker adapter/tests retained; human decisions on license, attribution, schema, timestamp, rate/cache/SLA, CRS/zoom/tile scheme and operational policy remain required; no production layer |
+| 2.6 | Platform hardening and provider approval readiness | PR #3 merged and safety flags false | Responsive/bundle/GIS audit; fail-closed activation, health, reliability, safety, provenance, offline/export/BCM/event contracts; security/accessibility review; GISTDA remains blocked; CI and human review required |
 | 3 | GISTDA integration | Exact GISTDA dataset/service approved after 2.5 gate | Adapter, contract, attribution, fallback, tests and production enablement review |
 | 4 | Rain/weather | Approved TMD dataset/service | Observed/forecast/model/warning separated and tested |
 | 5 | River and dam | Approved RID/HII datasets/services | Units, timestamps, trends, freshness, fallbacks tested |
