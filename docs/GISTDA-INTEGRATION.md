@@ -30,6 +30,28 @@ No GISTDA dataset is promoted to `APPROVED` or `APPROVED_WITH_CONDITIONS`. The r
 - No rate-limit headers or SLA were established. No polling or production cache policy is implemented.
 - Official catalog metadata exposed a key-like credential in a resource example. It was not used or copied. The data owner should remove/rotate it; the project must treat all catalog examples as compromised and require its own authorized secret.
 
+## Controlled Local Pilot Result
+
+| Field | Sanitized result |
+|---|---|
+| Date | 2026-08-24 |
+| Pilot type | `CONTROLLED LOCAL PILOT` |
+| Environment | Local Cloudflare Worker via Wrangler; not deployed. The installed local runtime required a `2026-05-22` compatibility-date override for this test only; production configuration was not changed. |
+| Authentication path | Worker-only `API-Key` header; configured and successful. Credential value was not recorded. |
+| Worker status | `READY_FOR_CONTROLLED_PILOT` |
+| Endpoint family | GISTDA Disaster Platform flood 1-day TMS through the internal Worker route |
+| HTTP result | `200` |
+| Content type | `image/png` |
+| Response size | `1,118 bytes` |
+| Secret handling | Temporary ignored secret file removed; one-time helper/process stopped and removed; replacement credential retained only in the human-controlled local password store. |
+| Operational approval | `operationalUseApproved = false` |
+| Real-data connection | `realDataConnected = false`; no frontend source/layer was enabled. |
+| Remaining verification | Full license and public/commercial/display/redistribution/export rights; attribution; rate limit; cache policy; SLA; timestamp semantics; update frequency; tile scheme; supported zoom; CRS/projection; WMS/WMTS/TMS operational policy. |
+
+The result verifies only the authentication path, Worker transport, GISTDA API Gateway response, and PNG response contract in a controlled local test. It is not production approval, does not establish observation time or data meaning, and does not validate the assumed XYZ coordinate interpretation against the provider's TMS scheme.
+
+Security closeout confirmed that no credential, authorization value, response tile, or credential screenshot was added to source, frontend assets, Git history, documentation, or committed command artifacts. An initial local credential-entry attempt was treated as compromised: that key was revoked, local credential/clipboard/command-history artifacts were cleared by the human operator, and the successful pilot used a replacement credential. No actual credential value is retained in this record.
+
 ## Pilot architecture
 
 ```text

@@ -37,6 +37,7 @@ Allowed statuses are `APPROVED`, `APPROVED_WITH_CONDITIONS`, `PENDING`, `RESTRIC
 - Verification Date / Reviewer: 2026-08-24 / project engineering review; human approval pending.
 - Production Status: `PENDING`.
 - Notes: OpenAPI response schema/timestamps/rate/SLA incomplete; catalog and current OpenAPI disagree on key transport. A key-like catalog example was not used and should be rotated/removed by its owner.
+- Controlled Pilot Evidence: Worker-only authentication and TMS transport returned HTTP 200 with `image/png` on 2026-08-24. This technical result does not supply missing license evidence and does not change any `UNKNOWN` field or the `PENDING` production status.
 
 ## Existing boundary artifact
 

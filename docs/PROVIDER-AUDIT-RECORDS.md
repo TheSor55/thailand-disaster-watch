@@ -15,7 +15,10 @@ Verification date for all records: **2026-08-24**. `Unknown` / `not verified` me
 - License / Attribution / Reuse Condition / Commercial-Public Use: catalog labels `Open Data Common` and public data; exact license version, attribution wording, cache/redistribution and commercial use remain unknown.
 - Availability / Fallback: SLA not documented / last approved cache plus explicit unavailable state; no substitute source approved.
 - Known Limitations: 200 JSON response schema is empty in the OpenAPI spec; catalog and current OpenAPI disagree on key transport; product period is not acquisition time. A key-like catalog example was not used and must be treated as compromised.
-- Production Status / Evidence: `PENDING — disabled Worker pilot only` / official URLs and observed access/CORS checks recorded in `GISTDA-INTEGRATION.md`.
+- Technical Connectivity: `VERIFIED IN CONTROLLED LOCAL PILOT` — Worker-only authentication and flood 1-day TMS transport returned HTTP 200 with `image/png`; sanitized evidence is recorded in `evidence/GISTDA-PILOT-RESULT.md`.
+- Production Eligibility: `PENDING`.
+- Operational Use: `NOT APPROVED`.
+- Production Status / Evidence: `PENDING — disabled Worker pilot only` / official URLs, access/CORS review, and controlled local transport evidence recorded in `GISTDA-INTEGRATION.md`. Technical connectivity does not resolve the license, attribution, timestamp, rate, cache, SLA, CRS, zoom, or tile-scheme gates.
 
 ### TMD meteorological products
 

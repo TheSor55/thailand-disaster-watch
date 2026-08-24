@@ -6,7 +6,7 @@
 | 0.5 | Architecture stabilization and GitHub bootstrap | Phase 0 approval | Vinext removed, GitHub/CI and local quality gates pass |
 | 1 | UI shell and GIS map | Phase 0.5 review/approval | **Complete:** PR #1 merged to `main`; checks and human review passed |
 | 2 | Official data, safety, governance, BCM and multi-hazard extension contracts | Phase 1 merged | **Complete:** PR #2 merged to `main`; CI and human review passed |
-| 2.5 | GISTDA dataset verification and controlled pilot | Phase 2 merged | Official evidence recorded; disabled Worker pilot/tests; human decision on license/schema/key/timestamp/rate; no production layer |
+| 2.5 | GISTDA dataset verification and controlled pilot | Phase 2 merged | **Controlled Local Pilot: COMPLETE. Production Approval: PENDING.** Sanitized evidence recorded; disabled Worker adapter/tests retained; human decisions on license, attribution, schema, timestamp, rate/cache/SLA, CRS/zoom/tile scheme and operational policy remain required; no production layer |
 | 3 | GISTDA integration | Exact GISTDA dataset/service approved after 2.5 gate | Adapter, contract, attribution, fallback, tests and production enablement review |
 | 4 | Rain/weather | Approved TMD dataset/service | Observed/forecast/model/warning separated and tested |
 | 5 | River and dam | Approved RID/HII datasets/services | Units, timestamps, trends, freshness, fallbacks tested |
