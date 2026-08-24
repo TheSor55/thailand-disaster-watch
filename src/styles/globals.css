@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+:root {
+  color: #f8fafc;
+  background: #020617;
+  font-family: Sarabun, "Noto Sans Thai", Tahoma, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #020617;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
