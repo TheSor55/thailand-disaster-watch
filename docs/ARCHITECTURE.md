@@ -1,8 +1,8 @@
-# Architecture — PHASE 2 foundation
+# Architecture — PHASE 2.6 hardening foundation
 
 ## Status
 
-PHASE 1 GIS navigation is merged. PHASE 2 freezes data-governance, safety, multi-hazard, offline, export, and BCM extension boundaries. No disaster-data integration is implemented, operational use is not approved, and production is not deployed.
+PHASE 2.5 is merged and its controlled local pilot verified transport only. PHASE 2.6 hardens the platform and provider-approval boundary. No live disaster-data integration is enabled, operational use is not approved, and production is not deployed.
 
 ## Context
 
@@ -69,6 +69,15 @@ GitHub is intended to be the single source of truth. Production target: `disaste
 `worker/src/providers/gistda/` contains a disabled TMS transport adapter selected for potential MapLibre efficiency. It follows the current official `API-Key` header contract and validates only facts documented by the provider: success status, PNG content type, and non-empty bytes. No Feature API schema, timestamp, freshness, cache TTL, rate, or severity is inferred. React has no live source/layer; the Layer Control exposes a disabled `PENDING` item only.
 
 The pilot has no default timeout or cache TTL. An authorized operator must configure a reviewed timeout and key in Worker bindings before isolated testing. Production enablement requires a separate approved change after legal and data-contract review.
+
+## PHASE 2.6 reliability and failure boundaries
+
+- `ProviderActivationGate` fails closed unless production status and all eight evidence gates pass. GISTDA evaluates to blocked.
+- Provider health uses `HEALTHY`, `DEGRADED`, `UNAVAILABLE`, `DISABLED`, and `UNKNOWN` without credentials or payloads.
+- A generic request coordinator supports injected provider policy, timeout, bounded retry/backoff, request deduplication, cancellation, circuit opening, and recovery probes. No numeric value is presented as GISTDA policy.
+- Connectivity mode is separate from data authority: `ONLINE`, `DEGRADED`, or `OFFLINE` never converts a system advisory into an official warning.
+- The map is dynamically imported and isolated by a module error boundary. Non-map region/province navigation remains available.
+- Full PWA caching is deferred. Future cached live metadata must retain `cachedAt`, `observedAt`, source, and freshness.
 
 ## Online, degraded, and offline modes
 

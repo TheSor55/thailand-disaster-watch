@@ -28,3 +28,5 @@ source adapter -> schema validator -> normalized governed record
 ```
 
 Provider adapters are enabled independently and only after their record in `DATA-SOURCES.md` and `DATA-LICENSE-REGISTRY.md` is approved for the intended scope.
+
+PHASE 2.6 compatibility is contract-only: normalized events support point geometry, occurrence time, optional magnitude/depth, multiple provider source-event IDs, and official bulletin association. Deduplication thresholds, authority preference, feeds, and operational actions remain intentionally undefined and disabled.

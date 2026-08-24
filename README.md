@@ -6,9 +6,10 @@ Thailand Disaster Watch is a planned multi-hazard situation-monitoring and busin
 
 ## Current status
 
-- Current Phase: **2.5 — GISTDA Verification & Controlled Pilot (implementation branch)**
+- Current Phase: **2.6 — Platform Hardening & Provider Approval Readiness (implementation branch)**
 - PHASE 1: **MERGED to `main` via PR #1**
 - PHASE 2: **MERGED to `main` via PR #2**
+- PHASE 2.5: **MERGED to `main` via PR #3; controlled local pilot complete**
 - Real Data: **NOT CONNECTED**
 - Operational Use: **NOT APPROVED**
 - Production: **NOT DEPLOYED**
@@ -32,7 +33,7 @@ pnpm install
 pnpm dev
 ```
 
-The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. PHASE 2.5 adds a disabled Worker-only GISTDA TMS pilot contract; no GISTDA layer is exposed because license, schema, timestamp, rate, and attribution evidence remain incomplete.
+The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. PHASE 2.6 adds fail-closed provider governance, health/reliability contracts, explicit safety/provenance UI, responsive hardening, and lazy GIS loading. The GISTDA layer remains disabled because license, display rights, schema, timestamp, rate/cache, attribution, and human approval evidence remain incomplete.
 
 Copy `.env.example` to `.env.local` only when local configuration is required. Never commit real secrets.
 
@@ -65,6 +66,10 @@ pnpm build
 - [SeismoWatch migration](docs/SEISMOWATCH-MIGRATION.md)
 - [Design system](docs/DESIGN-SYSTEM.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Provider approval matrix](docs/PROVIDER-APPROVAL-MATRIX.md)
+- [Mobile quality gate](docs/MOBILE-QUALITY-GATE.md)
+- [Performance budget](docs/PERFORMANCE-BUDGET.md)
+- [Observability contract](docs/OBSERVABILITY.md)
 - [Disclaimer](docs/DISCLAIMER.md)
 
 ## Data policy

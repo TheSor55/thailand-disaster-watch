@@ -1,0 +1,35 @@
+export type SafetyInformationType =
+  | 'OFFICIAL_WARNING'
+  | 'OBSERVED_DATA'
+  | 'FORECAST'
+  | 'MODEL'
+  | 'SYSTEM_ADVISORY'
+  | 'BCM_RECOMMENDATION'
+  | 'BCM_ACTIVATION'
+  | 'EXERCISE';
+
+export type SafetyBannerState =
+  | 'NO_LIVE_DATA'
+  | 'LIVE_DATA'
+  | 'DELAYED'
+  | 'STALE'
+  | 'OFFLINE'
+  | 'DEGRADED'
+  | 'EXERCISE'
+  | 'OFFICIAL_WARNING'
+  | 'SYSTEM_ADVISORY';
+
+export const SAFETY_LABELS: Record<SafetyInformationType, string> = {
+  OFFICIAL_WARNING: 'OFFICIAL WARNING',
+  OBSERVED_DATA: 'OBSERVED DATA',
+  FORECAST: 'FORECAST',
+  MODEL: 'MODEL OUTPUT',
+  SYSTEM_ADVISORY: 'SYSTEM ADVISORY — NOT AN OFFICIAL WARNING',
+  BCM_RECOMMENDATION: 'BCM RECOMMENDATION — HUMAN DECISION REQUIRED',
+  BCM_ACTIVATION: 'BCM ACTIVATION — HUMAN AUTHORIZED',
+  EXERCISE: 'EXERCISE — NOT A REAL INCIDENT',
+};
+
+export function safetyLabel(type: SafetyInformationType): string {
+  return SAFETY_LABELS[type];
+}

@@ -15,6 +15,7 @@ interface RequestOptions {
   fetcher?: GistdaFetcher;
   now?: () => Date;
   logger?: (entry: GistdaRequestLog) => void;
+  requestId?: string;
 }
 
 const inFlightRequests = new Map<string, Promise<GistdaTileResult>>();
@@ -106,6 +107,7 @@ async function performGistdaFloodTileRequest(
 ): Promise<GistdaTileResult> {
   const fetcher = options.fetcher ?? fetch;
   const now = options.now ?? (() => new Date());
+  const requestId = options.requestId ?? crypto.randomUUID();
   const startedAt = Date.now();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -128,10 +130,13 @@ async function performGistdaFloodTileRequest(
     const bytes = await validatePngTile(response);
     const retrievedAt = now().toISOString();
     options.logger?.({
+      requestId,
       provider: 'GISTDA',
+      dataset: 'gistda-disaster-flood-1day-tms',
+      route: '/api/providers/gistda/flood/1day/tiles/{z}/{x}/{y}.png',
       outcome: 'success',
       statusCode: response.status,
-      latencyMs: Date.now() - startedAt,
+      latency: Date.now() - startedAt,
       timestamp: retrievedAt,
     });
     return {
@@ -153,10 +158,13 @@ async function performGistdaFloodTileRequest(
               : 'GISTDA data temporarily unavailable',
           );
     options.logger?.({
+      requestId,
       provider: 'GISTDA',
+      dataset: 'gistda-disaster-flood-1day-tms',
+      route: '/api/providers/gistda/flood/1day/tiles/{z}/{x}/{y}.png',
       outcome: 'failure',
       statusCode: upstreamStatus,
-      latencyMs: Date.now() - startedAt,
+      latency: Date.now() - startedAt,
       timestamp: now().toISOString(),
     });
     throw providerError;

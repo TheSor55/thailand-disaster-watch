@@ -42,6 +42,7 @@ describe('GISTDA controlled pilot client', () => {
       {
         fetcher,
         logger,
+        requestId: 'request-test-1',
         now: () => new Date('2026-08-24T07:30:00.000Z'),
       },
     );
@@ -54,7 +55,13 @@ describe('GISTDA controlled pilot client', () => {
       productionStatus: 'PENDING',
     });
     expect(logger).toHaveBeenCalledWith(
-      expect.objectContaining({ provider: 'GISTDA', outcome: 'success' }),
+      expect.objectContaining({
+        requestId: 'request-test-1',
+        provider: 'GISTDA',
+        dataset: 'gistda-disaster-flood-1day-tms',
+        route: '/api/providers/gistda/flood/1day/tiles/{z}/{x}/{y}.png',
+        outcome: 'success',
+      }),
     );
     expect(JSON.stringify(logger.mock.calls)).not.toContain(placeholderCredential);
   });

@@ -21,10 +21,13 @@ export type GistdaErrorCode =
   | 'INVALID_RESPONSE';
 
 export interface GistdaRequestLog {
+  requestId: string;
   provider: 'GISTDA';
+  dataset: 'gistda-disaster-flood-1day-tms';
+  route: '/api/providers/gistda/flood/1day/tiles/{z}/{x}/{y}.png';
   outcome: 'success' | 'failure';
   statusCode: number;
-  latencyMs: number;
+  latency: number;
   timestamp: string;
 }
 

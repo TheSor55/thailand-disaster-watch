@@ -31,7 +31,7 @@ export default {
     if (request.method === 'GET' && url.pathname === '/api/health') {
       return jsonResponse({
         status: 'ok',
-        phase: '2.5',
+        phase: '2.6',
         realDataConnected: false,
         operationalUseApproved: false,
         providers: {

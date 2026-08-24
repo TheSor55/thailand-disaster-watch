@@ -13,6 +13,7 @@ type Confidence = 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN';
 type SourceAuthority = 'OFFICIAL_WARNING' | 'OFFICIAL_OBSERVATION' | 'VERIFIED_MODEL' | 'SYSTEM_ADVISORY' | 'AI_SUMMARY';
 type IncidentLifecycle = 'DETECTED' | 'MONITORING' | 'ESCALATED' | 'BCM_REVIEW' | 'ACTIVATED_BY_HUMAN' | 'STABILIZED' | 'RECOVERY' | 'CLOSED' | 'POST_INCIDENT_REVIEW';
 type SystemMode = 'ONLINE' | 'DEGRADED' | 'OFFLINE' | 'EXERCISE';
+type ProviderHealthStatus = 'HEALTHY' | 'DEGRADED' | 'UNAVAILABLE' | 'DISABLED' | 'UNKNOWN';
 ```
 
 Authority order is binding: `OFFICIAL_WARNING > OFFICIAL_OBSERVATION > VERIFIED_MODEL > SYSTEM_ADVISORY > AI_SUMMARY`. Authority is not a numerical confidence score and does not resolve conflicts automatically.
@@ -79,6 +80,12 @@ Freshness is calculated only from an approved per-source policy. No global opera
 ```
 
 One provider failure is isolated. Aggregate responses include health per source and must not represent partial results as complete.
+
+## Provider activation and reliability
+
+Activation requires license, display rights, authentication, schema, timestamp semantics, operational policy, attribution, and human approval gates. Connectivity evidence cannot bypass a gate. Generic timeout, retry/backoff, deduplication, cancellation, circuit breaker, and recovery-probe behavior accepts provider-specific configuration; this contract defines no official GISTDA numeric policy.
+
+Future event normalization retains one normalized hazard event with all source event IDs and optional official bulletin associations. It does not define matching thresholds, silent canonical-provider selection, or operational deduplication rules.
 
 ## Incident and BCM extension points
 

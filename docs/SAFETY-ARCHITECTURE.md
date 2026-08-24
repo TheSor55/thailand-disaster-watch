@@ -32,6 +32,8 @@ Any missing approval, expired authorization, stale evidence, unresolved critical
 
 The health view reports provider status, last successful sync, latency, error state, cache status, Worker status, adapter enabled state, last attempted receipt, last source observation, freshness, and validation failures. Credentials and raw confidential payloads are excluded. Health state is observable but does not itself change official hazard status.
 
+PHASE 2.6 implements a reusable banner vocabulary for `NO LIVE DATA`, `LIVE DATA`, `DELAYED`, `STALE`, `OFFLINE`, `DEGRADED`, `EXERCISE`, `OFFICIAL WARNING`, and `SYSTEM ADVISORY`. Only `NO LIVE DATA` is used in the current application. Visual and text semantics keep official warning, observed data, forecast, model output, system advisory, BCM recommendation, BCM activation, and exercise distinct. Color is never the only status signal.
+
 ## Audit requirements
 
 Security-sensitive and operational events are append-only: sign-in, role/permission change, source configuration, rule version, evaluation, approval/rejection, export/share, notification attempt/result, incident transition, and exercise-mode change. Retention and access periods remain subject to legal/organizational approval.
