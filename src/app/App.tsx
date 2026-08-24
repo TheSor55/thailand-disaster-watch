@@ -80,6 +80,7 @@ export function App() {
         </div>
         <div className="header-status" role="status">
           <span className="status-chip"><span aria-hidden="true">○</span> LIVE DATA NOT CONNECTED</span>
+          <span className="safety-label">Decision-support information · Not an official emergency warning</span>
           <span className="updated-time">Last update: —</span>
         </div>
         <div className="header-actions">
@@ -175,7 +176,7 @@ export function App() {
           </section>
 
           <section className="panel layer-panel">
-            <div className="panel-heading"><h2>Map Layers</h2><span className="eyebrow">PHASE 1</span></div>
+            <div className="panel-heading"><h2>Map Layers</h2><span className="eyebrow">PHASE 2.5</span></div>
             <LayerControl
               basemapMode={basemapMode}
               showProvinces={showProvinces}

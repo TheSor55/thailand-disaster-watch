@@ -9,4 +9,27 @@ describe('DataProvenance', () => {
     expect(screen.getByText('No live data')).toBeInTheDocument();
     expect(screen.getAllByText('—')).toHaveLength(3);
   });
+
+  it('renders all required pilot provenance fields without inventing observation time', () => {
+    render(
+      <DataProvenance
+        record={{
+          source: 'GISTDA',
+          dataset: 'Flood extent 1 day',
+          dataType: 'Observed Flood Extent',
+          observedAt: null,
+          retrievedAt: '2026-08-24T07:30:00Z',
+          freshness: 'UNKNOWN',
+          attribution: 'GISTDA · license review pending',
+          status: 'PENDING — PILOT DISABLED',
+        }}
+      />,
+    );
+
+    expect(screen.getByText('GISTDA')).toBeInTheDocument();
+    expect(screen.getByText('Observed Flood Extent')).toBeInTheDocument();
+    expect(screen.getByText('UNKNOWN')).toBeInTheDocument();
+    expect(screen.getByText('PENDING — PILOT DISABLED')).toBeInTheDocument();
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
 });

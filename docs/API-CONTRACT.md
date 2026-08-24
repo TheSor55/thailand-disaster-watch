@@ -83,3 +83,9 @@ One provider failure is isolated. Aggregate responses include health per source 
 ## Incident and BCM extension points
 
 Future incident records link governed hazards to exposure, business impact, evaluated trigger rule/version, recommendation, human approval, action, recovery state, owner, and audit events. The model is defined in `BCM-ARCHITECTURE.md`; PHASE 2 implements no automated action engine.
+
+## PHASE 2.5 GISTDA pilot transport
+
+Candidate internal route: `GET /api/providers/gistda/flood/1day/tiles/{z}/{x}/{y}.png`.
+
+The route is disabled by default and returns a controlled JSON error until Worker-only secret and reviewed pilot configuration are present. A successful response is `image/png`, `Cache-Control: no-store`, and carries non-sensitive provenance headers: provider, observed-at=`unknown`, retrieved-at, and freshness=`UNKNOWN`. The tile has no severity or province status semantics. The official Feature API is not normalized because its reviewed OpenAPI 200 response has no schema.

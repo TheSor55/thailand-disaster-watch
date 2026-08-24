@@ -6,8 +6,9 @@ Thailand Disaster Watch is a planned multi-hazard situation-monitoring and busin
 
 ## Current status
 
-- Current Phase: **2 — Official Data, Safety & Governance Foundation (implementation branch)**
+- Current Phase: **2.5 — GISTDA Verification & Controlled Pilot (implementation branch)**
 - PHASE 1: **MERGED to `main` via PR #1**
+- PHASE 2: **MERGED to `main` via PR #2**
 - Real Data: **NOT CONNECTED**
 - Operational Use: **NOT APPROVED**
 - Production: **NOT DEPLOYED**
@@ -31,7 +32,7 @@ pnpm install
 pnpm dev
 ```
 
-The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. The PHASE 2 audit records candidate official sources and governance contracts but connects no live provider.
+The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. PHASE 2.5 adds a disabled Worker-only GISTDA TMS pilot contract; no GISTDA layer is exposed because license, schema, timestamp, rate, and attribution evidence remain incomplete.
 
 Copy `.env.example` to `.env.local` only when local configuration is required. Never commit real secrets.
 
@@ -54,6 +55,7 @@ pnpm build
 - [GIS architecture](docs/GIS-ARCHITECTURE.md)
 - [Data sources](docs/DATA-SOURCES.md)
 - [Provider audit records](docs/PROVIDER-AUDIT-RECORDS.md)
+- [GISTDA verification and pilot](docs/GISTDA-INTEGRATION.md)
 - [Data license registry](docs/DATA-LICENSE-REGISTRY.md)
 - [API contract](docs/API-CONTRACT.md)
 - [Security](docs/SECURITY.md)
