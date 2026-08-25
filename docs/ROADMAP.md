@@ -8,6 +8,9 @@
 | 2 | Official data, safety, governance, BCM and multi-hazard extension contracts | Phase 1 merged | **Complete:** PR #2 merged to `main`; CI and human review passed |
 | 2.5 | GISTDA dataset verification and controlled pilot | Phase 2 merged | **Controlled Local Pilot: COMPLETE. Production Approval: PENDING.** Sanitized evidence recorded; disabled Worker adapter/tests retained; human decisions on license, attribution, schema, timestamp, rate/cache/SLA, CRS/zoom/tile scheme and operational policy remain required; no production layer |
 | 2.6 | Platform hardening and provider approval readiness | PR #3 merged and safety flags false | Responsive/bundle/GIS audit; fail-closed activation, health, reliability, safety, provenance, offline/export/BCM/event contracts; security/accessibility review; GISTDA remains blocked; CI and human review required |
+| 2.7 | Cross-device UX & GIS refinement | Phase 2.6 review/approval | **Complete:** PR #5 merged to `main`; responsive layouts and MapLibre mobile UX verified |
+| 2.8 | Water & Weather provider readiness | PR #5 merged | **Complete:** PR merged to `main`; TMD/RID/ThaiWater/EGAT APIs audited, domain models and test validations added |
+| 2.9 | Controlled weather/water provider pilot | Phase 2.8 review/approval | **Controlled Local Pilot (RID): COMPLETE. Production Approval: PENDING.** Single bounded request transport and telemetry normalization schemas verified. No live production display |
 | 3 | GISTDA integration | Exact GISTDA dataset/service approved after 2.5 gate | Adapter, contract, attribution, fallback, tests and production enablement review |
 | 4 | Rain/weather | Approved TMD dataset/service | Observed/forecast/model/warning separated and tested |
 | 5 | River and dam | Approved RID/HII datasets/services | Units, timestamps, trends, freshness, fallbacks tested |

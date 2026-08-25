@@ -5,8 +5,14 @@ import {
   type GistdaEnv,
   type GistdaRequestLog,
 } from './providers/gistda';
+import {
+  fetchRidWaterData,
+  ridPilotStatus,
+  RidProviderError,
+  type RidEnv,
+} from './providers/rid';
 
-type Env = GistdaEnv;
+type Env = GistdaEnv & RidEnv;
 
 const jsonHeaders = {
   'content-type': 'application/json; charset=utf-8',
@@ -38,6 +44,14 @@ export default {
           gistda: {
             status: gistdaPilotStatus(env),
             authentication: env.GISTDA_API_KEY ? 'configured' : 'not_configured',
+            dataFreshness: 'UNKNOWN',
+            lastSuccessfulRequest: null,
+            lastFailure: null,
+            latency: null,
+          },
+          rid: {
+            status: ridPilotStatus(env),
+            authentication: 'none_required',
             dataFreshness: 'UNKNOWN',
             lastSuccessfulRequest: null,
             lastFailure: null,
@@ -86,6 +100,33 @@ export default {
               code: providerError.code,
               message: providerError.message,
               provider: 'GISTDA',
+              retryable: providerError.status >= 500,
+            },
+          },
+          { status: providerError.status },
+        );
+      }
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/providers/rid/dams') {
+      try {
+        const result = await fetchRidWaterData(env);
+        return jsonResponse(result);
+      } catch (error) {
+        const providerError =
+          error instanceof RidProviderError
+            ? error
+            : new RidProviderError(
+                'RID_UNAVAILABLE',
+                503,
+                'RID data temporarily unavailable',
+              );
+        return jsonResponse(
+          {
+            error: {
+              code: providerError.code,
+              message: providerError.message,
+              provider: 'RID',
               retryable: providerError.status >= 500,
             },
           },
