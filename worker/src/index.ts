@@ -24,7 +24,12 @@ import {
   type OpenMeteoEnv,
 } from './providers/open-meteo';
 
-type Env = GistdaEnv & RidEnv & TmdEnv & OpenMeteoEnv;
+import {
+  fetchWeatherSituation,
+  type WeatherSituationEnv,
+} from './providers/situation';
+
+type Env = GistdaEnv & RidEnv & TmdEnv & OpenMeteoEnv & WeatherSituationEnv;
 
 const jsonHeaders = {
   'content-type': 'application/json; charset=utf-8',
@@ -213,6 +218,36 @@ export default {
             },
           },
           { status: providerError.status },
+        );
+      }
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/situation/weather') {
+      try {
+        const latParam = url.searchParams.get('lat');
+        const lonParam = url.searchParams.get('lon');
+        const label = url.searchParams.get('label') || null;
+
+        const latitude = latParam ? parseFloat(latParam) : 13.7563;
+        const longitude = lonParam ? parseFloat(lonParam) : 100.5018;
+
+        const result = await fetchWeatherSituation(env as unknown as Record<string, string | undefined>, {
+          latitude,
+          longitude,
+          label,
+        });
+        return jsonResponse(result);
+      } catch (error) {
+        return jsonResponse(
+          {
+            error: {
+              code: 'WEATHER_SITUATION_FAILED',
+              message: error instanceof Error ? error.message : 'Unknown pipeline error',
+              provider: 'WEATHER_SITUATION',
+              retryable: false,
+            },
+          },
+          { status: 500 },
         );
       }
     }
