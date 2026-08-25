@@ -15,7 +15,7 @@ This matrix evaluates and compares candidate official data providers for weather
 | **API** | Yes (UID/UKey required) | Yes (Public JSON endpoints) | Yes (Conceptual standard) | Varies (CSV reference only) |
 | **Timestamp quality** | High (Separate observed/issued) | Varies (Needs local parse) | High (Standard exchange) | Low (Annual update frequency) |
 | **License** | Stated non-commercial | Varies by dataset | PENDING | CC BY (Historical only) |
-| **Production readiness** | **PENDING** | **PENDING — TECHNICAL CONNECTIVITY VERIFIED** | **PENDING** | **APPROVED (CONDITIONAL)** |
+| **Production readiness** | **PENDING — TECHNICAL CONNECTIVITY GATED** | **PENDING — TECHNICAL CONNECTIVITY VERIFIED** | **PENDING** | **APPROVED (CONDITIONAL)** |
 
 ---
 
@@ -25,7 +25,7 @@ This matrix evaluates and compares candidate official data providers for weather
 - **Authority**: Primary official weather, rainfall, storm, and earthquake warning authority in Thailand.
 - **API Connectivity**: Publicly accessible with registered API credentials (`uid` and `ukey`). Outputs JSON and XML.
 - **Timestamp Semantics**: Supports distinct temporal markers (`observedAt`, `issuedAt`, `validFrom`, `validTo`).
-- **Production Status**: `PENDING`. Written confirmation for commercial use in decision-support applications is required.
+- **Production Status**: `PENDING — TECHNICAL CONNECTIVITY GATED`. Written confirmation for commercial use in decision-support applications is required.
 
 ### 2. Royal Irrigation Department (RID)
 - **Authority**: Primary authority for river levels, water flow, and irrigation reservoirs.
