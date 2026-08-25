@@ -45,4 +45,8 @@ Review date: **2026-08-24**. This register records discovery evidence; it does n
 5. Source-specific freshness policy and authoritative thresholds. No threshold is supplied by this audit.
 6. Security/privacy classification and approved production owner.
 
+## Weather Situation Pipeline Integration (Phase 3.0)
+
+TMD observations and Open-Meteo model forecasts are aggregated inside the location-based Weather Situation Pipeline. Observed readings (TMD) and forecast steps (Open-Meteo) are kept strictly separated to avoid temporal and semantic conversion errors.
+
 The field-complete, dataset-level records are maintained in [Provider audit records](PROVIDER-AUDIT-RECORDS.md). The matrix above is the decision summary and must not replace those records during an integration review.

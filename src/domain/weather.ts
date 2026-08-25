@@ -54,3 +54,53 @@ export interface RainForecast {
   unit: 'mm';
   time: WeatherTime;
 }
+
+export interface WeatherSituationLocation {
+  latitude: number;
+  longitude: number;
+  label?: string | null;
+}
+
+export interface WeatherSituationObserved {
+  source: string;
+  observedAt: string | null;
+  retrievedAt: string;
+  precipitation?: number | null;
+  temperatureCelsius?: number | null;
+  humidityPercent?: number | null;
+  windSpeedKph?: number | null;
+  freshness: 'FRESH' | 'DELAYED' | 'STALE' | 'UNAVAILABLE' | 'UNKNOWN';
+  provenance: string;
+}
+
+export interface WeatherSituationForecast {
+  source: string;
+  validAt: string | null;
+  retrievedAt: string;
+  precipitationMm?: number | null;
+  precipitationProbabilityPercent?: number | null;
+  temperatureCelsius?: number | null;
+  humidityPercent?: number | null;
+  windSpeedKph?: number | null;
+  freshness: 'FRESH' | 'DELAYED' | 'STALE' | 'UNAVAILABLE' | 'UNKNOWN';
+  provenance: string;
+}
+
+export interface WeatherSituationWarning {
+  present: boolean;
+  source: string | null;
+  issuedAt: string | null;
+  validFrom: string | null;
+  validTo: string | null;
+}
+
+export interface WeatherSituation {
+  location: WeatherSituationLocation;
+  generatedAt: string;
+  observed: WeatherSituationObserved | null;
+  forecast: WeatherSituationForecast | null;
+  officialWarning: WeatherSituationWarning | null;
+  sourceAgreement: 'CONSISTENT' | 'PARTIAL_AGREEMENT' | 'CONFLICT' | 'INSUFFICIENT_DATA';
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW' | 'INSUFFICIENT_DATA' | 'UNKNOWN';
+  limitations: string[];
+}
