@@ -106,4 +106,3 @@ Candidate internal routes:
 - `GET /api/providers/egat/reservoir`
 
 These routes are disabled by default and return a controlled JSON error. In future phases, these adapters will query official endpoints (e.g. `http://data.tmd.go.th/api/`, `https://app.rid.go.th/reservoir/api/`, `https://standard.thaiwater.net/`, `https://water.egat.co.th/`) only after explicit activation gates (license display, authentication config, rate limit verified, human approval) are satisfied.
-

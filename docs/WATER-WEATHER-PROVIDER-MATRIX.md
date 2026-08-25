@@ -1,6 +1,6 @@
 # Water & Weather Provider Selection Matrix
 
-This matrix evaluates and compares candidate official data providers for weather and water operational telemetry. 
+This matrix evaluates and compares candidate official data providers for weather and water operational telemetry.
 
 ## Capability Matrix
 
