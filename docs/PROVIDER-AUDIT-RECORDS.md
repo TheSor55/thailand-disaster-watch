@@ -31,7 +31,7 @@ Verification date for all records: **2026-08-24**. `Unknown` / `not verified` me
 - License / Attribution / Reuse Condition / Commercial-Public Use: stated public republication requires TMD attribution; commercial/production scope requires written confirmation.
 - Availability / Fallback: SLA not verified / cached labeled data or unavailable; no unofficial warning replacement.
 - Known Limitations: forecasts, observations, and warnings cannot share one unlabeled record type.
-- Production Status / Evidence: `PENDING` / official URLs above.
+- Production Status / Evidence: `PENDING — TECHNICAL CONNECTIVITY GATED` / Phase 2.10 controlled pilot verified endpoint structures and telemetry schema normalization while maintaining credential safety (fails closed on unconfigured environment keys).
 
 ### RID water resources
 

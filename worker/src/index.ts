@@ -11,8 +11,14 @@ import {
   RidProviderError,
   type RidEnv,
 } from './providers/rid';
+import {
+  fetchTmdWeatherData,
+  tmdPilotStatus,
+  TmdProviderError,
+  type TmdEnv,
+} from './providers/tmd';
 
-type Env = GistdaEnv & RidEnv;
+type Env = GistdaEnv & RidEnv & TmdEnv;
 
 const jsonHeaders = {
   'content-type': 'application/json; charset=utf-8',
@@ -52,6 +58,14 @@ export default {
           rid: {
             status: ridPilotStatus(env),
             authentication: 'none_required',
+            dataFreshness: 'UNKNOWN',
+            lastSuccessfulRequest: null,
+            lastFailure: null,
+            latency: null,
+          },
+          tmd: {
+            status: tmdPilotStatus(env),
+            authentication: (env.TMD_UID && env.TMD_UKEY) ? 'configured' : 'not_configured',
             dataFreshness: 'UNKNOWN',
             lastSuccessfulRequest: null,
             lastFailure: null,
@@ -127,6 +141,33 @@ export default {
               code: providerError.code,
               message: providerError.message,
               provider: 'RID',
+              retryable: providerError.status >= 500,
+            },
+          },
+          { status: providerError.status },
+        );
+      }
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/providers/tmd/weather') {
+      try {
+        const result = await fetchTmdWeatherData(env);
+        return jsonResponse(result);
+      } catch (error) {
+        const providerError =
+          error instanceof TmdProviderError
+            ? error
+            : new TmdProviderError(
+                'TMD_UNAVAILABLE',
+                503,
+                'TMD data temporarily unavailable',
+              );
+        return jsonResponse(
+          {
+            error: {
+              code: providerError.code,
+              message: providerError.message,
+              provider: 'TMD',
               retryable: providerError.status >= 500,
             },
           },
