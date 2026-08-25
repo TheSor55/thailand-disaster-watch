@@ -22,6 +22,12 @@ export interface WeatherForecast {
   temperatureMaxCelsius?: number | null;
   forecastText: string;
   time: WeatherTime;
+  // Detailed model forecast parameters (optional)
+  precipitationMm?: number | null;
+  precipitationProbabilityPercent?: number | null;
+  temperatureCelsius?: number | null;
+  humidityPercent?: number | null;
+  windSpeedKph?: number | null;
 }
 
 export interface OfficialWeatherWarning {

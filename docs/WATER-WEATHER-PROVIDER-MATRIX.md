@@ -44,3 +44,9 @@ This matrix evaluates and compares candidate official data providers for weather
 - **API Connectivity**: The live database is a web frontend only. The national open data portal offers an annual CSV inflow dataset.
 - **Timestamp Semantics**: Low frequency (annual) which is unsuitable for live disaster warnings.
 - **Production Status**: `APPROVED_WITH_CONDITIONS` for historical reference analytics only. Live telemetry remains `PENDING`.
+
+### 5. Open-Meteo
+- **Authority**: Independent weather API service aggregating global numerical weather prediction models (ECMWF, GFS, ICON).
+- **API Connectivity**: Standard REST endpoints for forecasts (`/v1/forecast`).
+- **Timestamp Semantics**: High quality; returns hourly forecast steps mapped to target offset timezones.
+- **Production Status**: `PENDING — TECHNICAL CONNECTIVITY VERIFIED`. Technical connectivity and mapping schemas verified in Phase 2.12 pilot. Requires UI attribution link.

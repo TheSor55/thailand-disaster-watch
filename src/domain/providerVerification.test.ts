@@ -4,6 +4,7 @@ import { tmdPilotStatus, fetchTmdWeatherData } from '../../worker/src/providers/
 import { ridPilotStatus, fetchRidWaterData } from '../../worker/src/providers/rid';
 import { thaiWaterPilotStatus, fetchThaiWaterData } from '../../worker/src/providers/thaiwater';
 import { egatPilotStatus, fetchEgatWaterData } from '../../worker/src/providers/egat';
+import { openMeteoPilotStatus, fetchOpenMeteoForecast } from '../../worker/src/providers/open-meteo';
 
 describe('Provider Verification and Governance Rules', () => {
   describe('Data Classification & Separation', () => {
@@ -58,11 +59,12 @@ describe('Provider Verification and Governance Rules', () => {
   });
 
   describe('Activation Gate Protection', () => {
-    it('keeps TMD, RID, ThaiWater, and EGAT pilots disabled by default', () => {
+    it('keeps TMD, RID, ThaiWater, EGAT, and Open-Meteo pilots disabled by default', () => {
       expect(tmdPilotStatus({})).toBe('DISABLED');
       expect(ridPilotStatus({})).toBe('DISABLED');
       expect(thaiWaterPilotStatus({})).toBe('DISABLED');
       expect(egatPilotStatus({})).toBe('DISABLED');
+      expect(openMeteoPilotStatus({})).toBe('DISABLED');
     });
 
     it('denies data fetches for disabled/unconfigured providers', async () => {
@@ -70,6 +72,7 @@ describe('Provider Verification and Governance Rules', () => {
       await expect(fetchRidWaterData({})).rejects.toThrow('RID Water Pilot is currently disabled');
       await expect(fetchThaiWaterData({})).rejects.toThrow('ThaiWater Pilot is currently disabled or unconfigured');
       await expect(fetchEgatWaterData({})).rejects.toThrow('EGAT Telemetry Pilot is currently disabled');
+      await expect(fetchOpenMeteoForecast({})).rejects.toThrow('Open-Meteo Weather Pilot is currently disabled');
     });
   });
 

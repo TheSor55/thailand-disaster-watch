@@ -17,8 +17,14 @@ import {
   TmdProviderError,
   type TmdEnv,
 } from './providers/tmd';
+import {
+  fetchOpenMeteoForecast,
+  openMeteoPilotStatus,
+  OpenMeteoProviderError,
+  type OpenMeteoEnv,
+} from './providers/open-meteo';
 
-type Env = GistdaEnv & RidEnv & TmdEnv;
+type Env = GistdaEnv & RidEnv & TmdEnv & OpenMeteoEnv;
 
 const jsonHeaders = {
   'content-type': 'application/json; charset=utf-8',
@@ -66,6 +72,14 @@ export default {
           tmd: {
             status: tmdPilotStatus(env),
             authentication: (env.TMD_UID && env.TMD_UKEY) ? 'configured' : 'not_configured',
+            dataFreshness: 'UNKNOWN',
+            lastSuccessfulRequest: null,
+            lastFailure: null,
+            latency: null,
+          },
+          open_meteo: {
+            status: openMeteoPilotStatus(env),
+            authentication: 'none_required',
             dataFreshness: 'UNKNOWN',
             lastSuccessfulRequest: null,
             lastFailure: null,
@@ -168,6 +182,33 @@ export default {
               code: providerError.code,
               message: providerError.message,
               provider: 'TMD',
+              retryable: providerError.status >= 500,
+            },
+          },
+          { status: providerError.status },
+        );
+      }
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/providers/open-meteo/forecast') {
+      try {
+        const result = await fetchOpenMeteoForecast(env);
+        return jsonResponse(result);
+      } catch (error) {
+        const providerError =
+          error instanceof OpenMeteoProviderError
+            ? error
+            : new OpenMeteoProviderError(
+                'OPEN_METEO_UNAVAILABLE',
+                502,
+                'Open-Meteo data temporarily unavailable',
+              );
+        return jsonResponse(
+          {
+            error: {
+              code: providerError.code,
+              message: providerError.message,
+              provider: 'Open-Meteo',
               retryable: providerError.status >= 500,
             },
           },
