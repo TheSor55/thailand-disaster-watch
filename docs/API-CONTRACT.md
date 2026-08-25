@@ -96,3 +96,14 @@ Future incident records link governed hazards to exposure, business impact, eval
 Candidate internal route: `GET /api/providers/gistda/flood/1day/tiles/{z}/{x}/{y}.png`.
 
 The route is disabled by default and returns a controlled JSON error until Worker-only secret and reviewed pilot configuration are present. A successful response is `image/png`, `Cache-Control: no-store`, and carries non-sensitive provenance headers: provider, observed-at=`unknown`, retrieved-at, and freshness=`UNKNOWN`. The tile has no severity or province status semantics. The official Feature API is not normalized because its reviewed OpenAPI 200 response has no schema.
+
+## PHASE 2.8 TMD / RID / ThaiWater / EGAT pilot preparation
+
+Candidate internal routes:
+- `GET /api/providers/tmd/weather`
+- `GET /api/providers/rid/reservoirs`
+- `GET /api/providers/thaiwater/telemetry`
+- `GET /api/providers/egat/reservoir`
+
+These routes are disabled by default and return a controlled JSON error. In future phases, these adapters will query official endpoints (e.g. `http://data.tmd.go.th/api/`, `https://app.rid.go.th/reservoir/api/`, `https://standard.thaiwater.net/`, `https://water.egat.co.th/`) only after explicit activation gates (license display, authentication config, rate limit verified, human approval) are satisfied.
+
