@@ -159,7 +159,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
 }
 @media (max-width: 540px) {
   .brand-lockup p { font-size: .65rem; }.brand-lockup h1 { font-size: .9rem; }.status-chip { font-size: .61rem; }
-  .left-rail { display: flex; }.map-column { min-height: 520px; grid-template-rows: auto 380px auto; }
+  .left-rail { display: flex; flex-direction: column; }.map-column { min-height: 520px; grid-template-rows: auto 380px auto; }
   .map-toolbar { align-items: flex-start; }.map-toolbar button { white-space: nowrap; }.map-license-note { max-width: calc(100% - 90px); }
   .summary-card { padding: 7px 6px; }.summary-card div { display: flex; flex-direction: column; align-items: flex-start; }.summary-card strong { display: none; }
   .timeline-options { min-width: 360px; }.timeline-bar { overflow-x: auto; }
@@ -167,5 +167,124 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
 @media (pointer: coarse) {
   button, input, select, .layer-row { min-height: 44px; }
   .icon-button, .mobile-sheet-heading button { min-width: 44px; min-height: 44px; }
+  .maplibregl-ctrl-group button { width: 44px !important; height: 44px !important; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* ==========================================
+   Phase 2.7 Cross-Device UX Additions
+   ========================================== */
+
+/* Command Modules Panel */
+.module-nav-panel {
+  padding: 13px;
+}
+.module-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.module-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  background: var(--surface-raised);
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.module-nav-item:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.module-nav-item.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.module-nav-item.is-disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  border-color: color-mix(in srgb, var(--border) 40%, transparent);
+}
+.module-nav-item .tag {
+  margin-left: auto;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* Share & Export Panel */
+.share-export-panel {
+  padding: 13px;
+  margin-top: 10px;
+}
+.share-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.share-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  background: var(--surface-raised);
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: not-allowed;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+.share-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.share-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  border-color: color-mix(in srgb, var(--border) 40%, transparent);
+}
+
+/* Mobile Situation Detail Enhancement */
+.mobile-situation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mobile-situation-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.mobile-share-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.mobile-share-section .share-grid {
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 8px;
+}
+@media (max-width: 480px) {
+  .mobile-share-section .share-grid {
+    grid-template-columns: 1fr;
+  }
+}
