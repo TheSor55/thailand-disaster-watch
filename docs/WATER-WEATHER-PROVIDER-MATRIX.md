@@ -15,7 +15,7 @@ This matrix evaluates and compares candidate official data providers for weather
 | **API** | Yes (UID/UKey required) | Yes (Public JSON endpoints) | Yes (Conceptual standard) | Varies (CSV reference only) |
 | **Timestamp quality** | High (Separate observed/issued) | Varies (Needs local parse) | High (Standard exchange) | Low (Annual update frequency) |
 | **License** | Stated non-commercial | Varies by dataset | PENDING | CC BY (Historical only) |
-| **Production readiness** | **PENDING** | **PENDING** | **PENDING** | **APPROVED (CONDITIONAL)** |
+| **Production readiness** | **PENDING** | **PENDING — TECHNICAL CONNECTIVITY VERIFIED** | **PENDING** | **APPROVED (CONDITIONAL)** |
 
 ---
 
@@ -31,7 +31,7 @@ This matrix evaluates and compares candidate official data providers for weather
 - **Authority**: Primary authority for river levels, water flow, and irrigation reservoirs.
 - **API Connectivity**: Maintains direct JSON endpoints for reservoirs (`/reservoir/api/reservoir/public`) and dams (`/reservoir/api/dam/public`).
 - **Timestamp Semantics**: Telemetry dates require custom verification parsing; timestamp schema is not standardized.
-- **Production Status**: `PENDING`. Written permission or explicit open usage license is required.
+- **Production Status**: `PENDING — TECHNICAL CONNECTIVITY VERIFIED`. Technical connectivity and normalization checked in Phase 2.9 pilot. Written permission or explicit open usage license is required for production.
 
 ### 3. Hydro-Informatics Institute (HII / ThaiWater)
 - **Authority**: Secondary aggregator that standardizes water data exchange across agencies.

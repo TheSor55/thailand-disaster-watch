@@ -44,7 +44,7 @@ Verification date for all records: **2026-08-24**. `Unknown` / `not verified` me
 - License / Attribution / Reuse Condition / Commercial-Public Use: selected-resource terms and attribution not yet confirmed from RID.
 - Availability / Fallback: SLA unknown / explicit unavailable; no fallback approved.
 - Known Limitations: direct JSON paths must not be reverse engineered without written confirmation.
-- Production Status / Evidence: `PENDING` / official catalog above.
+- Production Status / Evidence: `PENDING — TECHNICAL CONNECTIVITY VERIFIED` / Phase 2.9 controlled pilot successfully verified endpoint connectivity, response schema, and telemetry normalization.
 
 ### HII / ThaiWater standard and resources
 
