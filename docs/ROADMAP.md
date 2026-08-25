@@ -11,7 +11,8 @@
 | 2.7 | Cross-device UX & GIS refinement | Phase 2.6 review/approval | **Complete:** PR #5 merged to `main`; responsive layouts and MapLibre mobile UX verified |
 | 2.8 | Water & Weather provider readiness | PR #5 merged | **Complete:** PR merged to `main`; TMD/RID/ThaiWater/EGAT APIs audited, domain models and test validations added |
 | 2.9 | Controlled weather/water provider pilot | Phase 2.8 review/approval | **Complete:** PR #7 merged to `main`; RID controlled pilot verified. Production Approval: PENDING. No live production display |
-| 2.10 | Controlled TMD Weather Provider Pilot | Phase 2.9 review/approval | **Controlled Local Pilot (TMD): COMPLETE. Production Approval: PENDING.** Single bounded request transport and telemetry normalization schemas verified. Connectivity gated on unconfigured environment keys. No live production display |
+| 2.10 | Controlled TMD Weather Provider Pilot | Phase 2.9 review/approval | **Complete:** PR #8 merged to `main`; TMD controlled pilot verified. Production Approval: PENDING. No live production display |
+| 2.11 | Windy Free Feasibility Audit | Phase 2.10 review/approval | **Feasibility & Licensing Audit: COMPLETE.** Verified Windy Premium limitations, scrambled Testing API data, and mapped compliant open weather alternatives. No production code changes made |
 | 3 | GISTDA integration | Exact GISTDA dataset/service approved after 2.5 gate | Adapter, contract, attribution, fallback, tests and production enablement review |
 | 4 | Rain/weather | Approved TMD dataset/service | Observed/forecast/model/warning separated and tested |
 | 5 | River and dam | Approved RID/HII datasets/services | Units, timestamps, trends, freshness, fallbacks tested |
