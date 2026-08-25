@@ -19,8 +19,8 @@ export type RidErrorCode =
 export interface RidRequestLog {
   requestId: string;
   provider: 'RID';
-  dataset: 'rid-reservoir-telemetry';
-  route: '/api/providers/rid/reservoirs';
+  dataset: 'rid-dam-telemetry';
+  route: '/api/providers/rid/dams';
   outcome: 'success' | 'failure';
   statusCode: number;
   latency: number;
@@ -29,7 +29,7 @@ export interface RidRequestLog {
 
 export interface RidObservationResult {
   provider: 'RID';
-  datasetId: 'rid-reservoir-telemetry';
+  datasetId: 'rid-dam-telemetry';
   dataType: 'OBSERVED';
   retrievedAt: string;
   observations: WaterStationObservation[];

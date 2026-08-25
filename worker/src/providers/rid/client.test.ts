@@ -58,7 +58,7 @@ describe('RID Provider Client and Normalization', () => {
       });
 
       expect(result.provider).toBe('RID');
-      expect(result.datasetId).toBe('rid-reservoir-telemetry');
+      expect(result.datasetId).toBe('rid-dam-telemetry');
       expect(result.dataType).toBe('OBSERVED');
       expect(result.retrievedAt).toBe(mockNow.toISOString());
       

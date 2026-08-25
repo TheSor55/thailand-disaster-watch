@@ -174,7 +174,7 @@ export async function fetchRidWaterData(
 
   return {
     provider: 'RID',
-    datasetId: 'rid-reservoir-telemetry',
+    datasetId: 'rid-dam-telemetry',
     dataType: 'OBSERVED',
     retrievedAt: now.toISOString(),
     observations,

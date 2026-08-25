@@ -108,7 +108,7 @@ export default {
       }
     }
 
-    if (request.method === 'GET' && url.pathname === '/api/providers/rid/reservoirs') {
+    if (request.method === 'GET' && url.pathname === '/api/providers/rid/dams') {
       try {
         const result = await fetchRidWaterData(env);
         return jsonResponse(result);

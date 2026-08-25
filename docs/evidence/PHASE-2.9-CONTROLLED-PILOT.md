@@ -5,11 +5,11 @@ This document contains the verified schemas, datatypes, and technical connectivi
 ## Technical Connectivity
 
 - **Provider**: Royal Irrigation Department (RID)
-- **Dataset**: Medium/large reservoir telemetry (`rid-reservoir-telemetry`)
+- **Dataset**: Large dam telemetry (`rid-dam-telemetry`)
 - **Endpoint**: `https://app.rid.go.th/reservoir/api/dam/public`
 - **Authentication**: None required (public endpoint)
 - **Transport**: Cloudflare Worker Gateway Proxy
-- **Internal route**: `GET /api/providers/rid/reservoirs`
+- **Internal route**: `GET /api/providers/rid/dams`
 
 ## Schema Characteristics & Fields
 
