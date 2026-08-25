@@ -171,6 +171,41 @@ export function App() {
 
       <main className="workspace">
         <aside className="left-rail" aria-label="Region and layer navigation">
+          <section className="panel module-nav-panel">
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow">COMMAND MODULES</span>
+                <h2>ระบบปฏิบัติการ</h2>
+              </div>
+            </div>
+            <div className="module-nav-list" role="navigation" aria-label="Operations Modules">
+              <button type="button" className="module-nav-item is-active">
+                <span className="icon">🗺</span>
+                <span>GIS Map View</span>
+              </button>
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="My Sites — Coming Soon in Phase 3">
+                <span className="icon">🏢</span>
+                <span>My Sites</span>
+                <span className="tag">COMING SOON</span>
+              </button>
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Incident Watch — Coming Soon in Phase 3">
+                <span className="icon">🚨</span>
+                <span>Incident Watch</span>
+                <span className="tag">COMING SOON</span>
+              </button>
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="BCM Actions — Coming Soon in Phase 3">
+                <span className="icon">🛡</span>
+                <span>BCM Actions</span>
+                <span className="tag">COMING SOON</span>
+              </button>
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Reports — Coming Soon in Phase 3">
+                <span className="icon">📋</span>
+                <span>Reports</span>
+                <span className="tag">COMING SOON</span>
+              </button>
+            </div>
+          </section>
+
           <section className="panel region-panel">
             <div className="panel-heading">
               <div>
@@ -292,6 +327,32 @@ export function App() {
               {['Station', 'Location', 'Owner', 'Observed', 'Status'].map((field) => <div key={field}><dt>{field}</dt><dd>—</dd></div>)}
             </dl>
           </section>
+
+          <section className="panel share-export-panel">
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow">EXPORT & SHARE</span>
+                <h2>ส่งออกข้อมูล</h2>
+              </div>
+            </div>
+            <div className="share-grid">
+              <button type="button" disabled aria-disabled="true" title="Share Situation — Coming Soon" className="share-button">
+                <span>🔗 Share Situation</span>
+              </button>
+              <button type="button" disabled aria-disabled="true" title="Capture Map — Coming Soon" className="share-button">
+                <span>📸 Capture Map</span>
+              </button>
+              <button type="button" disabled aria-disabled="true" title="Export PDF Report — Coming Soon" className="share-button">
+                <span>📄 Export PDF Report</span>
+              </button>
+              <button type="button" disabled aria-disabled="true" title="BCM Report — Coming Soon" className="share-button">
+                <span>🛡 BCM Report</span>
+              </button>
+              <button type="button" disabled aria-disabled="true" title="Copy Summary — Coming Soon" className="share-button">
+                <span>✍ Copy Summary</span>
+              </button>
+            </div>
+          </section>
           </aside>
         </ModuleErrorBoundary>
       </main>
@@ -323,7 +384,44 @@ export function App() {
               </>
             )}
             {mobileSheet === 'layers' && <LayerControl basemapMode={basemapMode} showProvinces={showProvinces} onBasemapChange={setBasemapMode} onProvinceVisibilityChange={setShowProvinces} />}
-            {mobileSheet === 'situation' && <><p className="no-data-banner"><span aria-hidden="true">○</span> DEMO / NO LIVE DATA</p><DataProvenance /></>}
+            {mobileSheet === 'situation' && (
+              <div className="mobile-situation-content">
+                <span className="eyebrow">SITUATION OVERVIEW</span>
+                <h3 className="mobile-situation-title">{navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย'}</h3>
+                <p className="no-data-banner"><span aria-hidden="true">○</span> DEMO / NO LIVE DATA</p>
+
+                {navigation.viewLevel === 'province' && (
+                  <div className="module-grid" aria-label="Province data modules">
+                    {['Overview', 'Rain', 'Flood', 'River', 'Dam', 'CCTV', 'Alerts', 'Timeline'].map((module) => (
+                      <div key={module}><strong>{module}</strong><span>DATA SOURCE NOT CONNECTED</span></div>
+                    ))}
+                  </div>
+                )}
+
+                <DataProvenance />
+
+                <div className="mobile-share-section">
+                  <span className="eyebrow">EXPORT & SHARE</span>
+                  <div className="share-grid">
+                    <button type="button" disabled aria-disabled="true" title="Share Situation — Coming Soon" className="share-button">
+                      <span>🔗 Share Situation</span>
+                    </button>
+                    <button type="button" disabled aria-disabled="true" title="Capture Map — Coming Soon" className="share-button">
+                      <span>📸 Capture Map</span>
+                    </button>
+                    <button type="button" disabled aria-disabled="true" title="Export Report — Coming Soon" className="share-button">
+                      <span>📄 Export PDF Report</span>
+                    </button>
+                    <button type="button" disabled aria-disabled="true" title="BCM Report — Coming Soon" className="share-button">
+                      <span>🛡 BCM Report</span>
+                    </button>
+                    <button type="button" disabled aria-disabled="true" title="Copy Summary — Coming Soon" className="share-button">
+                      <span>✍ Copy Summary</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         </div>
       )}
