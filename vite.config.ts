@@ -11,9 +11,17 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['maplibre-gl'],
   },
-  server: isCodexSeatbeltSandbox
-    ? { watch: { useFsEvents: false, usePolling: true } }
-    : undefined,
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true,
+      },
+    },
+    ...(isCodexSeatbeltSandbox
+      ? { watch: { useFsEvents: false, usePolling: true } }
+      : {}),
+  },
   build: {
     outDir: 'dist/web',
     sourcemap: false,

@@ -15,7 +15,8 @@
 | 2.11 | Windy Free Feasibility Audit | Phase 2.10 review/approval | **Complete:** PR #9 merged to `main`; Windy feasibility & licensing audit completed. Zero-cost alternatives mapped |
 | 2.12 | Open-Meteo Controlled Forecast Prototype | Phase 2.11 review/approval | **Complete:** PR #10 merged to `main`; Open-Meteo controlled pilot verified. Production Approval: PENDING. No live production display |
 | 3.0 | Multi-Source Weather Situation Pipeline | Phase 2.12 review/approval | **Controlled Situation Pipeline: COMPLETE. Production Approval: PENDING.** Worker-level orchestration combining TMD observed and Open-Meteo model forecast parameters. Gated by default; no production display |
-| 3.1 | Weather Situation UI Safe Preview | Phase 3.0 review/approval | **Safe UI Preview: COMPLETE. Production Approval: PENDING.** Separated OBSERVED, MODEL_FORECAST, source provenance, freshness, FutureGreen branding, developer identity, and strict non-operational disclaimers. |
+| 3.1 | Weather Situation UI Safe Preview | Phase 3.0 review/approval | **Complete:** PR #12 merged to `main`; Separated OBSERVED, MODEL_FORECAST, source provenance, freshness, FutureGreen branding, and developer identity. |
+| 3.2 | Usable Weather Preview & Controlled Live Mode | Phase 3.1 review/approval | **Controlled Live Preview: COMPLETE. Production Approval: PENDING.** Dual explicit DEMO and CONTROLLED LIVE modes, location preset selector, explainer guide, and zero silent fallback. |
 | 3 | GISTDA integration | Exact GISTDA dataset/service approved after 2.5 gate | Adapter, contract, attribution, fallback, tests and production enablement review |
 | 4 | Rain/weather | Approved TMD dataset/service | Observed/forecast/model/warning separated and tested |
 | 5 | River and dam | Approved RID/HII datasets/services | Units, timestamps, trends, freshness, fallbacks tested |
