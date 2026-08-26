@@ -14,6 +14,8 @@ interface LayerControlProps {
   showProvinces: boolean;
   onBasemapChange: (mode: BasemapMode) => void;
   onProvinceVisibilityChange: (visible: boolean) => void;
+  showRadar?: boolean;
+  onRadarVisibilityChange?: (visible: boolean) => void;
 }
 
 export function LayerControl({
@@ -21,6 +23,8 @@ export function LayerControl({
   showProvinces,
   onBasemapChange,
   onProvinceVisibilityChange,
+  showRadar = false,
+  onRadarVisibilityChange,
 }: LayerControlProps) {
   return (
     <div className="layer-control">
@@ -38,7 +42,21 @@ export function LayerControl({
       </label>
       <div className="layer-row"><span><i className="layer-swatch layer-swatch--region" />Region highlight</span><span>Auto</span></div>
 
-      <h3>Disaster</h3>
+      <h3>Disaster &amp; Weather Observations</h3>
+      <label className="layer-row">
+        <span>
+          <i className="layer-swatch layer-swatch--radar" />
+          🌤 เรดาร์ตรวจอากาศ (Radar Observation)
+          <small>RainViewer · OBSERVED_REMOTE_SENSING · Controlled Preview</small>
+        </span>
+        <input
+          type="checkbox"
+          checked={showRadar}
+          onChange={(event) => onRadarVisibilityChange?.(event.target.checked)}
+          aria-label="เปิด/ปิด เลเยอร์เรดาร์ตรวจอากาศ"
+        />
+      </label>
+
       <div className="layer-row is-disabled" aria-disabled="true">
         <span>
           Satellite / GISTDA Flood Extent

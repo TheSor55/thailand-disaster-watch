@@ -20,6 +20,9 @@ interface ThailandMapProps {
   selectedProvinceIso: string | null;
   showProvinces: boolean;
   onProvinceSelect: (province: ProvinceDefinition) => void;
+  showRadar?: boolean;
+  radarTileUrl?: string | null;
+  radarOpacity?: number;
 }
 
 interface MapErrorEvent {
@@ -61,6 +64,9 @@ export function ThailandMap({
   selectedProvinceIso,
   showProvinces,
   onProvinceSelect,
+  showRadar = false,
+  radarTileUrl = null,
+  radarOpacity = 0.7,
 }: ThailandMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -232,6 +238,54 @@ export function ThailandMap({
       maxZoom: selectedProvinceIso ? 8.4 : 6.4,
     });
   }, [boundaryData, mapReady, selectedIsoCodes, selectedProvinceIso]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    const sourceId = 'radar-raster-source';
+    const layerId = 'radar-raster-layer';
+
+    if (!showRadar || !radarTileUrl) {
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', 'none');
+      }
+      return;
+    }
+
+    try {
+      if (map.getLayer(layerId)) {
+        map.removeLayer(layerId);
+      }
+      if (map.getSource(sourceId)) {
+        map.removeSource(sourceId);
+      }
+
+      map.addSource(sourceId, {
+        type: 'raster',
+        tiles: [radarTileUrl],
+        tileSize: 256,
+        attribution: 'Weather radar data by RainViewer',
+      });
+
+      const beforeLayer = map.getLayer('province-boundary') ? 'province-boundary' : undefined;
+      map.addLayer(
+        {
+          id: layerId,
+          type: 'raster',
+          source: sourceId,
+          layout: { visibility: 'visible' },
+          paint: {
+            'raster-opacity': radarOpacity,
+            'raster-fade-duration': 150,
+          },
+        },
+        beforeLayer,
+      );
+    } catch {
+      /* MapLibre source swap error recovery */
+    }
+  }, [mapReady, showRadar, radarTileUrl, radarOpacity]);
 
   return (
     <section className="map-shell" aria-label="แผนที่จังหวัดประเทศไทย">

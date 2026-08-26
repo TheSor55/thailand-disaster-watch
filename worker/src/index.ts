@@ -25,11 +25,18 @@ import {
 } from './providers/open-meteo';
 
 import {
+  fetchRainViewerFrames,
+  rainViewerPilotStatus,
+  RainViewerProviderError,
+  type RainViewerEnv,
+} from './providers/rainviewer';
+
+import {
   fetchWeatherSituation,
   type WeatherSituationEnv,
 } from './providers/situation';
 
-type Env = GistdaEnv & RidEnv & TmdEnv & OpenMeteoEnv & WeatherSituationEnv;
+type Env = GistdaEnv & RidEnv & TmdEnv & OpenMeteoEnv & WeatherSituationEnv & RainViewerEnv;
 
 const jsonHeaders = {
   'content-type': 'application/json; charset=utf-8',
@@ -84,6 +91,14 @@ export default {
           },
           open_meteo: {
             status: openMeteoPilotStatus(env),
+            authentication: 'none_required',
+            dataFreshness: 'UNKNOWN',
+            lastSuccessfulRequest: null,
+            lastFailure: null,
+            latency: null,
+          },
+          radar_rainviewer: {
+            status: rainViewerPilotStatus(env),
             authentication: 'none_required',
             dataFreshness: 'UNKNOWN',
             lastSuccessfulRequest: null,
@@ -248,6 +263,35 @@ export default {
             },
           },
           { status: 500 },
+        );
+      }
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/radar/frames') {
+      try {
+        const modeParam = url.searchParams.get('mode');
+        const mode = modeParam === 'LIVE' ? 'LIVE' : 'DEMO';
+        const result = await fetchRainViewerFrames(env, { mode });
+        return jsonResponse(result);
+      } catch (error) {
+        const providerError =
+          error instanceof RainViewerProviderError
+            ? error
+            : new RainViewerProviderError(
+                'RAINVIEWER_UNAVAILABLE',
+                502,
+                error instanceof Error ? error.message : 'Radar service unavailable',
+              );
+        return jsonResponse(
+          {
+            error: {
+              code: providerError.code,
+              message: providerError.message,
+              provider: 'RainViewer',
+              retryable: providerError.status >= 500,
+            },
+          },
+          { status: providerError.status },
         );
       }
     }
