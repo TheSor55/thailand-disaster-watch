@@ -24,12 +24,13 @@ describe('command-center navigation', () => {
     expect(await screen.findByLabelText('mock map')).toHaveTextContent('selected:');
   });
 
-  it('restores province deep links and keeps all situation modules explicitly disconnected', async () => {
+  it('restores province deep links and renders province hydrological telemetry', async () => {
     window.history.replaceState({}, '', '/province/chiang-mai');
     render(<App />);
-    expect(screen.getByRole('heading', { name: 'Chiang Mai Situation' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Chiang Mai Situation' })).toBeInTheDocument();
     expect(screen.getByText('เชียงใหม่', { selector: '.situation-panel h2' })).toBeInTheDocument();
-    expect(screen.getAllByText('DATA SOURCE NOT CONNECTED')).toHaveLength(8);
+    expect(screen.getByText('เขื่อนแม่งัดสมบูรณ์ชล')).toBeInTheDocument();
+    expect(screen.getByText('แม่น้ำปิง (สถานี P.1 สะพานนวรัฐ)')).toBeInTheDocument();
     expect(await screen.findByLabelText('mock map')).toHaveTextContent('selected:TH-50');
   });
 

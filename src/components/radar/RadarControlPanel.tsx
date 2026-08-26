@@ -1,19 +1,20 @@
 /**
- * RadarControlPanel — Phase 3.4
+ * RadarControlPanel — Phase 3.4 & v1.1 UX Refinement
  *
- * Floating/Docked control panel for the MapLibre Radar observation layer.
+ * Compact & Collapsible Floating Control Panel for the MapLibre Radar observation layer.
  *
  * Requirements:
  * - Frame timestamp display (formatted in Thai locale)
  * - Historical frame controls: Previous, Play/Pause, Next
- * - Opacity slider
+ * - Timeline scrubbing track & Opacity slider
+ * - Collapsible Mini-Player mode so it never blocks the map view
  * - Mandatory attribution ("Weather radar data by RainViewer")
  * - Non-operational development preview disclaimers
  * - Coverage gap note ("COVERAGE MAY BE INCOMPLETE")
  * - Strictly NO nowcasting or automated storm warnings
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import type { RadarFrame } from '../../domain/radar';
 
 interface RadarControlPanelProps {
@@ -40,6 +41,18 @@ function formatFrameTime(iso: string | null | undefined): string {
   }
 }
 
+function formatShortTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleTimeString('th-TH', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
+}
+
 export function RadarControlPanel({
   frames,
   selectedFrameIndex,
@@ -51,6 +64,7 @@ export function RadarControlPanel({
   onClose,
   mode,
 }: RadarControlPanelProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const currentFrame: RadarFrame | undefined = frames[selectedFrameIndex];
 
   const handleNext = useCallback(() => {
@@ -76,6 +90,77 @@ export function RadarControlPanel({
     return null;
   }
 
+  // Mini-player mode (Compact single-row bar)
+  if (isCollapsed) {
+    return (
+      <div
+        className="radar-control-panel radar-control-panel--mini"
+        role="region"
+        aria-label="แผงควบคุมเรดาร์ขนาดเล็ก"
+      >
+        <div className="radar-mini-row">
+          <button
+            type="button"
+            className={`radar-btn radar-btn--play ${isPlaying ? 'is-playing' : ''}`}
+            onClick={() => onTogglePlay(!isPlaying)}
+            aria-label={isPlaying ? 'หยุดเล่น' : 'เล่น'}
+            title={isPlaying ? 'หยุด' : 'เล่น'}
+          >
+            {isPlaying ? '⏸' : '▶'}
+          </button>
+
+          <button
+            type="button"
+            className="radar-btn radar-btn--small"
+            onClick={handlePrev}
+            aria-label="เฟรมก่อนหน้า"
+            title="เฟรมก่อนหน้า"
+          >
+            ◀
+          </button>
+
+          <div className="radar-mini-time">
+            <span className="radar-mini-time__badge">เรดาร์ {formatShortTime(currentFrame?.frameTime)}</span>
+            <span className="radar-mini-time__counter">
+              ({selectedFrameIndex + 1}/{frames.length})
+            </span>
+          </div>
+
+          <button
+            type="button"
+            className="radar-btn radar-btn--small"
+            onClick={handleNext}
+            aria-label="เฟรมถัดไป"
+            title="เฟรมถัดไป"
+          >
+            ▶
+          </button>
+
+          <button
+            type="button"
+            className="radar-btn radar-btn--expand"
+            onClick={() => setIsCollapsed(false)}
+            aria-label="ขยายแผงควบคุมเรดาร์"
+            title="ขยายแผงควบคุม"
+          >
+            ⛶ ขยาย
+          </button>
+
+          <button
+            type="button"
+            className="radar-control-panel__close-btn"
+            onClick={onClose}
+            aria-label="ปิดเลเยอร์เรดาร์"
+            title="ปิดเลเยอร์เรดาร์"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Expanded full control panel
   return (
     <div className="radar-control-panel" role="region" aria-label="แผงควบคุมเรดาร์ตรวจอากาศ">
       <div className="radar-control-panel__header">
@@ -87,6 +172,15 @@ export function RadarControlPanel({
           <span className={`status-chip status-chip--${mode === 'DEMO' ? 'demo' : 'dev-preview'}`}>
             {mode === 'DEMO' ? 'DEMO PREVIEW' : 'CONTROLLED LIVE'}
           </span>
+          <button
+            type="button"
+            className="radar-btn radar-btn--collapse"
+            onClick={() => setIsCollapsed(true)}
+            aria-label="ย่อแผงควบคุมเรดาร์"
+            title="ย่อแผงควบคุม"
+          >
+            — ย่อ
+          </button>
           <button
             type="button"
             className="radar-control-panel__close-btn"

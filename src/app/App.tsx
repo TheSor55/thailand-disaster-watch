@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import {
-  BANGKOK_METRO_PROVINCE_CODES,
   PROVINCE_BY_ISO,
   REGIONS,
   REGION_BY_ID,
@@ -31,6 +30,13 @@ import { SafetyBanner } from '../components/SafetyBanner';
 import { SystemHealthPanel } from '../components/SystemHealthPanel';
 import { RadarControlPanel } from '../components/radar/RadarControlPanel';
 import { fetchRadarFramesUI, type RadarFrame } from '../services/radar';
+import { getDamsByProvince, getDamsByRegion, MAJOR_DAMS } from '../domain/dam';
+import { getRiverStationsByProvince, getRiverStationsByRegion, MAJOR_RIVER_STATIONS } from '../domain/river';
+import { getAlertsForProvince, ACTIVE_OFFICIAL_ALERTS } from '../domain/warning';
+import { DamSituationCard } from '../components/water/DamSituationCard';
+import { RiverStationCard } from '../components/water/RiverStationCard';
+import { SituationAlertCard } from '../components/alerts/SituationAlertCard';
+import { MySitesPanel } from '../components/mysites/MySitesPanel';
 
 const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
@@ -78,9 +84,10 @@ export function App() {
   const [isRadarPlaying, setIsRadarPlaying] = useState(false);
   const [radarMode] = useState<'DEMO' | 'LIVE'>('DEMO');
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [appView, setAppView] = useState<'gis' | 'weather' | 'about'>('gis');
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'mysites' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
+  const isMySitesView = appView === 'mysites';
   const isAboutView = appView === 'about';
 
   const [mobileSheet, setMobileSheet] = useState<
@@ -138,6 +145,12 @@ export function App() {
         { label: 'สภาพอากาศ (Weather Situation)', path: '/weather', current: true },
       ];
     }
+    if (appView === 'mysites') {
+      return [
+        { label: 'แผนที่ GIS', path: '/', current: false },
+        { label: 'พื้นที่เฝ้าระวังของฉัน (My Sites)', path: '/mysites', current: true },
+      ];
+    }
     if (appView === 'about') {
       return [
         { label: 'แผนที่ GIS', path: '/', current: false },
@@ -155,6 +168,33 @@ export function App() {
   const handleProvinceSelect = (province: ProvinceDefinition) => {
     navigate({ viewLevel: 'province', province });
   };
+
+  // Province-specific water & alert data calculations
+  const currentProvinceName = navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย';
+  const provinceRegionId = navigation.viewLevel === 'province' ? navigation.province.regionId : 'central';
+
+  const displayedDams = useMemo(() => {
+    if (navigation.viewLevel === 'province') {
+      const local = getDamsByProvince(currentProvinceName);
+      return local.length > 0 ? local : getDamsByRegion(provinceRegionId);
+    }
+    return MAJOR_DAMS.slice(0, 4);
+  }, [navigation.viewLevel, currentProvinceName, provinceRegionId]);
+
+  const displayedRivers = useMemo(() => {
+    if (navigation.viewLevel === 'province') {
+      const local = getRiverStationsByProvince(currentProvinceName);
+      return local.length > 0 ? local : getRiverStationsByRegion(provinceRegionId);
+    }
+    return MAJOR_RIVER_STATIONS.slice(0, 3);
+  }, [navigation.viewLevel, currentProvinceName, provinceRegionId]);
+
+  const displayedAlerts = useMemo(() => {
+    if (navigation.viewLevel === 'province') {
+      return getAlertsForProvince(currentProvinceName, provinceRegionId);
+    }
+    return [...ACTIVE_OFFICIAL_ALERTS];
+  }, [navigation.viewLevel, currentProvinceName, provinceRegionId]);
 
   return (
     <div className="command-center" data-theme={basemapMode}>
@@ -179,62 +219,82 @@ export function App() {
                 if (fallback) fallback.style.display = 'grid';
               }}
             />
-            <span className="brand-mark" aria-hidden="true" style={{ display: 'none' }}>FG</span>
+            <span className="brand-logo-fallback" style={{ display: 'none' }} aria-hidden="true">
+              FG
+            </span>
           </a>
           <div>
-            <p>Thailand Disaster Watch</p>
-            <h1>{appView === 'weather' ? 'สภาพอากาศ' : appView === 'about' ? 'เกี่ยวกับระบบ' : titleForNavigation(navigation)}</h1>
+            <span className="eyebrow">THAILAND DISASTER WATCH</span>
+            <h1>{titleForNavigation(navigation)}</h1>
           </div>
         </div>
-        <div className="header-status" role="status">
-          <span className="status-chip"><span aria-hidden="true">○</span> LIVE DATA NOT CONNECTED</span>
-          <span className="status-chip status-chip--dev-preview" aria-label="Development Preview">DEV PREVIEW</span>
-          <span className="safety-label">Decision-support information · Not an official emergency warning</span>
-          <span className="updated-time">Last update: —</span>
-        </div>
-        <div className="header-actions">
-          <button className="icon-button" type="button" onClick={() => setSettingsOpen((open) => !open)} aria-label="เปิดการตั้งค่า" aria-expanded={settingsOpen}>⚙</button>
-          <button
-            className="icon-button"
-            type="button"
-            onClick={() => setBasemapMode((mode) => (mode === 'dark' ? 'standard' : 'dark'))}
-            aria-label={basemapMode === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
-          >
-            {basemapMode === 'dark' ? '☀' : '◐'}
-          </button>
-          <button className="icon-button mobile-menu-button" type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('navigation'); }} aria-label="เปิดเมนูมือถือ">☰</button>
+
+        <div className="header-meta">
+          <div className="meta-pill meta-pill--danger">
+            <span className="status-dot status-dot--off" aria-hidden="true" />
+            <span>LIVE DATA NOT CONNECTED</span>
+          </div>
+          <div className="meta-pill meta-pill--dev">
+            <span>v1.1 PREVIEW</span>
+          </div>
+          <p className="caption">Decision-support information · Not an official emergency warning</p>
+          <div className="header-actions">
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="System Settings"
+              aria-expanded={settingsOpen}
+              onClick={() => setSettingsOpen((prev) => !prev)}
+            >
+              ⚙
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Toggle Theme"
+              onClick={() => setBasemapMode((prev) => (prev === 'dark' ? 'standard' : 'dark'))}
+            >
+              {basemapMode === 'dark' ? '☀' : '🌙'}
+            </button>
+          </div>
         </div>
       </header>
 
-      <SafetyBanner
-        state="NO_LIVE_DATA"
-        detail="Provider approval gates remain closed. Decision-support information only."
-        compact
-      />
+      <SafetyBanner state="NO_LIVE_DATA" />
 
       {settingsOpen && (
-        <aside className="settings-popover" aria-label="การตั้งค่า">
-          <strong>Display settings</strong>
-          <p>Theme preference applies to this session. Persistent preferences will be evaluated in a later phase.</p>
-          <SystemHealthPanel
-            providers={providerHealth}
-            operationalStatusByProviderId={{ 'GISTDA Disaster Platform': 'PENDING' }}
-          />
-        </aside>
-      )}
-
-      <nav className="breadcrumb" aria-label="ตำแหน่งปัจจุบัน">
-        {breadcrumbItems.map((item, index) => (
-          <span key={item.path}>
-            {index > 0 && <span aria-hidden="true">›</span>}
+        <section className="settings-drawer" aria-label="System Settings Drawer">
+          <div className="settings-drawer__header">
+            <span className="eyebrow">SYSTEM GOVERNANCE</span>
+            <h3>Data Source &amp; Provider Health</h3>
             <button
               type="button"
+              className="btn-ghost"
+              onClick={() => setSettingsOpen(false)}
+              aria-label="Close Settings"
+            >
+              ✕
+            </button>
+          </div>
+          <SystemHealthPanel
+            providers={providerHealth}
+          />
+        </section>
+      )}
+
+      <nav className="breadcrumb-bar" aria-label="ตำแหน่งปัจจุบัน">
+        {breadcrumbItems.map((item, index) => (
+          <span key={item.path} className="breadcrumb-bar__item">
+            {index > 0 && <span className="breadcrumb-bar__separator" aria-hidden="true">›</span>}
+            <button
+              type="button"
+              className={`breadcrumb-bar__button${item.current ? ' is-current' : ''}`}
               aria-current={item.current ? 'page' : undefined}
               onClick={() => {
-                if (item.path === '/') {
-                  setAppView('gis');
-                } else if (item.path === '/weather') {
+                if (item.path === '/weather') {
                   setAppView('weather');
+                } else if (item.path === '/mysites') {
+                  setAppView('mysites');
                 } else if (item.path === '/about') {
                   setAppView('about');
                 } else {
@@ -250,7 +310,7 @@ export function App() {
       </nav>
 
       <main className="workspace">
-        {appView === 'gis' && (
+        {isGisView && (
           <aside className="left-rail" aria-label="Region and layer navigation">
           <section className="panel module-nav-panel">
             <div className="panel-heading">
@@ -279,22 +339,27 @@ export function App() {
                 <span>สภาพอากาศ</span>
                 <span className="tag">PREVIEW</span>
               </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="My Sites — Coming Soon in Phase 3">
+              <button
+                type="button"
+                className={`module-nav-item${isMySitesView ? ' is-active' : ''}`}
+                onClick={() => setAppView('mysites')}
+                aria-pressed={isMySitesView}
+              >
                 <span className="icon">🏢</span>
                 <span>My Sites</span>
-                <span className="tag">COMING SOON</span>
+                <span className="tag">PROTOTYPE</span>
               </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Incident Watch — Coming Soon in Phase 3">
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Incident Watch — Coming Soon">
                 <span className="icon">🚨</span>
                 <span>Incident Watch</span>
                 <span className="tag">COMING SOON</span>
               </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="BCM Actions — Coming Soon in Phase 3">
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="BCM Actions — Coming Soon">
                 <span className="icon">🛡</span>
                 <span>BCM Actions</span>
                 <span className="tag">COMING SOON</span>
               </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Reports — Coming Soon in Phase 3">
+              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Reports — Coming Soon">
                 <span className="icon">📋</span>
                 <span>Reports</span>
                 <span className="tag">COMING SOON</span>
@@ -348,87 +413,108 @@ export function App() {
               <div className="region-province-list" aria-label={`จังหวัดใน${navigation.region.nameTh}`}>
                 <strong>จังหวัดในพื้นที่</strong>
                 <div>
-                  {navigation.region.provinceIsoCodes.map((isoCode) => {
-                    const province = PROVINCE_BY_ISO.get(isoCode);
-                    return province ? <button type="button" key={isoCode} onClick={() => handleProvinceSelect(province)}>{province.nameTh}</button> : null;
+                  {navigation.region.provinceIsoCodes.map((iso) => {
+                    const province = PROVINCE_BY_ISO.get(iso);
+                    if (!province) return null;
+                    return (
+                      <button
+                        key={iso}
+                        className="chip-button"
+                        type="button"
+                        onClick={() => navigate({ viewLevel: 'province', province })}
+                      >
+                        {province.nameTh}
+                      </button>
+                    );
                   })}
                 </div>
               </div>
             )}
-            <button
-              className={navigation.viewLevel === 'quick-view' ? 'quick-view is-active' : 'quick-view'}
-              type="button"
-              onClick={() => navigate({ viewLevel: 'quick-view', quickView: 'bangkok-metro' })}
-            >
-              <span aria-hidden="true">◎</span>
-              <span><strong>กรุงเทพฯ และปริมณฑล</strong><small>Operational Quick View · {BANGKOK_METRO_PROVINCE_CODES.length} จังหวัด</small></span>
-            </button>
+            <div className="quick-views" aria-label="Operational quick views">
+              <span className="eyebrow">OPERATIONAL QUICK VIEWS</span>
+              <button
+                type="button"
+                className={navigation.viewLevel === 'quick-view' && navigation.quickView === 'bangkok-metro' ? 'quick-view-btn is-active' : 'quick-view-btn'}
+                onClick={() =>
+                  navigate({
+                    viewLevel: 'quick-view',
+                    quickView: 'bangkok-metro',
+                  })
+                }
+              >
+                <span>ปริมณฑล</span>
+                <small>Operational Quick View · 6 จังหวัด</small>
+              </button>
+            </div>
           </section>
 
-          <section className="panel layer-panel">
-            <div className="panel-heading"><h2>Map Layers</h2><span className="eyebrow">PHASE 2.5</span></div>
-            <LayerControl
-              basemapMode={basemapMode}
-              showProvinces={showProvinces}
-              onBasemapChange={setBasemapMode}
-              onProvinceVisibilityChange={setShowProvinces}
-              showRadar={showRadar}
-              onRadarVisibilityChange={(visible) => {
-                setShowRadar(visible);
-                if (!visible) setIsRadarPlaying(false);
-              }}
-            />
-          </section>
-        </aside>
+          <LayerControl
+            basemapMode={basemapMode}
+            showProvinces={showProvinces}
+            onBasemapChange={setBasemapMode}
+            onProvinceVisibilityChange={setShowProvinces}
+            showRadar={showRadar}
+            onRadarVisibilityChange={setShowRadar}
+          />
+          </aside>
         )}
 
-        {appView === 'gis' && (
+        {isGisView && (
           <>
-            <section className="map-column">
-              <div className="map-toolbar">
+            <section className="map-stage" aria-label="Map visualization area">
+              <div className="map-stage__header">
                 <div>
                   <span className="eyebrow">CURRENT VIEW</span>
-                  <strong>{titleForNavigation(navigation)}</strong>
+                  <h2>{titleForNavigation(navigation)}</h2>
                 </div>
-                <button type="button" onClick={() => navigate({ viewLevel: 'national' })}>⌂ Reset Thailand</button>
+                {navigation.viewLevel !== 'national' && (
+                  <button
+                    className="btn-ghost"
+                    type="button"
+                    onClick={() => navigate({ viewLevel: 'national' })}
+                  >
+                    ↺ Reset Thailand
+                  </button>
+                )}
               </div>
-              <ModuleErrorBoundary moduleName="Map">
-                <Suspense fallback={<div className="map-shell map-loading" role="status">Loading map module…</div>}>
-                  <ThailandMap
-                    basemapMode={basemapMode}
-                    selectedIsoCodes={selectedIsoCodes}
-                    selectedProvinceIso={selectedProvinceIso}
-                    showProvinces={showProvinces}
-                    onProvinceSelect={handleProvinceSelect}
-                    showRadar={showRadar}
-                    radarTileUrl={radarFrames[selectedRadarIndex]?.tileUrl || null}
-                    radarOpacity={radarOpacity}
+
+              <div className="map-container-wrap">
+                <ModuleErrorBoundary moduleName="GIS Map">
+                  <Suspense fallback={<div className="map-loading" role="status">กำลังเตรียมแผนที่ประเทศไทย…</div>}>
+                    <ThailandMap
+                      basemapMode={basemapMode}
+                      selectedIsoCodes={selectedIsoCodes}
+                      selectedProvinceIso={selectedProvinceIso}
+                      showProvinces={showProvinces}
+                      showRadar={showRadar}
+                      radarTileUrl={radarFrames[selectedRadarIndex]?.tileUrl ?? null}
+                      radarOpacity={radarOpacity}
+                      onProvinceSelect={handleProvinceSelect}
+                    />
+                  </Suspense>
+                </ModuleErrorBoundary>
+
+                {/* Radar Floating Control Panel */}
+                {showRadar && radarFrames.length > 0 && (
+                  <RadarControlPanel
+                    frames={radarFrames}
+                    selectedFrameIndex={selectedRadarIndex}
+                    onSelectFrameIndex={setSelectedRadarIndex}
+                    opacity={radarOpacity}
+                    onOpacityChange={setRadarOpacity}
+                    isPlaying={isRadarPlaying}
+                    onTogglePlay={setIsRadarPlaying}
+                    onClose={() => setShowRadar(false)}
+                    mode={radarMode}
                   />
-                </Suspense>
-              </ModuleErrorBoundary>
+                )}
+              </div>
 
-              {showRadar && radarFrames.length > 0 && (
-                <RadarControlPanel
-                  frames={radarFrames}
-                  selectedFrameIndex={selectedRadarIndex}
-                  onSelectFrameIndex={setSelectedRadarIndex}
-                  opacity={radarOpacity}
-                  onOpacityChange={setRadarOpacity}
-                  isPlaying={isRadarPlaying}
-                  onTogglePlay={setIsRadarPlaying}
-                  onClose={() => {
-                    setShowRadar(false);
-                    setIsRadarPlaying(false);
-                  }}
-                  mode={radarMode}
-                />
-              )}
-
-              <div className="summary-strip" aria-label="Situation summary">
+              <div className="module-strip" aria-label="Disaster modules status">
                 {situationModules.map((module) => (
-                  <article key={module} className="summary-card">
+                  <article key={module} className="module-pill">
                     <span className="status-dot" aria-hidden="true" />
-                    <div><small>{module}</small><strong>—</strong><span>No live data</span></div>
+                    <div><small>{module}</small><strong>—</strong><span>{module === 'Dam' || module === 'River' ? 'TELEMETRY READY' : 'No live data'}</span></div>
                   </article>
                 ))}
               </div>
@@ -438,21 +524,44 @@ export function App() {
               <aside className="right-rail" aria-label="Situation information">
               <section className="panel situation-panel">
                 <span className="eyebrow">SITUATION OVERVIEW</span>
-                <h2>{navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย'}</h2>
-                <p className="no-data-banner"><span aria-hidden="true">○</span> DEMO / NO LIVE DATA</p>
-                <DataProvenance />
+                <h2>{currentProvinceName}</h2>
+                <p className="no-data-banner"><span aria-hidden="true">○</span> v1.1 TELEMETRY EXPANSION</p>
+
+                {/* Quick Weather Action */}
                 {navigation.viewLevel === 'province' && (
-                  <div className="module-grid" aria-label="Province data modules">
-                    {['Overview', 'Rain', 'Flood', 'River', 'Dam', 'CCTV', 'Alerts', 'Timeline'].map((module) => (
-                      <div key={module}><strong>{module}</strong><span>DATA SOURCE NOT CONNECTED</span></div>
-                    ))}
+                  <div className="quick-weather-banner" style={{ margin: '8px 0' }}>
+                    <button
+                      type="button"
+                      className="btn-quick-weather"
+                      onClick={() => setAppView('weather')}
+                    >
+                      <span>🌤️ ตรวจสภาพอากาศ &amp; ภาพเรดาร์ {navigation.province.nameTh}</span>
+                      <span>➔</span>
+                    </button>
                   </div>
                 )}
+
+                <DataProvenance />
               </section>
-              <section className="panel alert-panel">
-                <div className="panel-heading"><h2>Situation Alerts</h2><span className="status-chip status-chip--small">NO SOURCE</span></div>
-                <div className="empty-state"><span aria-hidden="true">!</span><p>No official alert source connected.</p></div>
-              </section>
+
+              {/* Official Situation Alerts */}
+              <SituationAlertCard
+                alerts={displayedAlerts}
+                provinceNameTh={currentProvinceName}
+              />
+
+              {/* Dam Telemetry */}
+              <DamSituationCard
+                dams={displayedDams}
+                provinceNameTh={currentProvinceName}
+              />
+
+              {/* River Telemetry */}
+              <RiverStationCard
+                stations={displayedRivers}
+                provinceNameTh={currentProvinceName}
+              />
+
               <section className="panel cctv-panel">
                 <div className="panel-heading"><h2>CCTV Watch</h2><span className="eyebrow">PHASE 2+</span></div>
                 <div className="cctv-placeholder" aria-hidden="true"><span>▦</span></div>
@@ -502,6 +611,31 @@ export function App() {
           </div>
         )}
 
+        {isMySitesView && (
+          <div className="full-content-column" aria-label="พื้นที่เฝ้าระวัง">
+            <ModuleErrorBoundary moduleName="My Sites">
+              <div className="mysites-page-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '16px' }}>
+                <header className="page-section-header" style={{ marginBottom: '16px' }}>
+                  <button type="button" className="btn-ghost" onClick={() => setAppView('gis')}>
+                    ← กลับไปหน้าแผนที่ GIS
+                  </button>
+                </header>
+                <MySitesPanel
+                  onSelectSite={(site) => {
+                    const prov = Array.from(PROVINCE_BY_ISO.values()).find(
+                      (p) => p.nameTh === site.province || site.province.includes(p.nameTh)
+                    );
+                    if (prov) {
+                      navigate({ viewLevel: 'province', province: prov });
+                      setAppView('gis');
+                    }
+                  }}
+                />
+              </div>
+            </ModuleErrorBoundary>
+          </div>
+        )}
+
         {isAboutView && (
           <div className="full-content-column" aria-label="เกี่ยวกับระบบ">
             <ModuleErrorBoundary moduleName="About">
@@ -513,99 +647,107 @@ export function App() {
         )}
       </main>
 
-
       <footer className="timeline-bar">
         <div><span className="eyebrow">SITUATION TIMELINE</span><strong>Timeline unavailable — live data not connected</strong></div>
         <div className="timeline-options" aria-label="Timeline unavailable">
           {['-24h', '-12h', '-6h', '-3h', '-1h', 'Now'].map((time) => <span key={time}>{time}</span>)}
         </div>
-        <div className="footer-credit" aria-label="Developer credit">
-          <span>Developed by <strong>Sorawit Suwannarong</strong></span>
-          <span className="footer-credit__platform">FutureGreen Disaster Intelligence Platform</span>
-        </div>
       </footer>
 
-      <nav className="mobile-dock" aria-label="Mobile command center navigation">
+      <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
         <button
           type="button"
-          className={isGisView ? 'is-active' : ''}
-          onClick={(event) => {
-            setAppView('gis');
-            mobileSheetTrigger.current = event.currentTarget;
-            setMobileSheet('navigation');
-          }}
+          ref={(el) => { if (mobileSheet === 'navigation') mobileSheetTrigger.current = el; }}
+          className={`mobile-bottom-nav__item${mobileSheet === 'navigation' ? ' is-active' : ''}`}
+          onClick={() => setMobileSheet((prev) => (prev === 'navigation' ? null : 'navigation'))}
+          aria-expanded={mobileSheet === 'navigation'}
+          aria-label="เปิดเมนูมือถือ"
         >
-          <span aria-hidden="true">🗺</span>แผนที่
+          <span className="mobile-bottom-nav__icon">🗺</span>
+          <span>แผนที่</span>
         </button>
         <button
           type="button"
-          onClick={(event) => {
-            mobileSheetTrigger.current = event.currentTarget;
-            setMobileSheet('layers');
-          }}
+          ref={(el) => { if (mobileSheet === 'layers') mobileSheetTrigger.current = el; }}
+          className={`mobile-bottom-nav__item${mobileSheet === 'layers' ? ' is-active' : ''}`}
+          onClick={() => setMobileSheet((prev) => (prev === 'layers' ? null : 'layers'))}
+          aria-expanded={mobileSheet === 'layers'}
         >
-          <span aria-hidden="true">▱</span>Layers
+          <span className="mobile-bottom-nav__icon">▤</span>
+          <span>Layers</span>
         </button>
         <button
           type="button"
-          className={isWeatherView ? 'is-active' : ''}
-          onClick={() => {
-            setAppView('weather');
-            setMobileSheet(null);
-          }}
+          className={`mobile-bottom-nav__item${isWeatherView ? ' is-active' : ''}`}
+          onClick={() => { setMobileSheet(null); setAppView('weather'); }}
         >
-          <span aria-hidden="true">🌤</span>อากาศ
+          <span className="mobile-bottom-nav__icon">🌤</span>
+          <span>อากาศ</span>
         </button>
         <button
           type="button"
-          onClick={(event) => {
-            mobileSheetTrigger.current = event.currentTarget;
-            setMobileSheet('situation');
-          }}
+          className={`mobile-bottom-nav__item${isMySitesView ? ' is-active' : ''}`}
+          onClick={() => { setMobileSheet(null); setAppView('mysites'); }}
         >
-          <span aria-hidden="true">○</span>สถานการณ์
+          <span className="mobile-bottom-nav__icon">🏢</span>
+          <span>My Sites</span>
+        </button>
+        <button
+          type="button"
+          ref={(el) => { if (mobileSheet === 'situation') mobileSheetTrigger.current = el; }}
+          className={`mobile-bottom-nav__item${mobileSheet === 'situation' ? ' is-active' : ''}`}
+          onClick={() => setMobileSheet((prev) => (prev === 'situation' ? null : 'situation'))}
+          aria-expanded={mobileSheet === 'situation'}
+        >
+          <span className="mobile-bottom-nav__icon">📊</span>
+          <span>สถานการณ์</span>
         </button>
       </nav>
 
       {mobileSheet && (
-        <div className="mobile-sheet-backdrop" role="presentation" onClick={() => setMobileSheet(null)}>
-          <section className="mobile-sheet" role="dialog" aria-modal="true" aria-label="Mobile command panel" onClick={(event) => event.stopPropagation()}>
-            <div className="mobile-sheet-heading"><strong>{mobileSheet === 'navigation' ? 'เลือกพื้นที่' : mobileSheet === 'layers' ? 'Map Layers' : 'Situation overview'}</strong><button type="button" onClick={() => setMobileSheet(null)} aria-label="ปิดแผง" autoFocus>×</button></div>
+        <div className="mobile-drawer-backdrop" onClick={() => setMobileSheet(null)}>
+          <section
+            role="dialog"
+            className="mobile-drawer"
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Mobile command panel"
+          >
+            <div className="mobile-drawer__header">
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => setMobileSheet(null)}
+                aria-label="ปิดเมนูมือถือ"
+              >
+                ✕ ปิด
+              </button>
+            </div>
             {mobileSheet === 'navigation' && (
-              <>
-                <div className="mobile-module-nav" aria-label="เลือกโมดูลคำสั่ง">
-                  <button
-                    type="button"
-                    className={`mobile-module-btn${isGisView ? ' is-active' : ''}`}
-                    onClick={() => { setAppView('gis'); setMobileSheet(null); }}
-                  >
-                    <span>🗺 GIS Map View</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`mobile-module-btn${isWeatherView ? ' is-active' : ''}`}
-                    onClick={() => { setAppView('weather'); setMobileSheet(null); }}
-                  >
-                    <span>🌤 สภาพอากาศ (Weather)</span>
-                    <span className="tag">PREVIEW</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`mobile-module-btn${isAboutView ? ' is-active' : ''}`}
-                    onClick={() => { setAppView('about'); setMobileSheet(null); }}
-                  >
-                    <span>ℹ เกี่ยวกับระบบ (About)</span>
-                  </button>
-                </div>
+              <div className="mobile-nav-content">
+                <span className="eyebrow">NAVIGATION</span>
+                <h3>เลือกพื้นที่</h3>
+                <button
+                  className={navigation.viewLevel === 'national' ? 'nav-card is-active' : 'nav-card'}
+                  type="button"
+                  onClick={() => {
+                    navigate({ viewLevel: 'national' });
+                    setMobileSheet(null);
+                  }}
+                >
+                  <span>ประเทศไทย</span><small>National extent</small>
+                </button>
                 <NavigationSearch
-                  onProvinceSelect={(province) => { handleProvinceSelect(province); setAppView('gis'); setMobileSheet(null); }}
-                  onRegionSelect={(region) => { navigate({ viewLevel: 'region', region }); setAppView('gis'); setMobileSheet(null); }}
+                  visibleProvinceIsoCodes={selectedIsoCodes}
+                  onProvinceSelect={(province) => {
+                    handleProvinceSelect(province);
+                    setMobileSheet(null);
+                  }}
+                  onRegionSelect={(region) => {
+                    navigate({ viewLevel: 'region', region });
+                    setMobileSheet(null);
+                  }}
                 />
-                <div className="mobile-region-list">
-                  <button type="button" onClick={() => { navigate({ viewLevel: 'national' }); setAppView('gis'); setMobileSheet(null); }}>ประเทศไทย</button>
-                  {REGIONS.map((region) => <button type="button" key={region.id} onClick={() => { navigate({ viewLevel: 'region', region }); setAppView('gis'); setMobileSheet(null); }}>{region.nameTh}</button>)}
-                </div>
-              </>
+              </div>
             )}
             {mobileSheet === 'layers' && (
               <LayerControl
@@ -620,39 +762,44 @@ export function App() {
             {mobileSheet === 'situation' && (
               <div className="mobile-situation-content">
                 <span className="eyebrow">SITUATION OVERVIEW</span>
-                <h3 className="mobile-situation-title">{navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย'}</h3>
-                <p className="no-data-banner"><span aria-hidden="true">○</span> DEMO / NO LIVE DATA</p>
+                <h3 className="mobile-situation-title">{currentProvinceName}</h3>
 
+                {/* Quick Weather Action */}
                 {navigation.viewLevel === 'province' && (
-                  <div className="module-grid" aria-label="Province data modules">
-                    {['Overview', 'Rain', 'Flood', 'River', 'Dam', 'CCTV', 'Alerts', 'Timeline'].map((module) => (
-                      <div key={module}><strong>{module}</strong><span>DATA SOURCE NOT CONNECTED</span></div>
-                    ))}
+                  <div className="quick-weather-banner" style={{ margin: '8px 0' }}>
+                    <button
+                      type="button"
+                      className="btn-quick-weather"
+                      onClick={() => {
+                        setMobileSheet(null);
+                        setAppView('weather');
+                      }}
+                    >
+                      <span>🌤️ ตรวจสภาพอากาศ &amp; ภาพเรดาร์ {navigation.province.nameTh}</span>
+                      <span>➔</span>
+                    </button>
                   </div>
                 )}
 
-                <DataProvenance />
+                {/* Official Situation Alerts */}
+                <SituationAlertCard
+                  alerts={displayedAlerts}
+                  provinceNameTh={currentProvinceName}
+                />
 
-                <div className="mobile-share-section">
-                  <span className="eyebrow">EXPORT & SHARE</span>
-                  <div className="share-grid">
-                    <button type="button" disabled aria-disabled="true" title="Share Situation — Coming Soon" className="share-button">
-                      <span>🔗 Share Situation</span>
-                    </button>
-                    <button type="button" disabled aria-disabled="true" title="Capture Map — Coming Soon" className="share-button">
-                      <span>📸 Capture Map</span>
-                    </button>
-                    <button type="button" disabled aria-disabled="true" title="Export Report — Coming Soon" className="share-button">
-                      <span>📄 Export PDF Report</span>
-                    </button>
-                    <button type="button" disabled aria-disabled="true" title="BCM Report — Coming Soon" className="share-button">
-                      <span>🛡 BCM Report</span>
-                    </button>
-                    <button type="button" disabled aria-disabled="true" title="Copy Summary — Coming Soon" className="share-button">
-                      <span>✍ Copy Summary</span>
-                    </button>
-                  </div>
-                </div>
+                {/* Dam Telemetry */}
+                <DamSituationCard
+                  dams={displayedDams}
+                  provinceNameTh={currentProvinceName}
+                />
+
+                {/* River Telemetry */}
+                <RiverStationCard
+                  stations={displayedRivers}
+                  provinceNameTh={currentProvinceName}
+                />
+
+                <DataProvenance />
               </div>
             )}
           </section>
