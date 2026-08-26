@@ -168,7 +168,7 @@ export function App() {
             title="FutureGreen Disaster Intelligence Platform"
           >
             <img
-              src="/futuregreen-logo.svg"
+              src="/futuregreen-logo.png"
               alt="FutureGreen Logo"
               className="brand-logo"
               width="38"
