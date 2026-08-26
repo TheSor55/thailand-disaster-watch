@@ -71,6 +71,10 @@ export function App() {
   const [showProvinces, setShowProvinces] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [appView, setAppView] = useState<'gis' | 'weather' | 'about'>('gis');
+  const isGisView = appView === 'gis';
+  const isWeatherView = appView === 'weather';
+  const isAboutView = appView === 'about';
+
   const [mobileSheet, setMobileSheet] = useState<
     'navigation' | 'layers' | 'situation' | null
   >(null);
@@ -106,7 +110,22 @@ export function App() {
   );
   const selectedProvinceIso =
     navigation.viewLevel === 'province' ? navigation.province.isoCode : null;
-  const breadcrumbItems = breadcrumbsForNavigation(navigation);
+
+  const breadcrumbItems = useMemo(() => {
+    if (appView === 'weather') {
+      return [
+        { label: 'แผนที่ GIS', path: '/', current: false },
+        { label: 'สภาพอากาศ (Weather Situation)', path: '/weather', current: true },
+      ];
+    }
+    if (appView === 'about') {
+      return [
+        { label: 'แผนที่ GIS', path: '/', current: false },
+        { label: 'เกี่ยวกับระบบ (About)', path: '/about', current: true },
+      ];
+    }
+    return breadcrumbsForNavigation(navigation);
+  }, [appView, navigation]);
 
   const handleRegionSelect = (regionId: RegionId) => {
     const region = REGION_BY_ID.get(regionId);
@@ -191,7 +210,18 @@ export function App() {
             <button
               type="button"
               aria-current={item.current ? 'page' : undefined}
-              onClick={() => navigate(parseNavigationPath(item.path))}
+              onClick={() => {
+                if (item.path === '/') {
+                  setAppView('gis');
+                } else if (item.path === '/weather') {
+                  setAppView('weather');
+                } else if (item.path === '/about') {
+                  setAppView('about');
+                } else {
+                  setAppView('gis');
+                  navigate(parseNavigationPath(item.path));
+                }
+              }}
             >
               {item.label}
             </button>
@@ -200,7 +230,8 @@ export function App() {
       </nav>
 
       <main className="workspace">
-        <aside className="left-rail" aria-label="Region and layer navigation">
+        {appView === 'gis' && (
+          <aside className="left-rail" aria-label="Region and layer navigation">
           <section className="panel module-nav-panel">
             <div className="panel-heading">
               <div>
@@ -211,18 +242,18 @@ export function App() {
             <div className="module-nav-list" role="navigation" aria-label="Operations Modules">
               <button
                 type="button"
-                className={`module-nav-item${appView === 'gis' ? ' is-active' : ''}`}
+                className={`module-nav-item${isGisView ? ' is-active' : ''}`}
                 onClick={() => setAppView('gis')}
-                aria-pressed={appView === 'gis'}
+                aria-pressed={isGisView}
               >
                 <span className="icon">🗺</span>
                 <span>GIS Map View</span>
               </button>
               <button
                 type="button"
-                className={`module-nav-item${appView === 'weather' ? ' is-active' : ''}`}
+                className={`module-nav-item${isWeatherView ? ' is-active' : ''}`}
                 onClick={() => setAppView('weather')}
-                aria-pressed={appView === 'weather'}
+                aria-pressed={isWeatherView}
               >
                 <span className="icon">🌤</span>
                 <span>สภาพอากาศ</span>
@@ -250,9 +281,9 @@ export function App() {
               </button>
               <button
                 type="button"
-                className={`module-nav-item${appView === 'about' ? ' is-active' : ''}`}
+                className={`module-nav-item${isAboutView ? ' is-active' : ''}`}
                 onClick={() => setAppView('about')}
-                aria-pressed={appView === 'about'}
+                aria-pressed={isAboutView}
               >
                 <span className="icon">ℹ</span>
                 <span>เกี่ยวกับระบบ</span>
@@ -324,8 +355,9 @@ export function App() {
             />
           </section>
         </aside>
+        )}
 
-        {appView === 'gis' && (
+        {isGisView && (
           <>
             <section className="map-column">
               <div className="map-toolbar">
@@ -414,17 +446,17 @@ export function App() {
           </>
         )}
 
-        {appView === 'weather' && (
+        {isWeatherView && (
           <div className="full-content-column" aria-label="สภาพอากาศ">
             <ModuleErrorBoundary moduleName="Weather Situation">
               <Suspense fallback={<div className="page-loading" role="status">กำลังโหลดหน้าสภาพอากาศ…</div>}>
-                <WeatherSituationPage />
+                <WeatherSituationPage onBack={() => setAppView('gis')} />
               </Suspense>
             </ModuleErrorBoundary>
           </div>
         )}
 
-        {appView === 'about' && (
+        {isAboutView && (
           <div className="full-content-column" aria-label="เกี่ยวกับระบบ">
             <ModuleErrorBoundary moduleName="About">
               <Suspense fallback={<div className="page-loading" role="status">กำลังโหลด…</div>}>
@@ -448,10 +480,45 @@ export function App() {
       </footer>
 
       <nav className="mobile-dock" aria-label="Mobile command center navigation">
-        <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('navigation'); }}><span aria-hidden="true">⌕</span>พื้นที่</button>
-        <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('layers'); }}><span aria-hidden="true">▱</span>Layers</button>
-        <button type="button" onClick={() => { setAppView('weather'); setMobileSheet(null); }}><span aria-hidden="true">🌤</span>อากาศ</button>
-        <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('situation'); }}><span aria-hidden="true">○</span>สถานการณ์</button>
+        <button
+          type="button"
+          className={isGisView ? 'is-active' : ''}
+          onClick={(event) => {
+            setAppView('gis');
+            mobileSheetTrigger.current = event.currentTarget;
+            setMobileSheet('navigation');
+          }}
+        >
+          <span aria-hidden="true">🗺</span>แผนที่
+        </button>
+        <button
+          type="button"
+          onClick={(event) => {
+            mobileSheetTrigger.current = event.currentTarget;
+            setMobileSheet('layers');
+          }}
+        >
+          <span aria-hidden="true">▱</span>Layers
+        </button>
+        <button
+          type="button"
+          className={isWeatherView ? 'is-active' : ''}
+          onClick={() => {
+            setAppView('weather');
+            setMobileSheet(null);
+          }}
+        >
+          <span aria-hidden="true">🌤</span>อากาศ
+        </button>
+        <button
+          type="button"
+          onClick={(event) => {
+            mobileSheetTrigger.current = event.currentTarget;
+            setMobileSheet('situation');
+          }}
+        >
+          <span aria-hidden="true">○</span>สถานการณ์
+        </button>
       </nav>
 
       {mobileSheet && (
@@ -460,10 +527,37 @@ export function App() {
             <div className="mobile-sheet-heading"><strong>{mobileSheet === 'navigation' ? 'เลือกพื้นที่' : mobileSheet === 'layers' ? 'Map Layers' : 'Situation overview'}</strong><button type="button" onClick={() => setMobileSheet(null)} aria-label="ปิดแผง" autoFocus>×</button></div>
             {mobileSheet === 'navigation' && (
               <>
-                <NavigationSearch onProvinceSelect={(province) => { handleProvinceSelect(province); setMobileSheet(null); }} onRegionSelect={(region) => { navigate({ viewLevel: 'region', region }); setMobileSheet(null); }} />
+                <div className="mobile-module-nav" aria-label="เลือกโมดูลคำสั่ง">
+                  <button
+                    type="button"
+                    className={`mobile-module-btn${isGisView ? ' is-active' : ''}`}
+                    onClick={() => { setAppView('gis'); setMobileSheet(null); }}
+                  >
+                    <span>🗺 GIS Map View</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`mobile-module-btn${isWeatherView ? ' is-active' : ''}`}
+                    onClick={() => { setAppView('weather'); setMobileSheet(null); }}
+                  >
+                    <span>🌤 สภาพอากาศ (Weather)</span>
+                    <span className="tag">PREVIEW</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`mobile-module-btn${isAboutView ? ' is-active' : ''}`}
+                    onClick={() => { setAppView('about'); setMobileSheet(null); }}
+                  >
+                    <span>ℹ เกี่ยวกับระบบ (About)</span>
+                  </button>
+                </div>
+                <NavigationSearch
+                  onProvinceSelect={(province) => { handleProvinceSelect(province); setAppView('gis'); setMobileSheet(null); }}
+                  onRegionSelect={(region) => { navigate({ viewLevel: 'region', region }); setAppView('gis'); setMobileSheet(null); }}
+                />
                 <div className="mobile-region-list">
-                  <button type="button" onClick={() => { navigate({ viewLevel: 'national' }); setMobileSheet(null); }}>ประเทศไทย</button>
-                  {REGIONS.map((region) => <button type="button" key={region.id} onClick={() => { navigate({ viewLevel: 'region', region }); setMobileSheet(null); }}>{region.nameTh}</button>)}
+                  <button type="button" onClick={() => { navigate({ viewLevel: 'national' }); setAppView('gis'); setMobileSheet(null); }}>ประเทศไทย</button>
+                  {REGIONS.map((region) => <button type="button" key={region.id} onClick={() => { navigate({ viewLevel: 'region', region }); setAppView('gis'); setMobileSheet(null); }}>{region.nameTh}</button>)}
                 </div>
               </>
             )}
