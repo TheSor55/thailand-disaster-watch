@@ -30,6 +30,7 @@ export interface RainViewerFrameResult {
   attributionUrl: string;
   classification: 'OBSERVED_REMOTE_SENSING';
   freshness: 'FRESH' | 'DELAYED' | 'STALE' | 'UNAVAILABLE' | 'UNKNOWN';
+  freshnessPolicy?: 'INTERNAL_PREVIEW_POLICY';
   status: 'AVAILABLE' | 'UNAVAILABLE' | 'DEMO';
 }
 
@@ -40,4 +41,5 @@ export interface RainViewerMetadataResult {
   frames: RainViewerFrameResult[];
   sourceAgreement: 'NOT_APPLICABLE';
   limitations: string[];
+  freshnessPolicy: 'INTERNAL_PREVIEW_POLICY';
 }

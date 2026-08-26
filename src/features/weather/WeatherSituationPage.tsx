@@ -26,16 +26,26 @@ import { ModeBadge } from '../../components/weather/ModeBadge';
 import { ModeSelector } from '../../components/weather/ModeSelector';
 import { LocationSelector } from '../../components/weather/LocationSelector';
 import { WeatherExplainer } from '../../components/weather/WeatherExplainer';
+import { RadarIntelligenceCard } from '../../components/weather/RadarIntelligenceCard';
+import { TimeAlignmentMatrix } from '../../components/weather/TimeAlignmentMatrix';
+import { SourceComparisonCard } from '../../components/weather/SourceComparisonCard';
 import {
   fetchWeatherSituationUI,
   type WeatherPreviewMode,
   type WeatherSituationLoadState,
   type WeatherSituationRequest,
 } from '../../services/weatherSituation';
+import { fetchRadarFramesUI, type RadarLoadState } from '../../services/radar';
+import {
+  buildSituationTimeContext,
+  compareWeatherAndRadarSources,
+} from '../../domain/intelligence';
 import type { WeatherSituation } from '../../domain/weather';
 
 const GATE_FLAGS = [
   { key: 'WEATHER_SITUATION_PIPELINE_ENABLED', label: 'Weather Pipeline', value: 'false' },
+  { key: 'RADAR_PREVIEW_ENABLED', label: 'Radar Preview', value: 'false' },
+  { key: 'RAINVIEWER_PILOT_ENABLED', label: 'RainViewer Pilot', value: 'false' },
   { key: 'OPEN_METEO_PILOT_ENABLED', label: 'Open-Meteo Pilot', value: 'false' },
   { key: 'TMD_PILOT_ENABLED', label: 'TMD Pilot', value: 'false' },
   { key: 'GISTDA_PILOT_ENABLED', label: 'GISTDA Pilot', value: 'false' },
@@ -101,20 +111,24 @@ interface WeatherSituationPageProps {
 export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {}) {
   const [request, setRequest] = useState<WeatherSituationRequest>(getInitialRequest);
   const [loadState, setLoadState] = useState<WeatherSituationLoadState>({ status: 'IDLE' });
+  const [radarState, setRadarState] = useState<RadarLoadState>({ status: 'IDLE' });
   const [showGates, setShowGates] = useState(false);
   const [showClassification, setShowClassification] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const runLoad = useCallback(
-    (req: WeatherSituationRequest, onResult: (r: WeatherSituationLoadState) => void) => {
-      abortRef.current?.abort();
-      const ctrl = new AbortController();
-      abortRef.current = ctrl;
-      onResult({ status: 'LOADING' });
+  const executeLoad = useCallback(
+    (req: WeatherSituationRequest, ctrl: AbortController) => {
+      // Concurrent fetch with failure isolation
       fetchWeatherSituationUI(req, ctrl.signal)
-        .then(onResult)
+        .then((res) => setLoadState(res))
         .catch(() => {
           /* abort is expected on unmount or new request */
+        });
+
+      fetchRadarFramesUI(req.mode, ctrl.signal)
+        .then((res) => setRadarState(res))
+        .catch(() => {
+          /* abort is expected */
         });
     },
     [],
@@ -148,15 +162,23 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
   );
 
   const handleRefresh = useCallback(() => {
-    runLoad(request, setLoadState);
-  }, [request, runLoad]);
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    setLoadState({ status: 'LOADING' });
+    setRadarState({ status: 'LOADING' });
+    executeLoad(request, ctrl);
+  }, [request, executeLoad]);
 
   useEffect(() => {
-    runLoad(request, setLoadState);
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    executeLoad(request, ctrl);
     return () => {
-      abortRef.current?.abort();
+      ctrl.abort();
     };
-  }, [request, runLoad]);
+  }, [request, executeLoad]);
 
   const situation = getSituationData(loadState);
   const isDemo = request.mode === 'DEMO';
@@ -164,6 +186,49 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
   const isLoading = loadState.status === 'LOADING' || loadState.status === 'IDLE';
   const isLiveUnavailable = loadState.status === 'LIVE_UNAVAILABLE';
   const isError = loadState.status === 'ERROR';
+
+  const radarFrames =
+    radarState.status === 'AVAILABLE' || radarState.status === 'DEMO'
+      ? radarState.data.frames
+      : [];
+  const latestRadarFrame = radarFrames.length > 0 ? radarFrames[radarFrames.length - 1] : null;
+
+  const timeContext = buildSituationTimeContext(
+    situation?.generatedAt || new Date().toISOString(),
+    situation?.observed?.observedAt,
+    latestRadarFrame?.frameTime,
+    situation?.forecast?.validAt,
+    null,
+  );
+
+  const comparison = compareWeatherAndRadarSources({
+    hasObservedData: Boolean(situation?.observed),
+    isObservedRaining:
+      situation?.observed?.precipitation != null ? situation.observed.precipitation > 0 : null,
+    hasForecastData: Boolean(situation?.forecast),
+    forecast1hProb: situation?.forecast?.precipitationProbabilityPercent ?? null,
+    forecast1hPrecipMm: situation?.forecast?.precipitationMm ?? null,
+    hasRadarData: radarState.status === 'AVAILABLE' || radarState.status === 'DEMO',
+  });
+
+  const tmdStatus: 'AVAILABLE' | 'UNAVAILABLE' | 'UNKNOWN' = situation?.observed
+    ? 'AVAILABLE'
+    : loadState.status === 'AVAILABLE' || loadState.status === 'DEMO'
+      ? 'UNAVAILABLE'
+      : 'UNKNOWN';
+
+  const radarProviderStatus: 'AVAILABLE' | 'UNAVAILABLE' | 'UNKNOWN' =
+    radarState.status === 'AVAILABLE' || radarState.status === 'DEMO'
+      ? 'AVAILABLE'
+      : radarState.status === 'RADAR_UNAVAILABLE' || radarState.status === 'ERROR'
+        ? 'UNAVAILABLE'
+        : 'UNKNOWN';
+
+  const forecastProviderStatus: 'AVAILABLE' | 'UNAVAILABLE' | 'UNKNOWN' = situation?.forecast
+    ? 'AVAILABLE'
+    : loadState.status === 'AVAILABLE' || loadState.status === 'DEMO'
+      ? 'UNAVAILABLE'
+      : 'UNKNOWN';
 
   return (
     <div className="weather-situation-page" aria-label="Weather Situation">
@@ -274,30 +339,45 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
         </div>
       )}
 
-      {/* Main Weather Cards Grid */}
-      {situation && (
-        <div className="weather-cards-grid">
-          {/* Card A: Observed Weather (TMD) — Strict Observed Data Only */}
-          <ObservedWeatherCard
-            observed={situation.observed}
-            loading={isLoading}
-          />
+      {/* Main Weather & Radar Intelligence Cards Grid */}
+      <div className="weather-cards-grid">
+        {/* Section A: Observed Weather (TMD) — Strict Observed Data Only */}
+        <ObservedWeatherCard
+          observed={situation?.observed ?? null}
+          loading={isLoading}
+        />
 
-          {/* Card B: +1 Hour Forecast (Open-Meteo) — Probabilistic Model Forecast */}
-          <ForecastWeatherCard
-            forecast={situation.forecast}
-            horizon="1h"
-            loading={isLoading}
-          />
+        {/* Section B: Radar Observation (RainViewer) — Remote Sensing Composite */}
+        <RadarIntelligenceCard
+          radarState={radarState}
+          onNavigateToMap={onBack}
+        />
 
-          {/* Card C: +3 Hours Forecast (Open-Meteo) — Probabilistic Model Forecast */}
-          <ForecastWeatherCard
-            forecast={situation.forecast}
-            horizon="3h"
-            loading={isLoading}
-          />
-        </div>
-      )}
+        {/* Section C: +1 Hour Forecast (Open-Meteo) — Probabilistic Model Forecast */}
+        <ForecastWeatherCard
+          forecast={situation?.forecast ?? null}
+          horizon="1h"
+          loading={isLoading}
+        />
+
+        {/* Section D: +3 Hours Forecast (Open-Meteo) — Probabilistic Model Forecast */}
+        <ForecastWeatherCard
+          forecast={situation?.forecast ?? null}
+          horizon="3h"
+          loading={isLoading}
+        />
+      </div>
+
+      {/* Section E: Time Alignment Matrix */}
+      <TimeAlignmentMatrix timeContext={timeContext} />
+
+      {/* Section F: Source Status & Semantic Comparison */}
+      <SourceComparisonCard
+        comparison={comparison}
+        tmdStatus={tmdStatus}
+        radarStatus={radarProviderStatus}
+        forecastStatus={forecastProviderStatus}
+      />
 
       {/* Secondary Panels (Provenance & Agreement) */}
       {situation && (

@@ -62,6 +62,7 @@ export function getDemoRadarFrames(): RadarMetadataResponse {
       'Not connected to live radar feed in this mode.',
       'Not an official storm warning.',
     ],
+    freshnessPolicy: 'INTERNAL_PREVIEW_POLICY',
   };
 }
 

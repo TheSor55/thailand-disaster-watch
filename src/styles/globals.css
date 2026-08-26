@@ -1029,3 +1029,327 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
     font-size: 0.75rem;
   }
 }
+
+/* ==========================================================================
+   Weather & Radar Intelligence Preview — Phase 3.5
+   ========================================================================== */
+
+.weather-card--radar {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(8, 47, 73, 0.25) 100%);
+}
+
+.radar-intel-scan-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.radar-intel-scan-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radar-intel-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.radar-intel-timestamp {
+  font-size: 0.88rem;
+  color: #38bdf8;
+  font-family: var(--font-mono, monospace);
+}
+
+.radar-intel-counter {
+  font-size: 0.74rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.radar-intel-scrubber {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0 8px;
+}
+
+.radar-intel-tick {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s;
+}
+
+.radar-intel-tick:hover {
+  background: rgba(56, 189, 248, 0.6);
+}
+
+.radar-intel-tick.is-active {
+  background: #38bdf8;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+}
+
+.radar-intel-note {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  margin: 4px 0 8px;
+}
+
+.radar-intel-map-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 38px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 8px;
+}
+
+.radar-intel-map-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #f8fafc;
+}
+
+.radar-intel-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 6px;
+}
+
+.radar-intel-attribution {
+  margin: 0;
+}
+
+.radar-intel-attribution-link {
+  color: #38bdf8;
+  text-decoration: underline;
+}
+
+.radar-intel-warning {
+  margin: 0;
+  color: #f59e0b;
+}
+
+.radar-intel-disclaimer {
+  margin: 0;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Time Alignment Matrix */
+.weather-intel-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.weather-intel-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weather-intel-section__title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.weather-intel-section__subtitle {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.time-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.time-matrix-card {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-matrix-card__source {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.time-matrix-card__class {
+  font-size: 0.66rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--accent);
+}
+
+.time-matrix-card__time {
+  font-size: 1.1rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.time-matrix-card__delta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Source Comparison & Consistency */
+.comparison-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.comparison-result-box {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comparison-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comparison-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.comparison-badge--consistent {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.comparison-badge--partial {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.comparison-badge--conflict {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.comparison-badge--insufficient {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.comparison-summary-title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comparison-summary-details {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.comparison-meta-row {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.source-status-list-box {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.source-status-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.source-status-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.source-status-item__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-status-item__left strong {
+  font-size: 0.78rem;
+  display: block;
+}
+
+.source-status-item__left small {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.source-status-disclaimer {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
