@@ -74,6 +74,7 @@ export async function fetchRainViewerFrames(
         'Not connected to live radar feed in this mode.',
         'Not an official weather warning.',
       ],
+      freshnessPolicy: 'INTERNAL_PREVIEW_POLICY',
     };
   }
 
@@ -187,5 +188,6 @@ export async function fetchRainViewerFrames(
       'COVERAGE MAY BE INCOMPLETE in mountainous or radar-gap zones in Thailand.',
       'Not an official emergency or storm warning.',
     ],
+    freshnessPolicy: 'INTERNAL_PREVIEW_POLICY',
   };
 }
