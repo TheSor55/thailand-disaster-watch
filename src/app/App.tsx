@@ -34,6 +34,14 @@ const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
 );
 
+const WeatherSituationPage = lazy(() =>
+  import('../features/weather/WeatherSituationPage').then((m) => ({ default: m.WeatherSituationPage })),
+);
+
+const AboutPage = lazy(() =>
+  import('../pages/AboutPage').then((m) => ({ default: m.AboutPage })),
+);
+
 const providerHealth = [
   {
     providerId: 'GISTDA Disaster Platform',
@@ -62,6 +70,7 @@ export function App() {
   const [basemapMode, setBasemapMode] = useState<BasemapMode>('dark');
   const [showProvinces, setShowProvinces] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'about'>('gis');
   const [mobileSheet, setMobileSheet] = useState<
     'navigation' | 'layers' | 'situation' | null
   >(null);
@@ -112,14 +121,35 @@ export function App() {
     <div className="command-center" data-theme={basemapMode}>
       <header className="app-header">
         <div className="brand-lockup">
-          <span className="brand-mark" aria-hidden="true">TD</span>
+          <a
+            href="#"
+            className="brand-logo-link"
+            onClick={(e) => { e.preventDefault(); setAppView('about'); }}
+            aria-label="FutureGreen — Thailand Disaster Watch — เกี่ยวกับระบบ"
+            title="FutureGreen Disaster Intelligence Platform"
+          >
+            <img
+              src="/futuregreen-logo.svg"
+              alt="FutureGreen Logo"
+              className="brand-logo"
+              width="38"
+              height="38"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                if (fallback) fallback.style.display = 'grid';
+              }}
+            />
+            <span className="brand-mark" aria-hidden="true" style={{ display: 'none' }}>FG</span>
+          </a>
           <div>
             <p>Thailand Disaster Watch</p>
-            <h1>{titleForNavigation(navigation)}</h1>
+            <h1>{appView === 'weather' ? 'สภาพอากาศ' : appView === 'about' ? 'เกี่ยวกับระบบ' : titleForNavigation(navigation)}</h1>
           </div>
         </div>
         <div className="header-status" role="status">
           <span className="status-chip"><span aria-hidden="true">○</span> LIVE DATA NOT CONNECTED</span>
+          <span className="status-chip status-chip--dev-preview" aria-label="Development Preview">DEV PREVIEW</span>
           <span className="safety-label">Decision-support information · Not an official emergency warning</span>
           <span className="updated-time">Last update: —</span>
         </div>
@@ -179,9 +209,24 @@ export function App() {
               </div>
             </div>
             <div className="module-nav-list" role="navigation" aria-label="Operations Modules">
-              <button type="button" className="module-nav-item is-active">
+              <button
+                type="button"
+                className={`module-nav-item${appView === 'gis' ? ' is-active' : ''}`}
+                onClick={() => setAppView('gis')}
+                aria-pressed={appView === 'gis'}
+              >
                 <span className="icon">🗺</span>
                 <span>GIS Map View</span>
+              </button>
+              <button
+                type="button"
+                className={`module-nav-item${appView === 'weather' ? ' is-active' : ''}`}
+                onClick={() => setAppView('weather')}
+                aria-pressed={appView === 'weather'}
+              >
+                <span className="icon">🌤</span>
+                <span>สภาพอากาศ</span>
+                <span className="tag">PREVIEW</span>
               </button>
               <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="My Sites — Coming Soon in Phase 3">
                 <span className="icon">🏢</span>
@@ -202,6 +247,15 @@ export function App() {
                 <span className="icon">📋</span>
                 <span>Reports</span>
                 <span className="tag">COMING SOON</span>
+              </button>
+              <button
+                type="button"
+                className={`module-nav-item${appView === 'about' ? ' is-active' : ''}`}
+                onClick={() => setAppView('about')}
+                aria-pressed={appView === 'about'}
+              >
+                <span className="icon">ℹ</span>
+                <span>เกี่ยวกับระบบ</span>
               </button>
             </div>
           </section>
@@ -271,102 +325,132 @@ export function App() {
           </section>
         </aside>
 
-        <section className="map-column">
-          <div className="map-toolbar">
-            <div>
-              <span className="eyebrow">CURRENT VIEW</span>
-              <strong>{titleForNavigation(navigation)}</strong>
-            </div>
-            <button type="button" onClick={() => navigate({ viewLevel: 'national' })}>⌂ Reset Thailand</button>
-          </div>
-          <ModuleErrorBoundary moduleName="Map">
-            <Suspense fallback={<div className="map-shell map-loading" role="status">Loading map module…</div>}>
-              <ThailandMap
-                basemapMode={basemapMode}
-                selectedIsoCodes={selectedIsoCodes}
-                selectedProvinceIso={selectedProvinceIso}
-                showProvinces={showProvinces}
-                onProvinceSelect={handleProvinceSelect}
-              />
-            </Suspense>
-          </ModuleErrorBoundary>
-          <div className="summary-strip" aria-label="Situation summary">
-            {situationModules.map((module) => (
-              <article key={module} className="summary-card">
-                <span className="status-dot" aria-hidden="true" />
-                <div><small>{module}</small><strong>—</strong><span>No live data</span></div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <ModuleErrorBoundary moduleName="Situation panels">
-          <aside className="right-rail" aria-label="Situation information">
-          <section className="panel situation-panel">
-            <span className="eyebrow">SITUATION OVERVIEW</span>
-            <h2>{navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย'}</h2>
-            <p className="no-data-banner"><span aria-hidden="true">○</span> DEMO / NO LIVE DATA</p>
-            <DataProvenance />
-            {navigation.viewLevel === 'province' && (
-              <div className="module-grid" aria-label="Province data modules">
-                {['Overview', 'Rain', 'Flood', 'River', 'Dam', 'CCTV', 'Alerts', 'Timeline'].map((module) => (
-                  <div key={module}><strong>{module}</strong><span>DATA SOURCE NOT CONNECTED</span></div>
+        {appView === 'gis' && (
+          <>
+            <section className="map-column">
+              <div className="map-toolbar">
+                <div>
+                  <span className="eyebrow">CURRENT VIEW</span>
+                  <strong>{titleForNavigation(navigation)}</strong>
+                </div>
+                <button type="button" onClick={() => navigate({ viewLevel: 'national' })}>⌂ Reset Thailand</button>
+              </div>
+              <ModuleErrorBoundary moduleName="Map">
+                <Suspense fallback={<div className="map-shell map-loading" role="status">Loading map module…</div>}>
+                  <ThailandMap
+                    basemapMode={basemapMode}
+                    selectedIsoCodes={selectedIsoCodes}
+                    selectedProvinceIso={selectedProvinceIso}
+                    showProvinces={showProvinces}
+                    onProvinceSelect={handleProvinceSelect}
+                  />
+                </Suspense>
+              </ModuleErrorBoundary>
+              <div className="summary-strip" aria-label="Situation summary">
+                {situationModules.map((module) => (
+                  <article key={module} className="summary-card">
+                    <span className="status-dot" aria-hidden="true" />
+                    <div><small>{module}</small><strong>—</strong><span>No live data</span></div>
+                  </article>
                 ))}
               </div>
-            )}
-          </section>
-          <section className="panel alert-panel">
-            <div className="panel-heading"><h2>Situation Alerts</h2><span className="status-chip status-chip--small">NO SOURCE</span></div>
-            <div className="empty-state"><span aria-hidden="true">!</span><p>No official alert source connected.</p></div>
-          </section>
-          <section className="panel cctv-panel">
-            <div className="panel-heading"><h2>CCTV Watch</h2><span className="eyebrow">PHASE 2+</span></div>
-            <div className="cctv-placeholder" aria-hidden="true"><span>▦</span></div>
-            <p>No authorized CCTV source connected</p>
-            <dl className="cctv-fields">
-              {['Station', 'Location', 'Owner', 'Observed', 'Status'].map((field) => <div key={field}><dt>{field}</dt><dd>—</dd></div>)}
-            </dl>
-          </section>
+            </section>
 
-          <section className="panel share-export-panel">
-            <div className="panel-heading">
-              <div>
-                <span className="eyebrow">EXPORT & SHARE</span>
-                <h2>ส่งออกข้อมูล</h2>
-              </div>
-            </div>
-            <div className="share-grid">
-              <button type="button" disabled aria-disabled="true" title="Share Situation — Coming Soon" className="share-button">
-                <span>🔗 Share Situation</span>
-              </button>
-              <button type="button" disabled aria-disabled="true" title="Capture Map — Coming Soon" className="share-button">
-                <span>📸 Capture Map</span>
-              </button>
-              <button type="button" disabled aria-disabled="true" title="Export PDF Report — Coming Soon" className="share-button">
-                <span>📄 Export PDF Report</span>
-              </button>
-              <button type="button" disabled aria-disabled="true" title="BCM Report — Coming Soon" className="share-button">
-                <span>🛡 BCM Report</span>
-              </button>
-              <button type="button" disabled aria-disabled="true" title="Copy Summary — Coming Soon" className="share-button">
-                <span>✍ Copy Summary</span>
-              </button>
-            </div>
-          </section>
-          </aside>
-        </ModuleErrorBoundary>
+            <ModuleErrorBoundary moduleName="Situation panels">
+              <aside className="right-rail" aria-label="Situation information">
+              <section className="panel situation-panel">
+                <span className="eyebrow">SITUATION OVERVIEW</span>
+                <h2>{navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย'}</h2>
+                <p className="no-data-banner"><span aria-hidden="true">○</span> DEMO / NO LIVE DATA</p>
+                <DataProvenance />
+                {navigation.viewLevel === 'province' && (
+                  <div className="module-grid" aria-label="Province data modules">
+                    {['Overview', 'Rain', 'Flood', 'River', 'Dam', 'CCTV', 'Alerts', 'Timeline'].map((module) => (
+                      <div key={module}><strong>{module}</strong><span>DATA SOURCE NOT CONNECTED</span></div>
+                    ))}
+                  </div>
+                )}
+              </section>
+              <section className="panel alert-panel">
+                <div className="panel-heading"><h2>Situation Alerts</h2><span className="status-chip status-chip--small">NO SOURCE</span></div>
+                <div className="empty-state"><span aria-hidden="true">!</span><p>No official alert source connected.</p></div>
+              </section>
+              <section className="panel cctv-panel">
+                <div className="panel-heading"><h2>CCTV Watch</h2><span className="eyebrow">PHASE 2+</span></div>
+                <div className="cctv-placeholder" aria-hidden="true"><span>▦</span></div>
+                <p>No authorized CCTV source connected</p>
+                <dl className="cctv-fields">
+                  {['Station', 'Location', 'Owner', 'Observed', 'Status'].map((field) => <div key={field}><dt>{field}</dt><dd>—</dd></div>)}
+                </dl>
+              </section>
+
+              <section className="panel share-export-panel">
+                <div className="panel-heading">
+                  <div>
+                    <span className="eyebrow">EXPORT &amp; SHARE</span>
+                    <h2>ส่งออกข้อมูล</h2>
+                  </div>
+                </div>
+                <div className="share-grid">
+                  <button type="button" disabled aria-disabled="true" title="Share Situation — Coming Soon" className="share-button">
+                    <span>🔗 Share Situation</span>
+                  </button>
+                  <button type="button" disabled aria-disabled="true" title="Capture Map — Coming Soon" className="share-button">
+                    <span>📸 Capture Map</span>
+                  </button>
+                  <button type="button" disabled aria-disabled="true" title="Export PDF Report — Coming Soon" className="share-button">
+                    <span>📄 Export PDF Report</span>
+                  </button>
+                  <button type="button" disabled aria-disabled="true" title="BCM Report — Coming Soon" className="share-button">
+                    <span>🛡 BCM Report</span>
+                  </button>
+                  <button type="button" disabled aria-disabled="true" title="Copy Summary — Coming Soon" className="share-button">
+                    <span>✍ Copy Summary</span>
+                  </button>
+                </div>
+              </section>
+              </aside>
+            </ModuleErrorBoundary>
+          </>
+        )}
+
+        {appView === 'weather' && (
+          <div className="full-content-column" aria-label="สภาพอากาศ">
+            <ModuleErrorBoundary moduleName="Weather Situation">
+              <Suspense fallback={<div className="page-loading" role="status">กำลังโหลดหน้าสภาพอากาศ…</div>}>
+                <WeatherSituationPage />
+              </Suspense>
+            </ModuleErrorBoundary>
+          </div>
+        )}
+
+        {appView === 'about' && (
+          <div className="full-content-column" aria-label="เกี่ยวกับระบบ">
+            <ModuleErrorBoundary moduleName="About">
+              <Suspense fallback={<div className="page-loading" role="status">กำลังโหลด…</div>}>
+                <AboutPage onBack={() => setAppView('gis')} />
+              </Suspense>
+            </ModuleErrorBoundary>
+          </div>
+        )}
       </main>
+
 
       <footer className="timeline-bar">
         <div><span className="eyebrow">SITUATION TIMELINE</span><strong>Timeline unavailable — live data not connected</strong></div>
         <div className="timeline-options" aria-label="Timeline unavailable">
           {['-24h', '-12h', '-6h', '-3h', '-1h', 'Now'].map((time) => <span key={time}>{time}</span>)}
         </div>
+        <div className="footer-credit" aria-label="Developer credit">
+          <span>Developed by <strong>Sorawit Suwannarong</strong></span>
+          <span className="footer-credit__platform">FutureGreen Disaster Intelligence Platform</span>
+        </div>
       </footer>
 
       <nav className="mobile-dock" aria-label="Mobile command center navigation">
         <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('navigation'); }}><span aria-hidden="true">⌕</span>พื้นที่</button>
         <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('layers'); }}><span aria-hidden="true">▱</span>Layers</button>
+        <button type="button" onClick={() => { setAppView('weather'); setMobileSheet(null); }}><span aria-hidden="true">🌤</span>อากาศ</button>
         <button type="button" onClick={(event) => { mobileSheetTrigger.current = event.currentTarget; setMobileSheet('situation'); }}><span aria-hidden="true">○</span>สถานการณ์</button>
       </nav>
 
