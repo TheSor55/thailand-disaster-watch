@@ -75,6 +75,7 @@ export function ThailandMap({
   const mapRef = useRef<MapLibreMap | null>(null);
   const popupRef = useRef<Popup | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [styleLoaded, setStyleLoaded] = useState(false);
   const [mapUnavailable, setMapUnavailable] = useState(false);
   const [boundaryUnavailable, setBoundaryUnavailable] = useState(false);
   const [boundaryData, setBoundaryData] = useState<BoundaryFeatureCollection | null>(null);
@@ -120,6 +121,7 @@ export function ThailandMap({
 
       const handleLoad = () => {
         setMapReady(true);
+        setStyleLoaded(true);
         setMapUnavailable(false);
         fetch('/thailand-provinces.geojson')
           .then((res) => (res.ok ? res.json() : null))
@@ -129,6 +131,10 @@ export function ThailandMap({
           .catch(() => {
             /* ignore fallback fetch error */
           });
+      };
+
+      const handleStyleLoad = () => {
+        setStyleLoaded(true);
       };
 
       const handleError = (event: MapErrorEvent) => {
@@ -191,6 +197,7 @@ export function ThailandMap({
       };
 
       map.on('load', handleLoad);
+      map.on('styledata', handleStyleLoad);
       map.on('error', handleError);
       map.on('sourcedata', handleSourceData);
       map.on('click', 'province-fill', handleProvinceClick);
@@ -212,71 +219,102 @@ export function ThailandMap({
         mapRef.current = null;
       }
       setMapReady(false);
+      setStyleLoaded(false);
     };
   }, [onProvinceSelect, boundaryData]);
 
+  // Basemap style properties
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
 
-    const isDark = basemapMode === 'dark';
-    map.setPaintProperty('background', 'background-color', isDark ? '#07111f' : '#f1f5f9');
-    map.setPaintProperty('osm-basemap', 'raster-opacity', isDark ? 0.72 : 0.88);
-    map.setPaintProperty('osm-basemap', 'raster-saturation', isDark ? -0.62 : 0);
-    map.setPaintProperty('osm-basemap', 'raster-contrast', isDark ? 0.18 : 0);
-    map.setPaintProperty('osm-basemap', 'raster-brightness-min', isDark ? 0.12 : 0.5);
-    map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.68 : 1);
-  }, [basemapMode, mapReady]);
+    try {
+      const isDark = basemapMode === 'dark';
+      if (map.getLayer('background')) {
+        map.setPaintProperty('background', 'background-color', isDark ? '#07111f' : '#f1f5f9');
+      }
+      if (map.getLayer('osm-basemap')) {
+        map.setPaintProperty('osm-basemap', 'raster-opacity', isDark ? 0.72 : 0.88);
+        map.setPaintProperty('osm-basemap', 'raster-saturation', isDark ? -0.62 : 0);
+        map.setPaintProperty('osm-basemap', 'raster-contrast', isDark ? 0.18 : 0);
+        map.setPaintProperty('osm-basemap', 'raster-brightness-min', isDark ? 0.12 : 0.5);
+        map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.68 : 1);
+      }
+    } catch {
+      /* safe ignore during style reload */
+    }
+  }, [basemapMode, mapReady, styleLoaded]);
 
+  // Administrative boundaries visibility
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
 
-    map.setLayoutProperty('province-fill', 'visibility', showProvinces ? 'visible' : 'none');
-    map.setLayoutProperty('province-boundary', 'visibility', showProvinces ? 'visible' : 'none');
-    map.setLayoutProperty('province-region-highlight', 'visibility', showProvinces ? 'visible' : 'none');
-    map.setLayoutProperty('province-selected-fill', 'visibility', showProvinces ? 'visible' : 'none');
-  }, [mapReady, showProvinces]);
+    try {
+      const visibility = showProvinces ? 'visible' : 'none';
+      if (map.getLayer('province-fill')) map.setLayoutProperty('province-fill', 'visibility', visibility);
+      if (map.getLayer('province-boundary')) map.setLayoutProperty('province-boundary', 'visibility', visibility);
+      if (map.getLayer('province-region-highlight')) map.setLayoutProperty('province-region-highlight', 'visibility', visibility);
+      if (map.getLayer('province-selected-fill')) map.setLayoutProperty('province-selected-fill', 'visibility', visibility);
+    } catch {
+      /* safe ignore during style reload */
+    }
+  }, [mapReady, styleLoaded, showProvinces]);
 
+  // Region and province selection filters
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
 
-    const regionFilter: FilterSpecification = selectedIsoCodes.length
-      ? ['in', ['get', 'shapeISO'], ['literal', [...selectedIsoCodes]]]
-      : ['==', ['get', 'shapeISO'], ''];
-    const provinceFilter: FilterSpecification = selectedProvinceIso
-      ? ['==', ['get', 'shapeISO'], selectedProvinceIso]
-      : ['==', ['get', 'shapeISO'], ''];
-    map.setFilter('province-region-highlight', regionFilter);
-    map.setFilter('province-selected-fill', provinceFilter);
-    map.setFilter('province-selected', provinceFilter);
-  }, [mapReady, selectedIsoCodes, selectedProvinceIso]);
+    try {
+      const regionFilter: FilterSpecification = selectedIsoCodes.length
+        ? ['in', ['get', 'shapeISO'], ['literal', [...selectedIsoCodes]]]
+        : ['==', ['get', 'shapeISO'], ''];
+      const provinceFilter: FilterSpecification = selectedProvinceIso
+        ? ['==', ['get', 'shapeISO'], selectedProvinceIso]
+        : ['==', ['get', 'shapeISO'], ''];
 
+      if (map.getLayer('province-region-highlight')) map.setFilter('province-region-highlight', regionFilter);
+      if (map.getLayer('province-selected-fill')) map.setFilter('province-selected-fill', provinceFilter);
+      if (map.getLayer('province-selected')) map.setFilter('province-selected', provinceFilter);
+    } catch {
+      /* safe ignore during style reload */
+    }
+  }, [mapReady, styleLoaded, selectedIsoCodes, selectedProvinceIso]);
+
+  // Fit bounds on selection
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady || !boundaryData) return;
-    const features = featuresForIsoCodes(boundaryData, selectedIsoCodes);
-    const bounds = boundsForFeatures(features);
-    if (!bounds) return;
-    map.fitBounds(bounds, {
-      padding: { top: 76, right: 56, bottom: 72, left: 56 },
-      duration: 650,
-      maxZoom: selectedProvinceIso ? 8.4 : 6.4,
-    });
+    try {
+      const features = featuresForIsoCodes(boundaryData, selectedIsoCodes);
+      const bounds = boundsForFeatures(features);
+      if (!bounds) return;
+      map.fitBounds(bounds, {
+        padding: { top: 76, right: 56, bottom: 72, left: 56 },
+        duration: 650,
+        maxZoom: selectedProvinceIso ? 8.4 : 6.4,
+      });
+    } catch {
+      /* safe ignore */
+    }
   }, [boundaryData, mapReady, selectedIsoCodes, selectedProvinceIso]);
 
   // Radar raster layer handling
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
 
     const sourceId = 'radar-raster-source';
     const layerId = 'radar-raster-layer';
 
     if (!showRadar || !radarTileUrl) {
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', 'none');
+      try {
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', 'none');
+        }
+      } catch {
+        /* safe ignore */
       }
       return;
     }
@@ -314,20 +352,24 @@ export function ThailandMap({
     } catch {
       /* MapLibre source swap error recovery */
     }
-  }, [mapReady, showRadar, radarTileUrl, radarOpacity]);
+  }, [mapReady, styleLoaded, showRadar, radarTileUrl, radarOpacity]);
 
   // GISTDA Satellite Flood layer handling
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
 
     const sourceId = 'gistda-flood-source';
     const fillLayerId = 'gistda-flood-fill';
     const lineLayerId = 'gistda-flood-line';
 
     if (!showFlood) {
-      if (map.getLayer(fillLayerId)) map.setLayoutProperty(fillLayerId, 'visibility', 'none');
-      if (map.getLayer(lineLayerId)) map.setLayoutProperty(lineLayerId, 'visibility', 'none');
+      try {
+        if (map.getLayer(fillLayerId)) map.setLayoutProperty(fillLayerId, 'visibility', 'none');
+        if (map.getLayer(lineLayerId)) map.setLayoutProperty(lineLayerId, 'visibility', 'none');
+      } catch {
+        /* safe ignore */
+      }
       return;
     }
 
@@ -373,7 +415,7 @@ export function ThailandMap({
     } catch {
       /* ignore layer add error */
     }
-  }, [mapReady, showFlood]);
+  }, [mapReady, styleLoaded, showFlood]);
 
   return (
     <section className="map-shell" aria-label="แผนที่จังหวัดประเทศไทย">
