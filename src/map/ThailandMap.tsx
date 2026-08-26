@@ -74,14 +74,21 @@ export function ThailandMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const popupRef = useRef<Popup | null>(null);
+  const onProvinceSelectRef = useRef(onProvinceSelect);
+  useEffect(() => {
+    onProvinceSelectRef.current = onProvinceSelect;
+  }, [onProvinceSelect]);
+
   const [mapReady, setMapReady] = useState(false);
-  const [styleLoaded, setStyleLoaded] = useState(false);
   const [mapUnavailable, setMapUnavailable] = useState(false);
   const [boundaryUnavailable, setBoundaryUnavailable] = useState(false);
   const [boundaryData, setBoundaryData] = useState<BoundaryFeatureCollection | null>(null);
 
+  // Initialize MapLibre instance once on mount
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
+
+    let isMounted = true;
 
     try {
       const map = new MapLibreMap({
@@ -101,18 +108,15 @@ export function ThailandMap({
       map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left');
 
       const handleSourceData = (event: MapSourceDataEvent) => {
-        if (
-          event.sourceId === PROVINCE_SOURCE_ID &&
-          event.isSourceLoaded &&
-          !boundaryData
-        ) {
+        if (!isMounted) return;
+        if (event.sourceId === PROVINCE_SOURCE_ID && event.isSourceLoaded) {
           const source = map.getSource(PROVINCE_SOURCE_ID);
           if (source && 'serialize' in source) {
             const rawData = (source as { serialize: () => { data?: unknown } }).serialize();
             if (rawData && typeof rawData === 'object' && 'data' in rawData) {
               const data = rawData.data;
               if (data && typeof data === 'object' && 'features' in data) {
-                setBoundaryData(data as BoundaryFeatureCollection);
+                setBoundaryData((prev) => prev ?? (data as BoundaryFeatureCollection));
               }
             }
           }
@@ -120,24 +124,21 @@ export function ThailandMap({
       };
 
       const handleLoad = () => {
+        if (!isMounted) return;
         setMapReady(true);
-        setStyleLoaded(true);
         setMapUnavailable(false);
         fetch('/thailand-provinces.geojson')
           .then((res) => (res.ok ? res.json() : null))
           .then((data: BoundaryFeatureCollection | null) => {
-            if (data) setBoundaryData(data);
+            if (data && isMounted) setBoundaryData((prev) => prev ?? data);
           })
           .catch(() => {
             /* ignore fallback fetch error */
           });
       };
 
-      const handleStyleLoad = () => {
-        setStyleLoaded(true);
-      };
-
       const handleError = (event: MapErrorEvent) => {
+        if (!isMounted) return;
         if (event.sourceId === 'osm') {
           setMapUnavailable(true);
         }
@@ -153,7 +154,7 @@ export function ThailandMap({
         if (!iso) return;
         const province = PROVINCE_BY_ISO.get(iso);
         if (province) {
-          onProvinceSelect(province);
+          onProvinceSelectRef.current(province);
         }
       };
 
@@ -197,7 +198,6 @@ export function ThailandMap({
       };
 
       map.on('load', handleLoad);
-      map.on('styledata', handleStyleLoad);
       map.on('error', handleError);
       map.on('sourcedata', handleSourceData);
       map.on('click', 'province-fill', handleProvinceClick);
@@ -210,6 +210,7 @@ export function ThailandMap({
     }
 
     return () => {
+      isMounted = false;
       if (popupRef.current) {
         popupRef.current.remove();
         popupRef.current = null;
@@ -219,14 +220,13 @@ export function ThailandMap({
         mapRef.current = null;
       }
       setMapReady(false);
-      setStyleLoaded(false);
     };
-  }, [onProvinceSelect, boundaryData]);
+  }, []); // Run once on mount
 
   // Basemap style properties
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
+    if (!map || !mapReady || !map.isStyleLoaded()) return;
 
     try {
       const isDark = basemapMode === 'dark';
@@ -241,14 +241,14 @@ export function ThailandMap({
         map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.68 : 1);
       }
     } catch {
-      /* safe ignore during style reload */
+      /* safe ignore */
     }
-  }, [basemapMode, mapReady, styleLoaded]);
+  }, [basemapMode, mapReady]);
 
   // Administrative boundaries visibility
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
+    if (!map || !mapReady || !map.isStyleLoaded()) return;
 
     try {
       const visibility = showProvinces ? 'visible' : 'none';
@@ -257,14 +257,14 @@ export function ThailandMap({
       if (map.getLayer('province-region-highlight')) map.setLayoutProperty('province-region-highlight', 'visibility', visibility);
       if (map.getLayer('province-selected-fill')) map.setLayoutProperty('province-selected-fill', 'visibility', visibility);
     } catch {
-      /* safe ignore during style reload */
+      /* safe ignore */
     }
-  }, [mapReady, styleLoaded, showProvinces]);
+  }, [mapReady, showProvinces]);
 
   // Region and province selection filters
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
+    if (!map || !mapReady || !map.isStyleLoaded()) return;
 
     try {
       const regionFilter: FilterSpecification = selectedIsoCodes.length
@@ -278,9 +278,9 @@ export function ThailandMap({
       if (map.getLayer('province-selected-fill')) map.setFilter('province-selected-fill', provinceFilter);
       if (map.getLayer('province-selected')) map.setFilter('province-selected', provinceFilter);
     } catch {
-      /* safe ignore during style reload */
+      /* safe ignore */
     }
-  }, [mapReady, styleLoaded, selectedIsoCodes, selectedProvinceIso]);
+  }, [mapReady, selectedIsoCodes, selectedProvinceIso]);
 
   // Fit bounds on selection
   useEffect(() => {
@@ -303,7 +303,7 @@ export function ThailandMap({
   // Radar raster layer handling
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
+    if (!map || !mapReady || !map.isStyleLoaded()) return;
 
     const sourceId = 'radar-raster-source';
     const layerId = 'radar-raster-layer';
@@ -352,12 +352,12 @@ export function ThailandMap({
     } catch {
       /* MapLibre source swap error recovery */
     }
-  }, [mapReady, styleLoaded, showRadar, radarTileUrl, radarOpacity]);
+  }, [mapReady, showRadar, radarTileUrl, radarOpacity]);
 
   // GISTDA Satellite Flood layer handling
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !styleLoaded || !map.isStyleLoaded()) return;
+    if (!map || !mapReady || !map.isStyleLoaded()) return;
 
     const sourceId = 'gistda-flood-source';
     const fillLayerId = 'gistda-flood-fill';
@@ -415,7 +415,7 @@ export function ThailandMap({
     } catch {
       /* ignore layer add error */
     }
-  }, [mapReady, styleLoaded, showFlood]);
+  }, [mapReady, showFlood]);
 
   return (
     <section className="map-shell" aria-label="แผนที่จังหวัดประเทศไทย">
