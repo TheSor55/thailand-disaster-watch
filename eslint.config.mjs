@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     '**/.wrangler/**',
     'node_modules/**',
     'coverage/**',
+    'public/**',
   ]),
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
