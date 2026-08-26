@@ -630,6 +630,13 @@ export function App() {
                       setAppView('gis');
                     }
                   }}
+                  onCheckWeather={(site) => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('lat', site.latitude.toFixed(4));
+                    url.searchParams.set('lon', site.longitude.toFixed(4));
+                    window.history.replaceState({}, '', url.toString());
+                    setAppView('weather');
+                  }}
                 />
               </div>
             </ModuleErrorBoundary>

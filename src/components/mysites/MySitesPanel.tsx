@@ -3,6 +3,7 @@ import { useState } from 'react';
 export interface PinnedSite {
   id: string;
   name: string;
+  address?: string;
   category: 'FACTORY' | 'WAREHOUSE' | 'OFFICE' | 'RETAIL';
   province: string;
   latitude: number;
@@ -14,8 +15,33 @@ export interface PinnedSite {
 
 const INITIAL_SITES: PinnedSite[] = [
   {
+    id: 'site-petchsiam',
+    name: 'บริษัท เพชรสยามประเทศไทย จำกัด',
+    address: 'ซอยพระยามนธาตุฯ แยก 9 แขวงคลองบางบอน เขตบางบอน กรุงเทพมหานคร',
+    category: 'FACTORY',
+    province: 'กรุงเทพมหานคร',
+    latitude: 13.6635,
+    longitude: 100.4124,
+    rainRisk: 'LOW',
+    floodRisk: 'NORMAL',
+    damProximity: 'ลุ่มน้ำเจ้าพระยาตอนล่าง / คลองบางบอน (กทม.)',
+  },
+  {
+    id: 'site-salee-industry',
+    name: 'บริษัท สาลี่อุตสาหกรรม จำกัด (มหาชน)',
+    address: 'ตำบลคลองสี่ อำเภอคลองหลวง จังหวัดปทุมธานี',
+    category: 'FACTORY',
+    province: 'ปทุมธานี',
+    latitude: 14.0758,
+    longitude: 100.6865,
+    rainRisk: 'LOW',
+    floodRisk: 'NORMAL',
+    damProximity: 'ลุ่มน้ำเจ้าพระยา-ป่าสัก (ทุ่งรังสิต คลองสี่)',
+  },
+  {
     id: 'site-amata-chonburi',
     name: 'นิคมอุตสาหกรรมอมตะซิตี้ ชลบุรี',
+    address: 'ตำบลคลองตำหรุ อำเภอเมือง จังหวัดชลบุรี',
     category: 'FACTORY',
     province: 'ชลบุรี',
     latitude: 13.4214,
@@ -27,6 +53,7 @@ const INITIAL_SITES: PinnedSite[] = [
   {
     id: 'site-khonkaen-plant',
     name: 'โรงงานแปรรูปขอนแก่น (ท่าพระ)',
+    address: 'ตำบลท่าพระ อำเภอเมือง จังหวัดขอนแก่น',
     category: 'FACTORY',
     province: 'ขอนแก่น',
     latitude: 16.3312,
@@ -38,6 +65,7 @@ const INITIAL_SITES: PinnedSite[] = [
   {
     id: 'site-bangplee-dc',
     name: 'ศูนย์กระจายสินค้า บางพลี',
+    address: 'อำเภอบางพลี จังหวัดสมุทรปราการ',
     category: 'WAREHOUSE',
     province: 'สมุทรปราการ',
     latitude: 13.6042,
@@ -49,6 +77,7 @@ const INITIAL_SITES: PinnedSite[] = [
   {
     id: 'site-chiangmai-hub',
     name: 'สำนักงานภาคเหนือ (เชียงใหม่)',
+    address: 'ตำบลสุเทพ อำเภอเมือง จังหวัดเชียงใหม่',
     category: 'OFFICE',
     province: 'เชียงใหม่',
     latitude: 18.7953,
@@ -61,9 +90,10 @@ const INITIAL_SITES: PinnedSite[] = [
 
 interface MySitesPanelProps {
   onSelectSite?: (site: PinnedSite) => void;
+  onCheckWeather?: (site: PinnedSite) => void;
 }
 
-export function MySitesPanel({ onSelectSite }: MySitesPanelProps) {
+export function MySitesPanel({ onSelectSite, onCheckWeather }: MySitesPanelProps) {
   const [sites] = useState<PinnedSite[]>(INITIAL_SITES);
   const [filter, setFilter] = useState<'ALL' | 'FACTORY' | 'WAREHOUSE' | 'OFFICE'>('ALL');
 
@@ -108,10 +138,12 @@ export function MySitesPanel({ onSelectSite }: MySitesPanelProps) {
               onClick={() => onSelectSite?.(site)}
               role="button"
               tabIndex={0}
+              aria-label={`เฝ้าระวังพื้นที่ ${site.name}`}
             >
               <div className="mysite-item__header">
                 <div>
                   <strong className="mysite-name">{site.name}</strong>
+                  {site.address && <p className="mysite-address">{site.address}</p>}
                   <span className="mysite-prov">จ.{site.province}</span>
                 </div>
                 <span className="mysite-cat">{site.category}</span>
@@ -129,6 +161,25 @@ export function MySitesPanel({ onSelectSite }: MySitesPanelProps) {
               <div className="mysite-proximity">
                 <small>เขื่อน/ลุ่มน้ำ:</small>
                 <span>{site.damProximity}</span>
+              </div>
+
+              <div className="mysite-actions" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  className="btn-site-action btn-site-action--map"
+                  onClick={() => onSelectSite?.(site)}
+                >
+                  🗺️ ดูบนแผนที่ GIS
+                </button>
+                {onCheckWeather && (
+                  <button
+                    type="button"
+                    className="btn-site-action btn-site-action--weather"
+                    onClick={() => onCheckWeather(site)}
+                  >
+                    🌤️ ตรวจสภาพอากาศ &amp; เรดาร์
+                  </button>
+                )}
               </div>
             </article>
           );
