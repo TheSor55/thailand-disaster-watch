@@ -1,81 +1,69 @@
-# Thailand Disaster Watch v1.0
+# Thailand Disaster Watch v1.0.0
 
-Production target: `https://disaster.futuregreennet.com`
+**Production Domain**: `https://disaster.futuregreennet.com`
+**Platform**: FutureGreen Disaster Intelligence Platform
+**Project Creator & Lead Developer**: Sorawit Suwannarong
 
-Thailand Disaster Watch is a planned multi-hazard situation-monitoring and business-continuity decision-support platform. Flood/water remains the first operational domain; PHASE 2 defines safe extension points for earthquake and tsunami without connecting live data. It is not an official government warning system.
+Thailand Disaster Watch is a meteorological and hydrological decision-support platform tailored for Thailand. Built with an uncompromising focus on data provenance, spatial precision, and operational safety, v1.0 unites satellite imagery, weather station telemetry, Doppler radar mosaics, and high-resolution numerical model forecasts into a responsive, accessible GIS Command Center.
 
-## Current status
+> [!NOTE]
+> **Safety Notice**: This system is a development and decision-support preview tool. Official government disaster warnings issued by the Thai Meteorological Department (TMD) and Department of Disaster Prevention and Mitigation (DDPM) supersede any data displayed on this platform.
 
-- Current Phase: **3.2 — Usable Weather Preview & Controlled Live Data Mode (implementation branch)**
-- PHASE 1–3.1: **MERGED to `main`**
-- PHASE 3.2: **Controlled Live Preview & Demo Modes; NOT OPERATIONAL**
-- Real Data: **NOT CONNECTED**
-- Operational Use: **NOT APPROVED**
-- Production: **NOT DEPLOYED**
+---
 
-## Technology baseline
+## 1. Current Status & Governance
 
-- React 19, TypeScript, and Vite client application
-- Static frontend target for Cloudflare Pages
-- Isolated Cloudflare Worker API Gateway
-- MapLibre GL JS with a local, licensed Thailand ADM1 boundary file
-- Tailwind CSS baseline plus project CSS
-- ESLint, TypeScript type checking, Node test runner, and Vitest
-- pnpm with dependency build-script allowlist
+- **Release Version**: **v1.0.0**
+- **Operational Status**: **NON-OPERATIONAL / DECISION-SUPPORT PREVIEW**
+- **Real Data State**: Gated under controlled pilot architecture (`realDataConnected=false`, `operationalUseApproved=false`)
+- **Hosting Platform**: Cloudflare Pages + Cloudflare Workers
 
-## Local development
+---
 
-Requirements: Node.js 22.13 or newer and pnpm 11.
+## 2. Technology Stack
+
+- **Frontend**: React 19, TypeScript 5.8, Vite 8 (Pure static client bundle)
+- **GIS Engine**: MapLibre GL JS (WebGL vector tile rendering)
+- **Styling**: Tailwind CSS + Custom Dark Command Center System
+- **API Gateway**: Cloudflare Workers (TypeScript)
+- **Quality Gates**: ESLint, TypeScript Typecheck, Node Test Runner, Vitest
+
+---
+
+## 3. Local Development
+
+Requirements: Node.js 22.13+ and pnpm 11+ (or npm).
 
 ```bash
+# Install dependencies
 pnpm install
+
+# Start local development server
 pnpm dev
 ```
 
-For full local development instructions, see [Local Preview Guide](docs/LOCAL-PREVIEW-GUIDE.md).
+The web application will be accessible at `http://localhost:3000`.
 
-The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. PHASE 2.6 adds fail-closed provider governance, health/reliability contracts, explicit safety/provenance UI, responsive hardening, and lazy GIS loading. The GISTDA layer remains disabled because license, display rights, schema, timestamp, rate/cache, attribution, and human approval evidence remain incomplete.
+---
 
-Copy `.env.example` to `.env.local` only when local configuration is required. Never commit real secrets.
-
-The frontend exposes only variables prefixed with `VITE_`. Provider credentials belong in secure Cloudflare Worker bindings and must not be added until the source audit and license review are approved.
-
-## Quality checks
+## 4. Quality Checks & Production Build
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm lint       # ESLint validation
+pnpm typecheck  # TypeScript strict typecheck
+pnpm test       # Baseline tests + Vitest unit suite
+pnpm build      # Builds dist/web and validates Worker bundle
 ```
 
-`pnpm build` produces the static frontend in `dist/web` and performs a dry-run Worker bundle in `dist/worker`. It does not deploy either artifact.
+---
 
-## Documentation
+## 5. Documentation Directory
 
-- [Local Preview Guide](docs/LOCAL-PREVIEW-GUIDE.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [GIS architecture](docs/GIS-ARCHITECTURE.md)
-- [Weather Situation Pipeline](docs/WEATHER-SITUATION-PIPELINE.md)
-- [Weather Situation UI](docs/WEATHER-SITUATION-UI.md)
-- [Data sources](docs/DATA-SOURCES.md)
-- [Provider audit records](docs/PROVIDER-AUDIT-RECORDS.md)
-- [GISTDA verification and pilot](docs/GISTDA-INTEGRATION.md)
-- [Data license registry](docs/DATA-LICENSE-REGISTRY.md)
-- [API contract](docs/API-CONTRACT.md)
-- [Security](docs/SECURITY.md)
-- [Safety architecture](docs/SAFETY-ARCHITECTURE.md)
-- [BCM architecture](docs/BCM-ARCHITECTURE.md)
-- [Export and sharing](docs/EXPORT-SHARING.md)
-- [SeismoWatch migration](docs/SEISMOWATCH-MIGRATION.md)
-- [Design system](docs/DESIGN-SYSTEM.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Provider approval matrix](docs/PROVIDER-APPROVAL-MATRIX.md)
-- [Mobile quality gate](docs/MOBILE-QUALITY-GATE.md)
-- [Performance budget](docs/PERFORMANCE-BUDGET.md)
-- [Observability contract](docs/OBSERVABILITY.md)
-- [Disclaimer](docs/DISCLAIMER.md)
-
-## Data policy
-
-External datasets must not be connected to production until ownership, official documentation, schema, timestamps, license/reuse terms, attribution, operational constraints, security, and human approval are verified for the exact intended scope. `APPROVED_WITH_CONDITIONS` is not blanket approval.
+- [Release Notes v1.0](docs/RELEASE-v1.0.md)
+- [Production Readiness Review](docs/PRODUCTION-READINESS-v1.0.md)
+- [Cloudflare Deployment Guide](docs/DEPLOYMENT-v1.0.md)
+- [Known Limitations & Backlog](docs/KNOWN-LIMITATIONS-v1.0.md)
+- [Weather & Radar Intelligence](docs/WEATHER-RADAR-INTELLIGENCE.md)
+- [Radar Governance & Audit](docs/RADAR-SOURCE-AUDIT.md)
+- [Project Roadmap](docs/ROADMAP.md)
+- [Data License Registry](docs/DATA-LICENSE-REGISTRY.md)

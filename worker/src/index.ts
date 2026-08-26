@@ -38,17 +38,40 @@ import {
 
 type Env = GistdaEnv & RidEnv & TmdEnv & OpenMeteoEnv & WeatherSituationEnv & RainViewerEnv;
 
+const ALLOWED_ORIGINS = [
+  'https://disaster.futuregreennet.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+];
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const isAllowed =
+    origin &&
+    (ALLOWED_ORIGINS.includes(origin) ||
+      origin.endsWith('.futuregreennet.com') ||
+      origin.endsWith('.pages.dev'));
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : 'https://disaster.futuregreennet.com',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
 const jsonHeaders = {
   'content-type': 'application/json; charset=utf-8',
   'cache-control': 'no-store',
   'x-content-type-options': 'nosniff',
 } as const;
 
-function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
+function jsonResponse(body: unknown, init: ResponseInit = {}, origin: string | null = null): Response {
   return new Response(JSON.stringify(body), {
     ...init,
     headers: {
       ...jsonHeaders,
+      ...getCorsHeaders(origin),
       ...init.headers,
     },
   });
@@ -57,11 +80,19 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const origin = request.headers.get('Origin');
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: getCorsHeaders(origin),
+      });
+    }
 
     if (request.method === 'GET' && url.pathname === '/api/health') {
       return jsonResponse({
         status: 'ok',
-        phase: '2.6',
+        phase: '1.0',
         realDataConnected: false,
         operationalUseApproved: false,
         providers: {
