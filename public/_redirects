@@ -1,1 +1,2 @@
+/api/* https://thailand-disaster-watch-api.the-sor.workers.dev/api/:splat 200
 /* /index.html 200
