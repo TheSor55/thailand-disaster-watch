@@ -71,6 +71,10 @@ export function App() {
   const [showProvinces, setShowProvinces] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [appView, setAppView] = useState<'gis' | 'weather' | 'about'>('gis');
+  const isGisView = appView === 'gis';
+  const isWeatherView = appView === 'weather';
+  const isAboutView = appView === 'about';
+
   const [mobileSheet, setMobileSheet] = useState<
     'navigation' | 'layers' | 'situation' | null
   >(null);
@@ -238,18 +242,18 @@ export function App() {
             <div className="module-nav-list" role="navigation" aria-label="Operations Modules">
               <button
                 type="button"
-                className={`module-nav-item${appView === 'gis' ? ' is-active' : ''}`}
+                className={`module-nav-item${isGisView ? ' is-active' : ''}`}
                 onClick={() => setAppView('gis')}
-                aria-pressed={appView === 'gis'}
+                aria-pressed={isGisView}
               >
                 <span className="icon">🗺</span>
                 <span>GIS Map View</span>
               </button>
               <button
                 type="button"
-                className={`module-nav-item${appView === 'weather' ? ' is-active' : ''}`}
+                className={`module-nav-item${isWeatherView ? ' is-active' : ''}`}
                 onClick={() => setAppView('weather')}
-                aria-pressed={appView === 'weather'}
+                aria-pressed={isWeatherView}
               >
                 <span className="icon">🌤</span>
                 <span>สภาพอากาศ</span>
@@ -277,9 +281,9 @@ export function App() {
               </button>
               <button
                 type="button"
-                className={`module-nav-item${appView === 'about' ? ' is-active' : ''}`}
+                className={`module-nav-item${isAboutView ? ' is-active' : ''}`}
                 onClick={() => setAppView('about')}
-                aria-pressed={appView === 'about'}
+                aria-pressed={isAboutView}
               >
                 <span className="icon">ℹ</span>
                 <span>เกี่ยวกับระบบ</span>
@@ -353,7 +357,7 @@ export function App() {
         </aside>
         )}
 
-        {appView === 'gis' && (
+        {isGisView && (
           <>
             <section className="map-column">
               <div className="map-toolbar">
@@ -442,7 +446,7 @@ export function App() {
           </>
         )}
 
-        {appView === 'weather' && (
+        {isWeatherView && (
           <div className="full-content-column" aria-label="สภาพอากาศ">
             <ModuleErrorBoundary moduleName="Weather Situation">
               <Suspense fallback={<div className="page-loading" role="status">กำลังโหลดหน้าสภาพอากาศ…</div>}>
@@ -452,7 +456,7 @@ export function App() {
           </div>
         )}
 
-        {appView === 'about' && (
+        {isAboutView && (
           <div className="full-content-column" aria-label="เกี่ยวกับระบบ">
             <ModuleErrorBoundary moduleName="About">
               <Suspense fallback={<div className="page-loading" role="status">กำลังโหลด…</div>}>
@@ -478,7 +482,7 @@ export function App() {
       <nav className="mobile-dock" aria-label="Mobile command center navigation">
         <button
           type="button"
-          className={appView === 'gis' ? 'is-active' : ''}
+          className={isGisView ? 'is-active' : ''}
           onClick={(event) => {
             setAppView('gis');
             mobileSheetTrigger.current = event.currentTarget;
@@ -498,7 +502,7 @@ export function App() {
         </button>
         <button
           type="button"
-          className={appView === 'weather' ? 'is-active' : ''}
+          className={isWeatherView ? 'is-active' : ''}
           onClick={() => {
             setAppView('weather');
             setMobileSheet(null);
@@ -526,14 +530,14 @@ export function App() {
                 <div className="mobile-module-nav" aria-label="เลือกโมดูลคำสั่ง">
                   <button
                     type="button"
-                    className={`mobile-module-btn${appView === 'gis' ? ' is-active' : ''}`}
+                    className={`mobile-module-btn${isGisView ? ' is-active' : ''}`}
                     onClick={() => { setAppView('gis'); setMobileSheet(null); }}
                   >
                     <span>🗺 GIS Map View</span>
                   </button>
                   <button
                     type="button"
-                    className={`mobile-module-btn${appView === 'weather' ? ' is-active' : ''}`}
+                    className={`mobile-module-btn${isWeatherView ? ' is-active' : ''}`}
                     onClick={() => { setAppView('weather'); setMobileSheet(null); }}
                   >
                     <span>🌤 สภาพอากาศ (Weather)</span>
@@ -541,7 +545,7 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    className={`mobile-module-btn${appView === 'about' ? ' is-active' : ''}`}
+                    className={`mobile-module-btn${isAboutView ? ' is-active' : ''}`}
                     onClick={() => { setAppView('about'); setMobileSheet(null); }}
                   >
                     <span>ℹ เกี่ยวกับระบบ (About)</span>
