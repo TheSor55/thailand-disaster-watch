@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { LayerControl } from './LayerControl';
@@ -22,5 +22,25 @@ describe('LayerControl', () => {
     expect(
       screen.getByText('License and response schema require human verification'),
     ).toBeInTheDocument();
+  });
+
+  it('renders radar layer checkbox default to false and invokes onRadarVisibilityChange on toggle', () => {
+    const handleRadarChange = vi.fn();
+    render(
+      <LayerControl
+        basemapMode="dark"
+        showProvinces
+        showRadar={false}
+        onBasemapChange={vi.fn()}
+        onProvinceVisibilityChange={vi.fn()}
+        onRadarVisibilityChange={handleRadarChange}
+      />,
+    );
+
+    const radarCheckbox = screen.getByLabelText('เปิด/ปิด เลเยอร์เรดาร์ตรวจอากาศ');
+    expect(radarCheckbox).not.toBeChecked();
+
+    fireEvent.click(radarCheckbox);
+    expect(handleRadarChange).toHaveBeenCalledWith(true);
   });
 });

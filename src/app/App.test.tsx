@@ -54,4 +54,15 @@ describe('command-center navigation', () => {
     expect(dialog).toHaveTextContent('PENDING');
     expect(dialog.querySelector('[aria-disabled="true"]')).toBeInTheDocument();
   });
+
+  it('keeps radar layer OFF by default and shows radar control panel when toggled ON', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const radarCheckboxes = screen.getAllByLabelText('เปิด/ปิด เลเยอร์เรดาร์ตรวจอากาศ');
+    expect(radarCheckboxes[0]).not.toBeChecked();
+
+    await user.click(radarCheckboxes[0]);
+    expect(radarCheckboxes[0]).toBeChecked();
+    expect(await screen.findByRole('region', { name: 'แผงควบคุมเรดาร์ตรวจอากาศ' })).toBeInTheDocument();
+  });
 });

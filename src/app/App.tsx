@@ -29,6 +29,8 @@ import { ModuleErrorBoundary } from '../components/ModuleErrorBoundary';
 import { NavigationSearch } from '../components/NavigationSearch';
 import { SafetyBanner } from '../components/SafetyBanner';
 import { SystemHealthPanel } from '../components/SystemHealthPanel';
+import { RadarControlPanel } from '../components/radar/RadarControlPanel';
+import { fetchRadarFramesUI, type RadarFrame } from '../services/radar';
 
 const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
@@ -69,6 +71,12 @@ export function App() {
   );
   const [basemapMode, setBasemapMode] = useState<BasemapMode>('dark');
   const [showProvinces, setShowProvinces] = useState(true);
+  const [showRadar, setShowRadar] = useState(false);
+  const [radarFrames, setRadarFrames] = useState<RadarFrame[]>([]);
+  const [selectedRadarIndex, setSelectedRadarIndex] = useState(0);
+  const [radarOpacity, setRadarOpacity] = useState(0.7);
+  const [isRadarPlaying, setIsRadarPlaying] = useState(false);
+  const [radarMode] = useState<'DEMO' | 'LIVE'>('DEMO');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [appView, setAppView] = useState<'gis' | 'weather' | 'about'>('gis');
   const isGisView = appView === 'gis';
@@ -103,6 +111,18 @@ export function App() {
       mobileSheetTrigger.current?.focus();
     };
   }, [mobileSheet]);
+
+  useEffect(() => {
+    if (!showRadar || radarFrames.length > 0) return;
+    const controller = new AbortController();
+    fetchRadarFramesUI(radarMode, controller.signal).then((state) => {
+      if (state.status === 'DEMO' || state.status === 'AVAILABLE') {
+        setRadarFrames(state.data.frames);
+        setSelectedRadarIndex(Math.max(0, state.data.frames.length - 1));
+      }
+    });
+    return () => controller.abort();
+  }, [showRadar, radarMode, radarFrames.length]);
 
   const selectedIsoCodes = useMemo(
     () => provinceCodesForNavigation(navigation),
@@ -352,12 +372,17 @@ export function App() {
               showProvinces={showProvinces}
               onBasemapChange={setBasemapMode}
               onProvinceVisibilityChange={setShowProvinces}
+              showRadar={showRadar}
+              onRadarVisibilityChange={(visible) => {
+                setShowRadar(visible);
+                if (!visible) setIsRadarPlaying(false);
+              }}
             />
           </section>
         </aside>
         )}
 
-        {isGisView && (
+        {appView === 'gis' && (
           <>
             <section className="map-column">
               <div className="map-toolbar">
@@ -375,9 +400,30 @@ export function App() {
                     selectedProvinceIso={selectedProvinceIso}
                     showProvinces={showProvinces}
                     onProvinceSelect={handleProvinceSelect}
+                    showRadar={showRadar}
+                    radarTileUrl={radarFrames[selectedRadarIndex]?.tileUrl || null}
+                    radarOpacity={radarOpacity}
                   />
                 </Suspense>
               </ModuleErrorBoundary>
+
+              {showRadar && radarFrames.length > 0 && (
+                <RadarControlPanel
+                  frames={radarFrames}
+                  selectedFrameIndex={selectedRadarIndex}
+                  onSelectFrameIndex={setSelectedRadarIndex}
+                  opacity={radarOpacity}
+                  onOpacityChange={setRadarOpacity}
+                  isPlaying={isRadarPlaying}
+                  onTogglePlay={setIsRadarPlaying}
+                  onClose={() => {
+                    setShowRadar(false);
+                    setIsRadarPlaying(false);
+                  }}
+                  mode={radarMode}
+                />
+              )}
+
               <div className="summary-strip" aria-label="Situation summary">
                 {situationModules.map((module) => (
                   <article key={module} className="summary-card">
@@ -561,7 +607,16 @@ export function App() {
                 </div>
               </>
             )}
-            {mobileSheet === 'layers' && <LayerControl basemapMode={basemapMode} showProvinces={showProvinces} onBasemapChange={setBasemapMode} onProvinceVisibilityChange={setShowProvinces} />}
+            {mobileSheet === 'layers' && (
+              <LayerControl
+                basemapMode={basemapMode}
+                showProvinces={showProvinces}
+                onBasemapChange={setBasemapMode}
+                onProvinceVisibilityChange={setShowProvinces}
+                showRadar={showRadar}
+                onRadarVisibilityChange={setShowRadar}
+              />
+            )}
             {mobileSheet === 'situation' && (
               <div className="mobile-situation-content">
                 <span className="eyebrow">SITUATION OVERVIEW</span>
