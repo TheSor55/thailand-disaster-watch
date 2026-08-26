@@ -46,14 +46,14 @@ describe('command-center navigation', () => {
     expect(trigger).toHaveFocus();
   });
 
-  it('exposes the pending GISTDA layer in the mobile layer panel without enabling it', async () => {
+  it('exposes the GISTDA satellite flood layer in the mobile layer panel', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: /Layers/ }));
     const dialog = screen.getByRole('dialog', { name: 'Mobile command panel' });
-    expect(dialog).toHaveTextContent('Satellite / GISTDA Flood Extent');
-    expect(dialog).toHaveTextContent('PENDING');
-    expect(dialog.querySelector('[aria-disabled="true"]')).toBeInTheDocument();
+    expect(dialog).toHaveTextContent('ภาพถ่ายดาวเทียมน้ำท่วมขัง (GISTDA Flood Inundation)');
+    const floodCheckboxes = screen.getAllByLabelText('เปิด/ปิด เลเยอร์ภาพถ่ายดาวเทียมน้ำท่วมขัง');
+    expect(floodCheckboxes[0]).not.toBeChecked();
   });
 
   it('keeps radar layer OFF by default and shows radar control panel when toggled ON', async () => {

@@ -78,6 +78,7 @@ export function App() {
   const [basemapMode, setBasemapMode] = useState<BasemapMode>('dark');
   const [showProvinces, setShowProvinces] = useState(true);
   const [showRadar, setShowRadar] = useState(false);
+  const [showFlood, setShowFlood] = useState(false);
   const [radarFrames, setRadarFrames] = useState<RadarFrame[]>([]);
   const [selectedRadarIndex, setSelectedRadarIndex] = useState(0);
   const [radarOpacity, setRadarOpacity] = useState(0.7);
@@ -455,6 +456,8 @@ export function App() {
             onProvinceVisibilityChange={setShowProvinces}
             showRadar={showRadar}
             onRadarVisibilityChange={setShowRadar}
+            showFlood={showFlood}
+            onFloodVisibilityChange={setShowFlood}
           />
           </aside>
         )}
@@ -489,6 +492,7 @@ export function App() {
                       showRadar={showRadar}
                       radarTileUrl={radarFrames[selectedRadarIndex]?.tileUrl ?? null}
                       radarOpacity={radarOpacity}
+                      showFlood={showFlood}
                       onProvinceSelect={handleProvinceSelect}
                     />
                   </Suspense>
@@ -514,7 +518,7 @@ export function App() {
                 {situationModules.map((module) => (
                   <article key={module} className="module-pill">
                     <span className="status-dot" aria-hidden="true" />
-                    <div><small>{module}</small><strong>—</strong><span>{module === 'Dam' || module === 'River' ? 'TELEMETRY READY' : 'No live data'}</span></div>
+                    <div><small>{module}</small><strong>—</strong><span>{module === 'Dam' || module === 'River' ? 'TELEMETRY READY' : module === 'Flood' ? 'SATELLITE PILOT' : 'No live data'}</span></div>
                   </article>
                 ))}
               </div>
@@ -764,6 +768,8 @@ export function App() {
                 onProvinceVisibilityChange={setShowProvinces}
                 showRadar={showRadar}
                 onRadarVisibilityChange={setShowRadar}
+                showFlood={showFlood}
+                onFloodVisibilityChange={setShowFlood}
               />
             )}
             {mobileSheet === 'situation' && (

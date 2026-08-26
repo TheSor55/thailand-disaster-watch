@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { MySitesPanel } from './MySitesPanel';
 
-describe('MySitesPanel (Petchsiam & Salee Industry)', () => {
+describe('MySitesPanel (Petchsiam & Salee Industry & BCM Intelligence)', () => {
   it('renders Petchsiam and Salee Industry sites with address', () => {
     render(<MySitesPanel />);
 
@@ -37,7 +37,7 @@ describe('MySitesPanel (Petchsiam & Salee Industry)', () => {
 
     render(<MySitesPanel onCheckWeather={handleCheckWeather} />);
 
-    const weatherButtons = screen.getAllByRole('button', { name: /ตรวจสภาพอากาศ & เรดาร์/ });
+    const weatherButtons = screen.getAllByRole('button', { name: /ตรวจสภาพอากาศ/ });
     await user.click(weatherButtons[1]); // Salee Industry
 
     expect(handleCheckWeather).toHaveBeenCalledWith(
@@ -46,5 +46,22 @@ describe('MySitesPanel (Petchsiam & Salee Industry)', () => {
         province: 'ปทุมธานี',
       })
     );
+  });
+
+  it('opens BCM Report Modal when clicking BCM report button and closes on close button', async () => {
+    const user = userEvent.setup();
+    render(<MySitesPanel />);
+
+    const bcmButtons = screen.getAllByRole('button', { name: /สรุปรายงาน BCM/ });
+    await user.click(bcmButtons[0]); // Petchsiam
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(/รายงานประเมินความเสี่ยงอุทกภัยและความต่อเนื่องทางธุรกิจ/)).toBeInTheDocument();
+    expect(screen.getByText('🖨️ พิมพ์ / บันทึก PDF รายงาน (Print BCM Report)')).toBeInTheDocument();
+
+    const closeButton = screen.getByRole('button', { name: 'ปิดหน้าต่าง' });
+    await user.click(closeButton);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

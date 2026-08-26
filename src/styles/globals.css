@@ -1004,6 +1004,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
   background: linear-gradient(135deg, #38bdf8 0%, #34d399 50%, #facc15 100%);
 }
 
+.layer-swatch--flood {
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);
+  border-color: #22d3ee;
+}
+
 .radar-control-panel {
   position: absolute;
   bottom: 74px;
@@ -2001,6 +2006,302 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
 .btn-site-action--weather:hover {
   background: rgba(16, 185, 129, 0.25);
   color: #ffffff;
+}
+
+.btn-site-action--bcm {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.btn-site-action--bcm:hover {
+  background: rgba(168, 85, 247, 0.3);
+  color: #ffffff;
+}
+
+/* ==========================================
+   v1.2 BCM Executive Report Modal & Print
+   ========================================== */
+.bcm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 18, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.bcm-modal-content {
+  width: min(100%, 820px);
+  max-height: 90vh;
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bcm-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #1e293b;
+  border-bottom: 1px solid var(--border);
+}
+
+.bcm-brand-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bcm-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+}
+
+.bcm-brand-title h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #f8fafc;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.btn-close-modal:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.bcm-modal-body {
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bcm-exec-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.bcm-site-type {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.bcm-company-name {
+  margin: 2px 0 4px;
+  font-size: 1.15rem;
+  color: #38bdf8;
+}
+
+.bcm-address {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.bcm-meta-geo {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.bcm-meta-geo code {
+  color: #38bdf8;
+  font-family: var(--font-mono, monospace);
+}
+
+.bcm-overall-risk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 16px;
+  border: 2px solid;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+}
+
+.bcm-overall-risk small {
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.bcm-overall-risk strong {
+  font-size: 1.05rem;
+  margin: 2px 0;
+}
+
+.bcm-overall-risk span {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.bcm-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .bcm-exec-card {
+    flex-direction: column;
+  }
+  .bcm-overall-risk {
+    width: 100%;
+  }
+  .bcm-matrix-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bcm-matrix-card {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bcm-matrix-card h4 {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #f8fafc;
+}
+
+.bcm-metric {
+  margin: 2px 0;
+  font-size: 0.78rem;
+}
+
+.bcm-matrix-card small {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.bcm-recommendations {
+  background: rgba(56, 189, 248, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.bcm-recommendations h4 {
+  margin: 0 0 8px;
+  font-size: 0.88rem;
+  color: #38bdf8;
+}
+
+.bcm-actions-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.bcm-actions-list li strong {
+  color: #f8fafc;
+}
+
+.bcm-report-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bcm-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px;
+  background: #1e293b;
+  border-top: 1px solid var(--border);
+}
+
+.btn-print-report {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  border: 1px solid #38bdf8;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-print-report:hover {
+  background: #0284c7;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+/* Print Stylesheet for A4 PDF */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #bcm-printable-area, #bcm-printable-area * {
+    visibility: visible;
+  }
+  #bcm-printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 20px;
+  }
+  .bcm-company-name {
+    color: #0369a1 !important;
+  }
+  .bcm-exec-card, .bcm-matrix-card, .bcm-recommendations {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+  }
 }
 
 

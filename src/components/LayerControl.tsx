@@ -3,8 +3,8 @@ import type { BasemapMode } from '../map/ThailandMap';
 const futureLayers = [
   'Rain Radar',
   'Flood Forecast',
-  'River',
-  'Dam',
+  'River Telemetry',
+  'Dam Telemetry',
   'CCTV',
   'Warning Areas',
 ];
@@ -16,6 +16,8 @@ interface LayerControlProps {
   onProvinceVisibilityChange: (visible: boolean) => void;
   showRadar?: boolean;
   onRadarVisibilityChange?: (visible: boolean) => void;
+  showFlood?: boolean;
+  onFloodVisibilityChange?: (visible: boolean) => void;
 }
 
 export function LayerControl({
@@ -25,6 +27,8 @@ export function LayerControl({
   onProvinceVisibilityChange,
   showRadar = false,
   onRadarVisibilityChange,
+  showFlood = false,
+  onFloodVisibilityChange,
 }: LayerControlProps) {
   return (
     <div className="layer-control">
@@ -57,13 +61,21 @@ export function LayerControl({
         />
       </label>
 
-      <div className="layer-row is-disabled" aria-disabled="true">
+      {/* GISTDA Satellite Flood Layer */}
+      <label className="layer-row">
         <span>
-          Satellite / GISTDA Flood Extent
-          <small>License and response schema require human verification</small>
+          <i className="layer-swatch layer-swatch--flood" />
+          🛰️ ภาพถ่ายดาวเทียมน้ำท่วมขัง (GISTDA Flood Inundation)
+          <small>GISTDA Sentinel-1 SAR · OBSERVED · Controlled Pilot</small>
         </span>
-        <b>PENDING</b>
-      </div>
+        <input
+          type="checkbox"
+          checked={showFlood}
+          onChange={(event) => onFloodVisibilityChange?.(event.target.checked)}
+          aria-label="เปิด/ปิด เลเยอร์ภาพถ่ายดาวเทียมน้ำท่วมขัง"
+        />
+      </label>
+
       {futureLayers.map((layer) => (
         <div className="layer-row is-disabled" key={layer}><span>{layer}</span><b>PHASE 2+</b></div>
       ))}

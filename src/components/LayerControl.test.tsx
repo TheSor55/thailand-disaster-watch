@@ -3,25 +3,25 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { LayerControl } from './LayerControl';
 
-describe('LayerControl', () => {
-  it('keeps the GISTDA pilot unavailable until human verification', () => {
+describe('LayerControl (v1.2)', () => {
+  it('renders GISTDA satellite flood layer checkbox and invokes onFloodVisibilityChange on toggle', () => {
+    const handleFloodChange = vi.fn();
     render(
       <LayerControl
         basemapMode="dark"
         showProvinces
+        showFlood={false}
         onBasemapChange={vi.fn()}
         onProvinceVisibilityChange={vi.fn()}
+        onFloodVisibilityChange={handleFloodChange}
       />,
     );
 
-    const pendingLayer = screen
-      .getByText('Satellite / GISTDA Flood Extent')
-      .closest('[aria-disabled="true"]');
-    expect(pendingLayer).toBeInTheDocument();
-    expect(screen.getByText('PENDING')).toBeInTheDocument();
-    expect(
-      screen.getByText('License and response schema require human verification'),
-    ).toBeInTheDocument();
+    const floodCheckbox = screen.getByLabelText('เปิด/ปิด เลเยอร์ภาพถ่ายดาวเทียมน้ำท่วมขัง');
+    expect(floodCheckbox).not.toBeChecked();
+
+    fireEvent.click(floodCheckbox);
+    expect(handleFloodChange).toHaveBeenCalledWith(true);
   });
 
   it('renders radar layer checkbox default to false and invokes onRadarVisibilityChange on toggle', () => {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BcmReportModal } from './BcmReportModal';
 
 export interface PinnedSite {
   id: string;
@@ -96,6 +97,7 @@ interface MySitesPanelProps {
 export function MySitesPanel({ onSelectSite, onCheckWeather }: MySitesPanelProps) {
   const [sites] = useState<PinnedSite[]>(INITIAL_SITES);
   const [filter, setFilter] = useState<'ALL' | 'FACTORY' | 'WAREHOUSE' | 'OFFICE'>('ALL');
+  const [activeBcmSite, setActiveBcmSite] = useState<PinnedSite | null>(null);
 
   const filteredSites = filter === 'ALL' ? sites : sites.filter((s) => s.category === filter);
 
@@ -106,7 +108,7 @@ export function MySitesPanel({ onSelectSite, onCheckWeather }: MySitesPanelProps
           <span className="eyebrow">ASSET RISK MONITORING</span>
           <h2>📍 พื้นที่เฝ้าระวังของฉัน (My Sites)</h2>
         </div>
-        <span className="status-chip status-chip--dev-preview">PROTOTYPE</span>
+        <span className="status-chip status-chip--dev-preview">BCM INTELLIGENCE</span>
       </div>
 
       {/* Filter tabs */}
@@ -177,14 +179,29 @@ export function MySitesPanel({ onSelectSite, onCheckWeather }: MySitesPanelProps
                     className="btn-site-action btn-site-action--weather"
                     onClick={() => onCheckWeather(site)}
                   >
-                    🌤️ ตรวจสภาพอากาศ &amp; เรดาร์
+                    🌤️ ตรวจสภาพอากาศ
                   </button>
                 )}
+                <button
+                  type="button"
+                  className="btn-site-action btn-site-action--bcm"
+                  onClick={() => setActiveBcmSite(site)}
+                >
+                  📄 สรุปรายงาน BCM
+                </button>
               </div>
             </article>
           );
         })}
       </div>
+
+      {/* BCM Report Executive Modal */}
+      {activeBcmSite && (
+        <BcmReportModal
+          site={activeBcmSite}
+          onClose={() => setActiveBcmSite(null)}
+        />
+      )}
     </section>
   );
 }
