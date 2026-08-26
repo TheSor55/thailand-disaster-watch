@@ -6,9 +6,9 @@ Thailand Disaster Watch is a planned multi-hazard situation-monitoring and busin
 
 ## Current status
 
-- Current Phase: **3.1 — Weather Situation UI Safe Preview (implementation branch)**
-- PHASE 1–3.0: **MERGED to `main`**
-- PHASE 3.1: **Controlled Safe Preview; NOT OPERATIONAL**
+- Current Phase: **3.2 — Usable Weather Preview & Controlled Live Data Mode (implementation branch)**
+- PHASE 1–3.1: **MERGED to `main`**
+- PHASE 3.2: **Controlled Live Preview & Demo Modes; NOT OPERATIONAL**
 - Real Data: **NOT CONNECTED**
 - Operational Use: **NOT APPROVED**
 - Production: **NOT DEPLOYED**
@@ -32,6 +32,8 @@ pnpm install
 pnpm dev
 ```
 
+For full local development instructions, see [Local Preview Guide](docs/LOCAL-PREVIEW-GUIDE.md).
+
 The application supports direct browser routes such as `/region/north`, `/province/chiang-mai`, and `/quick-view/bangkok-metro`. All disaster modules intentionally show unavailable states. PHASE 2.6 adds fail-closed provider governance, health/reliability contracts, explicit safety/provenance UI, responsive hardening, and lazy GIS loading. The GISTDA layer remains disabled because license, display rights, schema, timestamp, rate/cache, attribution, and human approval evidence remain incomplete.
 
 Copy `.env.example` to `.env.local` only when local configuration is required. Never commit real secrets.
@@ -51,6 +53,7 @@ pnpm build
 
 ## Documentation
 
+- [Local Preview Guide](docs/LOCAL-PREVIEW-GUIDE.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [GIS architecture](docs/GIS-ARCHITECTURE.md)
 - [Weather Situation Pipeline](docs/WEATHER-SITUATION-PIPELINE.md)
