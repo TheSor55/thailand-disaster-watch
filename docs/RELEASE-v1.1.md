@@ -1,8 +1,6 @@
-# Thailand Disaster Watch — Release Notes v1.1.0
-
 **Release Tag:** `v1.1.0`  
 **Release Date:** 2026-08-26  
-**Status:** PRODUCTION-READY / STAGED FOR DEPLOYMENT  
+**Status:** 🚀 LIVE IN PRODUCTION  
 **Domain:** `https://disaster.futuregreennet.com`  
 
 ---
