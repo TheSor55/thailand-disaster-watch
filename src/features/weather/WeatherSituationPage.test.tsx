@@ -298,6 +298,31 @@ describe('WeatherSituationPage (Phase 3.2)', () => {
     });
   });
 
+  it('calls onBack handler when back button is clicked', async () => {
+    const user = userEvent.setup();
+    const handleBack = vi.fn();
+    mockFetchWeatherSituationUI.mockResolvedValue({
+      status: 'DEMO',
+      data: {
+        location: { latitude: 13.7563, longitude: 100.5018 },
+        generatedAt: new Date().toISOString(),
+        observed: null,
+        forecast: null,
+        officialWarning: null,
+        sourceAgreement: 'INSUFFICIENT_DATA' as const,
+        confidence: 'UNKNOWN' as const,
+        limitations: [],
+      },
+    });
+
+    render(<WeatherSituationPage onBack={handleBack} />);
+
+    const backBtn = screen.getByRole('button', { name: /กลับไปหน้าแผนที่ GIS/i });
+    expect(backBtn).toBeTruthy();
+    await user.click(backBtn);
+    expect(handleBack).toHaveBeenCalledTimes(1);
+  });
+
   it('does NOT contain radar, RainViewer, Windy, or nowcasting keywords in HTML output', () => {
     const html = document.documentElement.innerHTML;
     expect(html.toLowerCase()).not.toContain('rainviewer');

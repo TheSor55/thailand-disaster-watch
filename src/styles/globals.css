@@ -713,3 +713,63 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
   cursor: pointer;
 }
 .weather-retry-btn:hover { border-color: var(--accent); }
+
+/* ==========================================
+   Phase 3.3 UX Refinements & Touch Ergonomics
+   ========================================== */
+
+/* Navigation top bar in Weather page */
+.weather-nav-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2px;
+}
+.weather-back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 8px 14px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-raised); color: var(--text);
+  font-size: .75rem; font-weight: 600; cursor: pointer;
+  transition: all .15s ease-in-out;
+}
+.weather-back-btn:hover {
+  border-color: var(--accent); background: var(--surface-soft); color: var(--accent);
+}
+
+/* Mobile Command Module Navigation in Drawer */
+.mobile-module-nav {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 4px 0 12px; border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.mobile-module-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 44px; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--surface-soft); color: var(--text);
+  font-size: .82rem; font-weight: 700; text-align: left;
+  cursor: pointer; transition: all .15s ease;
+}
+.mobile-module-btn:hover {
+  border-color: var(--accent); background: var(--surface-raised);
+}
+.mobile-module-btn.is-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface-soft));
+  box-shadow: inset 3px 0 var(--accent);
+}
+.mobile-dock button.is-active {
+  color: var(--accent);
+  border-top-color: var(--accent);
+}
+
+/* Touch targets refinement */
+.location-preset-btn {
+  min-height: 44px;
+}
+.weather-refresh-btn {
+  min-height: 38px;
+}
+.weather-switch-demo-btn,
+.weather-retry-btn {
+  min-height: 40px;
+}

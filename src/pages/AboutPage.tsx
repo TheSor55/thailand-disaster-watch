@@ -86,7 +86,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
       <section className="about-section">
         <h3>เวอร์ชัน</h3>
         <dl className="about-identity">
-          <div><dt>Phase</dt><dd>3.1 — Weather Situation UI Safe Preview</dd></div>
+          <div><dt>Phase</dt><dd>3.3 — Real User Acceptance Test &amp; UX Refinement</dd></div>
           <div><dt>Repository</dt><dd>TheSor55/thailand-disaster-watch</dd></div>
         </dl>
       </section>

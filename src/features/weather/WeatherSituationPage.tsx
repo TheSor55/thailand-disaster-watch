@@ -94,7 +94,11 @@ function getSituationData(state: WeatherSituationLoadState): WeatherSituation | 
   return null;
 }
 
-export function WeatherSituationPage() {
+interface WeatherSituationPageProps {
+  onBack?: () => void;
+}
+
+export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {}) {
   const [request, setRequest] = useState<WeatherSituationRequest>(getInitialRequest);
   const [loadState, setLoadState] = useState<WeatherSituationLoadState>({ status: 'IDLE' });
   const [showGates, setShowGates] = useState(false);
@@ -163,6 +167,20 @@ export function WeatherSituationPage() {
 
   return (
     <div className="weather-situation-page" aria-label="Weather Situation">
+      {/* Back button to GIS Map when navigation handler provided */}
+      {onBack && (
+        <div className="weather-nav-bar">
+          <button
+            type="button"
+            className="weather-back-btn"
+            onClick={onBack}
+            aria-label="กลับไปหน้าแผนที่ GIS"
+          >
+            ← กลับไปหน้าแผนที่ GIS
+          </button>
+        </div>
+      )}
+
       {/* Prominent Development Preview Banner — always visible */}
       <PreviewBadge />
 
