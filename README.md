@@ -6,10 +6,9 @@ Thailand Disaster Watch is a planned multi-hazard situation-monitoring and busin
 
 ## Current status
 
-- Current Phase: **2.6 — Platform Hardening & Provider Approval Readiness (implementation branch)**
-- PHASE 1: **MERGED to `main` via PR #1**
-- PHASE 2: **MERGED to `main` via PR #2**
-- PHASE 2.5: **MERGED to `main` via PR #3; controlled local pilot complete**
+- Current Phase: **3.1 — Weather Situation UI Safe Preview (implementation branch)**
+- PHASE 1–3.0: **MERGED to `main`**
+- PHASE 3.1: **Controlled Safe Preview; NOT OPERATIONAL**
 - Real Data: **NOT CONNECTED**
 - Operational Use: **NOT APPROVED**
 - Production: **NOT DEPLOYED**
@@ -54,6 +53,8 @@ pnpm build
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [GIS architecture](docs/GIS-ARCHITECTURE.md)
+- [Weather Situation Pipeline](docs/WEATHER-SITUATION-PIPELINE.md)
+- [Weather Situation UI](docs/WEATHER-SITUATION-UI.md)
 - [Data sources](docs/DATA-SOURCES.md)
 - [Provider audit records](docs/PROVIDER-AUDIT-RECORDS.md)
 - [GISTDA verification and pilot](docs/GISTDA-INTEGRATION.md)
