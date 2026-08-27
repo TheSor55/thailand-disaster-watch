@@ -39,7 +39,20 @@ export function SituationAlertCard({ alerts, provinceNameTh }: SituationAlertCar
             <p className="alert-summary">{alert.summaryTh}</p>
             <div className="alert-footer">
               <small>พื้นที่: {alert.targetAreas.join(', ')}</small>
-              <small className="source-attr">แหล่งข้อมูล: {alert.sourceAttribution}</small>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', flexWrap: 'wrap', gap: '4px' }}>
+                <small className="source-attr">แหล่งข้อมูล: {alert.sourceAttribution}</small>
+                {alert.officialUrl && (
+                  <a
+                    href={alert.officialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="alert-official-link"
+                    style={{ fontSize: '0.65rem', color: '#38bdf8', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    ตรวจประกาศทางการฉบับจริง ↗
+                  </a>
+                )}
+              </div>
             </div>
           </article>
         ))}

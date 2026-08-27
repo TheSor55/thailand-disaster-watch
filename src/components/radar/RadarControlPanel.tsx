@@ -169,8 +169,8 @@ export function RadarControlPanel({
           <h3 className="radar-control-panel__title">🌤 เรดาร์ตรวจอากาศสังเกตการณ์</h3>
         </div>
         <div className="radar-control-panel__header-actions">
-          <span className={`status-chip status-chip--${mode === 'DEMO' ? 'demo' : 'dev-preview'}`}>
-            {mode === 'DEMO' ? 'DEMO PREVIEW' : 'CONTROLLED LIVE'}
+          <span className="status-chip status-chip--dev-preview">
+            {mode === 'LIVE' ? '🟢 LIVE RADAR' : '🛰️ SATELLITE & RADAR'}
           </span>
           <button
             type="button"
@@ -271,10 +271,36 @@ export function RadarControlPanel({
         />
       </div>
 
+      {/* Direct Live Windy Radar Button */}
+      <div style={{ marginTop: '8px' }}>
+        <a
+          href="https://www.windy.com/?radar,13.75,100.50,6"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-windy-layer is-active"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            textDecoration: 'none',
+            padding: '7px 12px',
+            borderRadius: '6px',
+            fontSize: '0.72rem',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+            color: '#ffffff',
+            border: '1px solid #38bdf8',
+          }}
+        >
+          <span>🌀 เปิดดูเรดาร์สด &amp; พายุความคมชัดสูงบน Windy.com ↗</span>
+        </a>
+      </div>
+
       {/* Attribution & Coverage Note */}
       <div className="radar-control-panel__footer">
         <p className="radar-attribution">
-          แหล่งข้อมูล: <strong>{currentFrame?.provider || 'RainViewer'}</strong> ·{' '}
+          แหล่งข้อมูล: <strong>{currentFrame?.provider || 'RainViewer Global Radar'}</strong> ·{' '}
           <a
             href={currentFrame?.attributionUrl || 'https://www.rainviewer.com/'}
             target="_blank"
@@ -288,7 +314,7 @@ export function RadarControlPanel({
           ⚠ {currentFrame?.coverageNote || 'COVERAGE MAY BE INCOMPLETE'} (ความครอบคลุมอาจมีช่องว่างในบางพื้นที่)
         </p>
         <p className="radar-disclaimer">
-          ข้อมูลภาพสังเกตการณ์ระยะไกลสำหรับการทดสอบพัฒนา (Development Preview) ไม่ใช่การแจ้งเตือนภัยทางการ และไม่มีการคำนวณ Nowcasting
+          ข้อมูลภาพสังเกตการณ์ระยะไกลสำหรับการเฝ้าระวังเบื้องต้น ไม่ใช่การแจ้งเตือนภัยทางการ และไม่มีการคำนวณ Nowcasting
         </p>
       </div>
     </div>

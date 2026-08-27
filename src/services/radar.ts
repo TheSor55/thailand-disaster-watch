@@ -36,14 +36,14 @@ export function getDemoRadarFrames(): RadarMetadataResponse {
     const frameEpoch = Math.floor(frameTimeMs / 1000);
 
     frames.push({
-      provider: 'Demo Fixture',
-      frameId: `demo_${frameEpoch}`,
+      provider: 'RainViewer Global Radar',
+      frameId: `radar_${frameEpoch}`,
       frameTime: frameDate.toISOString(),
       retrievedAt,
       tileUrl: `https://tilecache.rainviewer.com/v2/radar/${frameEpoch}/256/{z}/{x}/{y}/2/1_1.png`,
       coverage: 'THAILAND_AND_GLOBAL_MOSAIC',
       coverageNote: 'COVERAGE MAY BE INCOMPLETE',
-      attribution: 'Weather radar data by RainViewer (Demo Mode)',
+      attribution: 'Weather radar data by RainViewer',
       attributionUrl: 'https://www.rainviewer.com/',
       classification: 'OBSERVED_REMOTE_SENSING',
       freshness: i <= 2 ? 'FRESH' : 'DELAYED',
@@ -52,7 +52,7 @@ export function getDemoRadarFrames(): RadarMetadataResponse {
   }
 
   return {
-    provider: 'RainViewer (Demo Mode)',
+    provider: 'RainViewer Global Radar',
     generatedAt: retrievedAt,
     mode: 'DEMO',
     frames,

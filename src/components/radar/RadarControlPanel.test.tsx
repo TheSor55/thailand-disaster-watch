@@ -39,7 +39,7 @@ describe('RadarControlPanel Component (Phase 3.4)', () => {
     );
 
     expect(screen.getByText('🌤 เรดาร์ตรวจอากาศสังเกตการณ์')).toBeInTheDocument();
-    expect(screen.getByText('DEMO PREVIEW')).toBeInTheDocument();
+    expect(screen.getByText(/SATELLITE & RADAR/)).toBeInTheDocument();
     expect(screen.getByText(/Weather radar data by RainViewer/)).toBeInTheDocument();
     expect(screen.getByText(/COVERAGE MAY BE INCOMPLETE/)).toBeInTheDocument();
     expect(screen.getByText(/ไม่ใช่การแจ้งเตือนภัยทางการ/)).toBeInTheDocument();

@@ -20,7 +20,7 @@ export type RadarFrameStatus = 'AVAILABLE' | 'UNAVAILABLE' | 'DEMO';
 export type RadarFreshnessPolicy = 'INTERNAL_PREVIEW_POLICY';
 
 export interface RadarFrame {
-  provider: 'RainViewer' | 'Demo Fixture';
+  provider: 'RainViewer' | 'Demo Fixture' | 'RainViewer Global Radar';
   frameId: string;
   frameTime: string; // ISO 8601 UTC timestamp of radar scan
   retrievedAt: string; // ISO 8601 UTC timestamp when metadata was obtained
