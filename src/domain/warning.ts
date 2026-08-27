@@ -50,8 +50,8 @@ export const ACTIVE_OFFICIAL_ALERTS: readonly OfficialAlert[] = [
     validFrom: new Date().toISOString(),
     validTo: new Date(Date.now() + 86400000 * 3).toISOString(),
     summaryTh: 'ปภ. ประสานจังหวัดในพื้นที่เฝ้าระวังติดตามปริมาณน้ำและเตรียมพร้อมเครื่องจักรกลสาธารณภัยตลอด 24 ชั่วโมง',
-    officialUrl: 'https://www.disaster.go.th',
-    sourceAttribution: 'ศูนย์เตือนภัยพิบัติแห่งชาติ กรมป้องกันและบรรเทาสาธารณภัย (DDPM)',
+    officialUrl: 'https://portal.disaster.go.th/portal/public/index.do',
+    sourceAttribution: 'ศูนย์เตือนภัยพิบัติแห่งชาติ กรมป้องกันและบรรเทาสาธารณภัย (DPM PORTAL)',
   },
 ];
 
