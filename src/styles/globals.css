@@ -3640,19 +3640,65 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   border: none;
 }
 
-.seismo-footer-note {
-  font-size: 0.68rem;
+/* ==========================================
+   Breadcrumb Bar Navigation Styling
+   ========================================== */
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.76rem;
+  z-index: 10;
+}
+
+.breadcrumb-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb-bar__separator {
   color: var(--muted);
-  padding: 0 4px;
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+.breadcrumb-bar__button {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.76rem;
+  transition: all 0.15s ease;
+}
+
+.breadcrumb-bar__button:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.breadcrumb-bar__button.is-current {
+  color: #38bdf8;
+  font-weight: 700;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 /* ==========================================
-   Chao Phraya River Basin Live Flow Diagram (HII)
+   Chao Phraya River Basin Live Flow Diagram (HII) - Modern Command Center
    ========================================== */
 .chaopraya-container-page {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   height: 100%;
   min-height: 560px;
 }
@@ -3663,68 +3709,152 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.85), rgba(9, 14, 23, 0.95));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-.chaopraya-toolbar-info h2 {
-  margin: 2px 0;
-  font-size: 1rem;
+.chaopraya-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-command-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-command-back:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
   color: #38bdf8;
+  transform: translateX(-2px);
 }
 
-.chaopraya-toolbar-info small {
+.btn-back-icon {
+  font-size: 0.9rem;
+}
+
+.chaopraya-title-group h2 {
+  margin: 4px 0 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.chaopraya-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.command-pill-live {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid #10b981;
+  color: #34d399;
+  letter-spacing: 0.05em;
+}
+
+.command-pill-source {
+  font-size: 0.68rem;
   color: var(--muted);
-  font-size: 0.7rem;
 }
 
-.chaopraya-actions {
+/* Action Button Strip */
+.chaopraya-actions-strip {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
-.btn-chaopraya-external {
-  padding: 6px 12px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  border-radius: 6px;
+.btn-pro-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.btn-pro-action--primary {
   background: linear-gradient(135deg, #0284c7, #0369a1);
   border: 1px solid #38bdf8;
   color: #ffffff;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.15s ease;
 }
 
-.btn-chaopraya-external:hover {
-  background: #0284c7;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+.btn-pro-action--primary:hover {
+  background: linear-gradient(135deg, #0369a1, #0284c7);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+  transform: translateY(-1px);
 }
 
-.btn-chaopraya-dam {
+.btn-pro-action--emerald {
   background: linear-gradient(135deg, #059669, #047857);
-  border-color: #34d399;
+  border: 1px solid #34d399;
+  color: #ffffff;
 }
 
-.btn-chaopraya-dam:hover {
-  background: #059669;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+.btn-pro-action--emerald:hover {
+  background: linear-gradient(135deg, #047857, #059669);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
 }
 
+.btn-pro-action--cyan {
+  background: linear-gradient(135deg, #0891b2, #0e7490);
+  border: 1px solid #22d3ee;
+  color: #ffffff;
+}
+
+.btn-pro-action--cyan:hover {
+  background: linear-gradient(135deg, #0e7490, #0891b2);
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-pro-icon {
+  font-size: 0.85rem;
+}
+
+.btn-pro-arrow {
+  font-weight: bold;
+  opacity: 0.8;
+}
+
+/* Schematic Layout */
 .chaopraya-schematic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 16px;
   flex: 1;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .chaopraya-schematic-grid {
     grid-template-columns: 1fr;
   }
@@ -3734,27 +3864,48 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 .chaopraya-visual-column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .chaopraya-hero-launcher {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(15, 23, 42, 0.6));
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 12px;
-  padding: 16px;
+  background: linear-gradient(145deg, rgba(2, 132, 199, 0.12), rgba(15, 23, 42, 0.85));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 14px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.chaopraya-hero-launcher .hero-icon {
-  font-size: 2rem;
+.hero-top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+}
+
+.hero-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.4); opacity: 0.4; }
 }
 
 .chaopraya-hero-launcher h3 {
   margin: 0;
-  font-size: 1.05rem;
-  color: #38bdf8;
+  font-size: 1.1rem;
+  color: #f8fafc;
 }
 
 .chaopraya-hero-launcher p {
@@ -3767,104 +3918,187 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 .hero-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   margin-top: 6px;
 }
 
 .btn-hero-launch {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 10px 16px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #0284c7, #0369a1);
-  color: #ffffff;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 10px;
   text-decoration: none;
-  font-weight: 700;
-  font-size: 0.82rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.btn-hero-launch--glow {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
   border: 1px solid #38bdf8;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-  transition: all 0.15s ease;
+  color: #ffffff;
 }
 
-.btn-hero-launch:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(56, 189, 248, 0.45);
+.btn-hero-launch--glow:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 20px rgba(56, 189, 248, 0.5);
 }
 
-.btn-hero-secondary {
+.btn-hero-launch--emerald {
   background: linear-gradient(135deg, #059669, #047857);
-  border-color: #34d399;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+  border: 1px solid #34d399;
+  color: #ffffff;
 }
 
-.btn-hero-secondary:hover {
-  box-shadow: 0 6px 18px rgba(52, 211, 153, 0.45);
+.btn-hero-launch--emerald:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 20px rgba(16, 185, 129, 0.5);
 }
 
+.hero-btn-icon {
+  font-size: 1.2rem;
+}
+
+.hero-btn-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex: 1;
+  margin: 0 10px;
+}
+
+.hero-btn-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Strategic Gates Card */
 .chaopraya-gates-card {
-  background: var(--surface);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
-.chaopraya-gates-card h4 {
-  margin: 0 0 10px 0;
-  font-size: 0.85rem;
-  color: var(--text);
+.gates-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.gates-card-header h4 {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #f8fafc;
 }
 
 .gate-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .gate-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 8px 10px;
-  background: var(--surface-glass);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  gap: 4px;
+  padding: 10px 12px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.gate-item:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.gate-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .gate-badge {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.gate-badge--blue {
+  background: rgba(2, 132, 199, 0.2);
   color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
 }
 
-.gate-item strong {
-  font-size: 0.78rem;
-  color: var(--text);
+.gate-badge--amber {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-.gate-item small {
-  font-size: 0.7rem;
+.gate-badge--red {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.gate-badge--cyan {
+  background: rgba(6, 182, 212, 0.2);
+  color: #22d3ee;
+  border: 1px solid rgba(34, 211, 238, 0.4);
+}
+
+.gate-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.gate-item p {
+  margin: 0;
+  font-size: 0.72rem;
   color: var(--muted);
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
+/* Schematic Visual Card */
 .schematic-card {
-  background: var(--surface);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .schematic-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.schematic-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.schematic-title {
+  font-size: 0.82rem;
+  color: #f8fafc;
 }
 
 .schematic-svg-wrap {
@@ -3875,13 +4109,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 
 .schematic-svg {
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   height: auto;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .chaopraya-footer-note {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--muted);
-  padding: 0 4px;
+  padding: 2px 6px;
 }

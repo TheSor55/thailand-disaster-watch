@@ -1,10 +1,8 @@
 /**
  * ChaoPhrayaFlowView — Official Chao Phraya River Basin Flow Diagram (HII / RID)
  *
- * Provides real-time hydrological flow monitoring from Ping, Wang, Yom, Nan
- * down to Chao Phraya Dam, Bang Sai (Ayutthaya), Bangkok, and the Gulf of Thailand.
- *
- * Source: Hydro-Informatics Institute (HII) & Royal Irrigation Department (RID)
+ * Ultra-Modern Enterprise Decision-Support Command View for Chao Phraya River Basin.
+ * Hydro-Informatics Institute (HII) & Royal Irrigation Department (RID)
  */
 
 interface ChaoPhrayaFlowViewProps {
@@ -18,195 +16,272 @@ const THAIWATER_RIVER_URL = 'https://www.thaiwater.net/water/river';
 export function ChaoPhrayaFlowView({ onBack }: ChaoPhrayaFlowViewProps) {
   return (
     <div className="chaopraya-container-page" aria-label="ผังน้ำลุ่มน้ำเจ้าพระยา HII">
-      {/* Top Toolbar */}
-      <div className="chaopraya-toolbar">
-        <div className="chaopraya-toolbar-info">
+      {/* Top Command Toolbar */}
+      <header className="chaopraya-toolbar">
+        <div className="chaopraya-toolbar-left">
           {onBack && (
-            <button type="button" className="btn-ghost" onClick={onBack} aria-label="กลับไปหน้าแผนที่ GIS">
-              ← กลับไปหน้าแผนที่ GIS
+            <button
+              type="button"
+              className="btn-command-back"
+              onClick={onBack}
+              aria-label="กลับสู่แผนที่หลัก GIS"
+            >
+              <span className="btn-back-icon">←</span>
+              <span>กลับสู่แผนที่ GIS</span>
             </button>
           )}
-          <div>
-            <h2>🌊 ผังน้ำลุ่มน้ำเจ้าพระยา (Chao Phraya River Basin Live Flow Diagram)</h2>
-            <small>
-              สถาบันสารสนเทศทรัพยากรน้ำ (สสน. / HII) · กรมชลประทาน (RID) · ระบบติดตามอัตราการไหลและปริมาณน้ำสด
-            </small>
+          <div className="chaopraya-title-group">
+            <div className="chaopraya-badge-row">
+              <span className="command-pill-live">🟢 LIVE STREAMFLOW</span>
+              <span className="command-pill-source">สสน. (HII) · กรมชลประทาน (RID)</span>
+            </div>
+            <h2>🌊 ผังน้ำลุ่มน้ำเจ้าพระยา (Chao Phraya River Basin Flow Diagram)</h2>
           </div>
         </div>
 
-        <div className="chaopraya-actions">
+        {/* Action Button Strip */}
+        <div className="chaopraya-actions-strip">
           <a
             href={HII_FLOW_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-chaopraya-external"
-            title="เปิดผังน้ำต้นฉบับสดจาก HII"
+            className="btn-pro-action btn-pro-action--primary"
+            title="เปิดผังการไหลน้ำเจ้าพระยาต้นฉบับ Real-Time บน tiwrm.hii.or.th"
           >
-            🌊 เปิดผังน้ำสดต้นฉบับบน HII.or.th ↗
+            <span className="btn-pro-icon">🌊</span>
+            <span className="btn-pro-text">เปิดผังน้ำสด (HII.or.th)</span>
+            <span className="btn-pro-arrow">↗</span>
           </a>
+
           <a
             href={THAIWATER_DAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-chaopraya-external btn-chaopraya-dam"
-            title="ดูรายงานน้ำในเขื่อนใหญ่ทั่วประเทศ"
+            className="btn-pro-action btn-pro-action--emerald"
+            title="ดูรายงานสถานการณ์น้ำในอ่างเก็บน้ำขนาดใหญ่ทั่วประเทศ"
           >
-            🏞️ รายงานเขื่อนใหญ่ทั่วประเทศ (ThaiWater) ↗
+            <span className="btn-pro-icon">🏞️</span>
+            <span className="btn-pro-text">รายงานเขื่อนใหญ่ (ThaiWater)</span>
+            <span className="btn-pro-arrow">↗</span>
           </a>
+
           <a
             href={THAIWATER_RIVER_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-chaopraya-external"
-            style={{ background: 'linear-gradient(135deg, #0284c7, #0369a1)', borderColor: '#38bdf8' }}
-            title="โทรมาตรระดับน้ำแม่น้ำสายหลักทั่วประเทศ"
+            className="btn-pro-action btn-pro-action--cyan"
+            title="โทรมาตรตรวจวัดระดับน้ำแม่น้ำสายหลักทั่วประเทศ"
           >
-            💧 ระดับน้ำแม่น้ำทั่วประเทศ ↗
+            <span className="btn-pro-icon">💧</span>
+            <span className="btn-pro-text">ระดับน้ำแม่น้ำสายหลัก</span>
+            <span className="btn-pro-arrow">↗</span>
           </a>
         </div>
-      </div>
+      </header>
 
-      {/* Main Interactive Schematic Flow View */}
+      {/* Main Hydrodynamic Dashboard Grid */}
       <div className="chaopraya-schematic-grid">
-        {/* Left Column: Direct Launcher & Telemetry Gates */}
+        {/* Left Column: Command & Operations Hub */}
         <div className="chaopraya-info-column">
+          {/* Executive Direct Launcher Card */}
           <div className="chaopraya-hero-launcher">
-            <div className="hero-icon">🌊</div>
-            <h3>ผังการไหลของน้ำลุ่มน้ำเจ้าพระยาแบบ Real-Time</h3>
+            <div className="hero-top-badge">
+              <span className="hero-pulse" />
+              <span>HYDROLOGIC TELEMETRY GATEWAY</span>
+            </div>
+            <h3>ระบบติดตามผังการไหลของน้ำแบบ Real-Time</h3>
             <p>
-              เนื่องจากเซิร์ฟเวอร์ระบบคลังข้อมูลน้ำแห่งชาติ (HII) ป้องกันความปลอดภัยไม่ให้ฝังภายนอก (Cross-Origin Protection)
-              ท่านสามารถคลิกเปิดดู <strong>ผังการไหลของน้ำแบบสด ณ ชั่วโมงปัจจุบัน</strong> จาก สสน./กรมชลประทาน ได้ทันที:
+              สถาบันสารสนเทศทรัพยากรน้ำ (สสน.) ได้วางระบบความปลอดภัยป้องกันการฝัง iframe จากภายนอก
+              ท่านสามารถคลิกเปิดดู <strong>ผังการกระจายน้ำ อัตราการไหล (ลบ.ม./วินาที) และการระบายน้ำของทุกเขื่อน</strong> ณ วินาทีปัจจุบันได้โดยตรง:
             </p>
             <div className="hero-buttons">
               <a
                 href={HII_FLOW_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-hero-launch"
+                className="btn-hero-launch btn-hero-launch--glow"
               >
-                <span>🌊 เปิดดูผังน้ำเจ้าพระยา HII สดเต็มจอ ↗</span>
+                <span className="hero-btn-icon">🌊</span>
+                <span className="hero-btn-title">เปิดผังน้ำลุ่มน้ำเจ้าพระยาสดเต็มจอ (HII Portal)</span>
+                <span className="hero-btn-tag">RECOMMENDED ↗</span>
               </a>
               <a
                 href={THAIWATER_DAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-hero-launch btn-hero-secondary"
+                className="btn-hero-launch btn-hero-launch--emerald"
               >
-                <span>🏞️ ตรวจสอบปริมาณน้ำเขื่อนใหญ่ทั่วประเทศ (ThaiWater) ↗</span>
+                <span className="hero-btn-icon">🏞️</span>
+                <span className="hero-btn-title">ตรวจสอบปริมาณน้ำกักเก็บเขื่อนใหญ่ทั่วประเทศ (ThaiWater)</span>
+                <span className="hero-btn-tag">LIVE ↗</span>
               </a>
             </div>
           </div>
 
           {/* Key Hydrological Gateways Breakdown */}
           <div className="chaopraya-gates-card">
-            <h4>📍 จุดควบคุมและตรวจวัดหลักในลุ่มน้ำเจ้าพระยา</h4>
+            <div className="gates-card-header">
+              <span className="icon">📍</span>
+              <h4>เกณฑ์ควบคุมและจุดตรวจวัดยุทธศาสตร์ลุ่มน้ำเจ้าพระยา</h4>
+            </div>
             <div className="gate-list">
               <div className="gate-item">
-                <span className="gate-badge">1. ต้นน้ำ 4 สาย</span>
-                <strong>ปิง · วัง · ยม · น่าน</strong>
-                <small>รับน้ำจากภาคเหนือและเขื่อนภูมิพล / เขื่อนสิริกิติ์ / เขื่อนกิ่วลม / เขื่อนแควน้อย</small>
+                <div className="gate-item-header">
+                  <span className="gate-badge gate-badge--blue">1. แหล่งน้ำต้นน้ำ (ภาคเหนือ)</span>
+                  <span className="gate-label">ปิง · วัง · ยม · น่าน</span>
+                </div>
+                <p>รองรับน้ำหลากจากเทือกเขาภาคเหนือและน้ำระบายจากเขื่อนภูมิพล, เขื่อนสิริกิติ์, เขื่อนกิ่วลม, และเขื่อนแควน้อยบำรุงแดน</p>
               </div>
+
               <div className="gate-item">
-                <span className="gate-badge">2. สถานี C.2 นครสวรรค์</span>
-                <strong>ปากน้ำโพ (รวม ปิง-วัง-ยม-น่าน)</strong>
-                <small>เกณฑ์เฝ้าระวัง: อัตราไหลเกิน 2,000 - 2,500 ลบ.ม./วินาที เริ่มมีความเสี่ยงน้ำล้นตลิ่ง</small>
+                <div className="gate-item-header">
+                  <span className="gate-badge gate-badge--amber">2. สถานี C.2 ปากน้ำโพ นครสวรรค์</span>
+                  <span className="gate-label">จุดรวมน้ำเหนือ</span>
+                </div>
+                <p>จุดรวมแม่น้ำปิง วัง ยม น่าน ก่อนเข้าสู่แม่น้ำเจ้าพระยา เกณฑ์วิกฤต: อัตราไหลเกิน 2,000 - 2,500 ลบ.ม./วินาที</p>
               </div>
+
               <div className="gate-item">
-                <span className="gate-badge">3. สถานี C.13 ชัยนาท</span>
-                <strong>เขื่อนเจ้าพระยา</strong>
-                <small>เกณฑ์ระบายท้ายเขื่อน: 700 / 1,500 / 2,000 / 2,500+ ลบ.ม./วินาที (ผันน้ำออกฝั่งตะวันตก-ตะวันออก)</small>
+                <div className="gate-item-header">
+                  <span className="gate-badge gate-badge--red">3. เขื่อนเจ้าพระยา (สถานี C.13 ชัยนาท)</span>
+                  <span className="gate-label">หัวใจควบคุมน้ำ</span>
+                </div>
+                <p>บริหารตัดยอดน้ำเข้าคลองฝั่งตะวันตก (ท่าจีน/มะขามเฒ่า) และฝั่งตะวันออก (ชัยนาท-ป่าสัก) ควบคุมการปล่อยน้ำลงท้ายเขื่อน</p>
               </div>
+
               <div className="gate-item">
-                <span className="gate-badge">4. สถานี C.29A พระนครศรีอยุธยา</span>
-                <strong>สถานีบางไทร (จุดคุมน้ำก่อนเข้า กทม.)</strong>
-                <small>เกณฑ์เฝ้าระวังสูงสุด: เกิน 2,500 - 3,000 ลบ.ม./วินาที มีผลกระทบต่อพื้นที่ลุ่มต่ำริมแม่น้ำเจ้าพระยา</small>
+                <div className="gate-item-header">
+                  <span className="gate-badge gate-badge--cyan">4. สถานี C.29A บางไทร พระนครศรีอยุธยา</span>
+                  <span className="gate-label">จุดคุมน้ำก่อนเข้า กทม.</span>
+                </div>
+                <p>จุดตรวจวัดสุดท้ายก่อนมวลน้ำเข้าสู่ปทุมธานี นนทบุรี และกรุงเทพมหานคร เกณฑ์เฝ้าระวังสูงสุด: เกิน 2,500 - 3,000 ลบ.ม./วินาที</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Visual Schematic Vector Architecture */}
+        {/* Right Column: High-Tech Visual Schematic Blueprint */}
         <div className="chaopraya-visual-column">
           <div className="schematic-card">
             <div className="schematic-header">
-              <span>📐 ผังการเดินทางของมวลน้ำ (Water Travel Time)</span>
+              <div className="schematic-title-group">
+                <span className="schematic-icon">📐</span>
+                <strong className="schematic-title">ผังแบบจำลองเส้นทางน้ำ &amp; ระยะเวลาเดินทาง (Water Travel Time)</strong>
+              </div>
               <span className="live-pill">HYDRO-INFORMATICS MODEL</span>
             </div>
 
             <div className="schematic-svg-wrap">
-              <svg viewBox="0 0 500 620" className="schematic-svg" aria-label="ผังโครงสร้างลุ่มน้ำเจ้าพระยา">
-                {/* Background Grid */}
-                <rect width="500" height="620" fill="#08101d" rx="10" />
+              <svg viewBox="0 0 520 660" className="schematic-svg" aria-label="ผังโครงสร้างลุ่มน้ำเจ้าพระยา">
+                <defs>
+                  <linearGradient id="riverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#0284c7" />
+                    <stop offset="100%" stopColor="#38bdf8" />
+                  </linearGradient>
+                  <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#0369a1" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#082f49" stopOpacity="0.8" />
+                  </linearGradient>
+                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
 
-                {/* Northern Rivers: Ping, Wang, Yom, Nan */}
+                {/* Blueprint Background */}
+                <rect width="520" height="660" fill="#070d17" rx="12" stroke="#1e293b" strokeWidth="1.5" />
+
+                {/* Grid Lines for Command Display Aesthetic */}
+                <line x1="20" y1="180" x2="500" y2="180" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1" />
+                <line x1="20" y1="330" x2="500" y2="330" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1" />
+                <line x1="20" y1="510" x2="500" y2="510" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1" />
+
+                {/* Northern Tributaries: Ping, Wang, Yom, Nan */}
                 {/* Ping */}
-                <path d="M 60,30 L 60,140 L 130,170" stroke="#0284c7" strokeWidth="8" strokeLinecap="round" fill="none" />
-                <rect x="30" y="20" width="60" height="24" rx="4" fill="#0369a1" />
-                <text x="60" y="36" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำปิง</text>
-                <text x="60" y="80" fill="#7dd3fc" fontSize="8" textAnchor="middle">เขื่อนภูมิพล</text>
+                <path d="M 70,30 L 70,140 L 170,180" stroke="url(#riverGrad)" strokeWidth="8" strokeLinecap="round" fill="none" filter="url(#glow)" />
+                <rect x="35" y="20" width="70" height="26" rx="5" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.2" />
+                <text x="70" y="37" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำปิง</text>
+                <rect x="35" y="70" width="70" height="20" rx="4" fill="#0369a1" />
+                <text x="70" y="84" fill="#e0f2fe" fontSize="8" fontWeight="600" textAnchor="middle">เขื่อนภูมิพล</text>
 
                 {/* Wang */}
-                <path d="M 140,30 L 140,110 L 80,140" stroke="#0284c7" strokeWidth="6" strokeLinecap="round" fill="none" />
-                <rect x="115" y="20" width="50" height="24" rx="4" fill="#0369a1" />
-                <text x="140" y="36" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำวัง</text>
-                <text x="140" y="80" fill="#7dd3fc" fontSize="8" textAnchor="middle">เขื่อนกิ่วลม</text>
+                <path d="M 160,30 L 160,110 L 100,140" stroke="url(#riverGrad)" strokeWidth="6" strokeLinecap="round" fill="none" />
+                <rect x="130" y="20" width="60" height="26" rx="5" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.2" />
+                <text x="160" y="37" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำวัง</text>
+                <rect x="130" y="70" width="60" height="20" rx="4" fill="#0369a1" />
+                <text x="160" y="84" fill="#e0f2fe" fontSize="8" fontWeight="600" textAnchor="middle">เขื่อนกิ่วลม</text>
 
                 {/* Yom */}
-                <path d="M 270,30 L 270,140 L 230,170" stroke="#0284c7" strokeWidth="6" strokeLinecap="round" fill="none" />
-                <rect x="245" y="20" width="50" height="24" rx="4" fill="#0369a1" />
-                <text x="270" y="36" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำยม</text>
-                <text x="270" y="80" fill="#7dd3fc" fontSize="8" textAnchor="middle">บางระกำ</text>
+                <path d="M 310,30 L 310,140 L 250,180" stroke="url(#riverGrad)" strokeWidth="6" strokeLinecap="round" fill="none" />
+                <rect x="280" y="20" width="60" height="26" rx="5" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.2" />
+                <text x="310" y="37" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำยม</text>
+                <rect x="280" y="70" width="60" height="20" rx="4" fill="#0369a1" />
+                <text x="310" y="84" fill="#e0f2fe" fontSize="8" fontWeight="600" textAnchor="middle">บางระกำ</text>
 
                 {/* Nan */}
-                <path d="M 400,30 L 400,140 L 270,170" stroke="#0284c7" strokeWidth="8" strokeLinecap="round" fill="none" />
-                <rect x="375" y="20" width="50" height="24" rx="4" fill="#0369a1" />
-                <text x="400" y="36" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำน่าน</text>
-                <text x="400" y="80" fill="#7dd3fc" fontSize="8" textAnchor="middle">เขื่อนสิริกิติ์</text>
+                <path d="M 430,30 L 430,140 L 290,180" stroke="url(#riverGrad)" strokeWidth="8" strokeLinecap="round" fill="none" filter="url(#glow)" />
+                <rect x="395" y="20" width="70" height="26" rx="5" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.2" />
+                <text x="430" y="37" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">แม่น้ำน่าน</text>
+                <rect x="395" y="70" width="70" height="20" rx="4" fill="#0369a1" />
+                <text x="430" y="84" fill="#e0f2fe" fontSize="8" fontWeight="600" textAnchor="middle">เขื่อนสิริกิติ์</text>
 
-                {/* Pak Nam Pho Junction */}
-                <circle cx="200" cy="180" r="16" fill="#0284c7" stroke="#38bdf8" strokeWidth="2" />
-                <text x="200" y="184" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">C.2</text>
-                <rect x="130" y="205" width="140" height="26" rx="5" fill="rgba(15, 23, 42, 0.9)" stroke="#38bdf8" />
-                <text x="200" y="222" fill="#38bdf8" fontSize="9" fontWeight="bold" textAnchor="middle">ปากน้ำโพ (นครสวรรค์)</text>
+                {/* Pak Nam Pho C.2 Junction */}
+                <circle cx="220" cy="188" r="18" fill="#0284c7" stroke="#38bdf8" strokeWidth="2.5" filter="url(#glow)" />
+                <text x="220" y="193" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">C.2</text>
+                <rect x="135" y="215" width="170" height="26" rx="6" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.2" />
+                <text x="220" y="232" fill="#38bdf8" fontSize="10" fontWeight="bold" textAnchor="middle">ปากน้ำโพ (นครสวรรค์)</text>
 
-                {/* Chao Phraya Main Stem */}
-                <line x1="200" y1="196" x2="200" y2="300" stroke="#38bdf8" strokeWidth="12" />
-                <text x="230" y="260" fill="#f59e0b" fontSize="8" fontWeight="bold">ระยะเวลา 1 วัน ➔</text>
+                {/* Upper Chao Phraya Stem */}
+                <line x1="220" y1="206" x2="220" y2="330" stroke="#38bdf8" strokeWidth="14" filter="url(#glow)" />
+                
+                {/* Timeline Tag 1 */}
+                <rect x="250" y="260" width="95" height="22" rx="4" fill="#78350f" stroke="#f59e0b" strokeWidth="1" />
+                <text x="297" y="275" fill="#fef3c7" fontSize="9" fontWeight="bold" textAnchor="middle">⏱️ ใช้เวลา 1 วัน</text>
 
-                {/* Chao Phraya Dam */}
-                <rect x="120" y="300" width="160" height="34" rx="6" fill="#b91c1c" stroke="#ef4444" strokeWidth="1.5" />
-                <text x="200" y="318" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">เขื่อนเจ้าพระยา (C.13 ชัยนาท)</text>
-                <text x="200" y="329" fill="#fecaca" fontSize="7" textAnchor="middle">ประตูระบายน้ำหลักลุ่มน้ำเจ้าพระยา</text>
+                {/* Chao Phraya Dam C.13 */}
+                <rect x="120" y="330" width="200" height="38" rx="8" fill="#991b1b" stroke="#f87171" strokeWidth="2" filter="url(#glow)" />
+                <text x="220" y="350" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">เขื่อนเจ้าพระยา (C.13 ชัยนาท)</text>
+                <text x="220" y="362" fill="#fee2e2" fontSize="8" textAnchor="middle">ประตูระบายน้ำยุทธศาสตร์ภาคกลาง</text>
 
-                {/* Western diversion (Tha Chin, Makham Thao, Noi) */}
-                <path d="M 120,317 L 60,330 L 60,540" stroke="#0369a1" strokeWidth="6" strokeLinecap="round" fill="none" />
-                <text x="50" y="440" fill="#7dd3fc" fontSize="8" transform="rotate(-90 50,440)">แม่น้ำท่าจีน / คลองฝั่งตะวันตก</text>
+                {/* Western Diversion (Tha Chin River) */}
+                <path d="M 120,349 L 60,365 L 60,580" stroke="#0284c7" strokeWidth="6" strokeLinecap="round" fill="none" />
+                <rect x="20" y="440" width="80" height="22" rx="4" fill="#0f172a" stroke="#0284c7" />
+                <text x="60" y="455" fill="#7dd3fc" fontSize="8" fontWeight="bold" textAnchor="middle">แม่น้ำท่าจีน</text>
 
-                {/* Eastern diversion (Chainat-Pasak) */}
-                <path d="M 280,317 L 350,330 L 350,420" stroke="#0369a1" strokeWidth="6" strokeLinecap="round" fill="none" />
-                <text x="365" y="375" fill="#7dd3fc" fontSize="8">คลองชัยนาท-ป่าสัก</text>
+                {/* Eastern Diversion (Chainat-Pasak Canal) */}
+                <path d="M 320,349 L 385,365 L 385,450" stroke="#0284c7" strokeWidth="6" strokeLinecap="round" fill="none" />
+                <rect x="345" y="390" width="80" height="20" rx="4" fill="#0f172a" stroke="#0284c7" />
+                <text x="385" y="404" fill="#7dd3fc" fontSize="8" fontWeight="bold" textAnchor="middle">ชัยนาท-ป่าสัก</text>
 
-                {/* Pasak River & Dam */}
-                <path d="M 440,320 L 440,430 L 320,450" stroke="#0284c7" strokeWidth="6" strokeLinecap="round" fill="none" />
-                <rect x="400" y="310" width="80" height="22" rx="4" fill="#047857" />
-                <text x="440" y="324" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">เขื่อนป่าสักชลสิทธิ์</text>
-                <text x="440" y="375" fill="#34d399" fontSize="8" textAnchor="middle">แม่น้ำป่าสัก</text>
+                {/* Pasak River & Pasak Jolasid Dam */}
+                <path d="M 465,340 L 465,450 L 330,475" stroke="#059669" strokeWidth="6" strokeLinecap="round" fill="none" />
+                <rect x="420" y="330" width="90" height="24" rx="5" fill="#065f46" stroke="#34d399" strokeWidth="1.2" />
+                <text x="465" y="346" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">เขื่อนป่าสักชลสิทธิ์</text>
+                <text x="465" y="400" fill="#34d399" fontSize="8" fontWeight="bold" textAnchor="middle">แม่น้ำป่าสัก</text>
 
-                {/* Lower Chao Phraya */}
-                <line x1="200" y1="334" x2="200" y2="470" stroke="#38bdf8" strokeWidth="12" />
-                <text x="230" y="400" fill="#f59e0b" fontSize="8" fontWeight="bold">ระยะเวลา 1.5 วัน ➔</text>
+                {/* Lower Chao Phraya Stem */}
+                <line x1="220" y1="368" x2="220" y2="505" stroke="#38bdf8" strokeWidth="14" filter="url(#glow)" />
 
-                {/* Bang Sai Ayutthaya C.29A */}
-                <circle cx="200" cy="470" r="16" fill="#0284c7" stroke="#38bdf8" strokeWidth="2" />
-                <text x="200" y="474" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">C.29A</text>
-                <rect x="120" y="495" width="160" height="26" rx="5" fill="rgba(15, 23, 42, 0.9)" stroke="#38bdf8" />
-                <text x="200" y="512" fill="#38bdf8" fontSize="9" fontWeight="bold" textAnchor="middle">สถานีบางไทร (อยุธยา)</text>
+                {/* Timeline Tag 2 */}
+                <rect x="250" y="420" width="105" height="22" rx="4" fill="#78350f" stroke="#f59e0b" strokeWidth="1" />
+                <text x="302" y="435" fill="#fef3c7" fontSize="9" fontWeight="bold" textAnchor="middle">⏱️ ใช้เวลา 1.5 วัน</text>
 
-                {/* Bangkok & Gulf of Thailand */}
-                <line x1="200" y1="486" x2="200" y2="560" stroke="#38bdf8" strokeWidth="14" />
-                <text x="230" y="540" fill="#f59e0b" fontSize="8" fontWeight="bold">ระยะเวลา 1 วัน ➔</text>
-                <rect x="100" y="560" width="200" height="30" rx="6" fill="#1e3a8a" stroke="#60a5fa" />
-                <text x="200" y="580" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">กรุงเทพมหานครและปริมณฑล ➔ อ่าวไทย</text>
+                {/* Bang Sai C.29A Junction */}
+                <circle cx="220" cy="505" r="18" fill="#0284c7" stroke="#38bdf8" strokeWidth="2.5" filter="url(#glow)" />
+                <text x="220" y="510" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">C.29A</text>
+                <rect x="130" y="530" width="180" height="26" rx="6" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.2" />
+                <text x="220" y="547" fill="#38bdf8" fontSize="10" fontWeight="bold" textAnchor="middle">สถานีบางไทร (อยุธยา)</text>
+
+                {/* Final River Reach to BKK */}
+                <line x1="220" y1="523" x2="220" y2="595" stroke="#38bdf8" strokeWidth="16" filter="url(#glow)" />
+
+                {/* Timeline Tag 3 */}
+                <rect x="250" y="565" width="95" height="22" rx="4" fill="#78350f" stroke="#f59e0b" strokeWidth="1" />
+                <text x="297" y="580" fill="#fef3c7" fontSize="9" fontWeight="bold" textAnchor="middle">⏱️ ใช้เวลา 1 วัน</text>
+
+                {/* Bangkok & Gulf */}
+                <rect x="95" y="605" width="250" height="34" rx="8" fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="220" y="626" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">กรุงเทพมหานครและปริมณฑล ➔ อ่าวไทย</text>
               </svg>
             </div>
           </div>
