@@ -337,7 +337,7 @@ export function App() {
       `📹 กล้องตรวจการณ์ CCTV: ${cctvCount} จุด\n` +
       `🌐 ตรวจสอบสดเพิ่มเติมที่: ${typeof window !== 'undefined' ? window.location.href : ''}\n` +
       `-----------------------------------------\n` +
-      `ผู้จัดทำและลิขสิทธิ์การออกแบบ: คุณสรวิศ สุวรรณรงค์ (Sorawit Suwannarong) · FutureGreen Consulting`;
+      `ผู้จัดทำและลิขสิทธิ์การออกแบบ: คุณสรวิศ สุวรรณรงค์ (Sorawit Suwannarong)`;
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(summaryText);
@@ -571,7 +571,7 @@ export function App() {
                 <div className="author-badge-text">
                   <span className="author-badge-label">ผู้จัดทำและลิขสิทธิ์การออกแบบ</span>
                   <strong className="author-name">คุณสรวิศ สุวรรณรงค์</strong>
-                  <small className="author-sub">Sorawit Suwannarong · FutureGreen Consulting</small>
+                  <small className="author-sub">Sorawit Suwannarong</small>
                 </div>
               </div>
             </div>
@@ -827,9 +827,9 @@ export function App() {
                     type="button"
                     onClick={handleCaptureMap}
                     className="share-button btn-capture-active"
-                    title="บันทึกภาพแผนที่ / สั่งพิมพ์"
+                    title="บันทึกภาพแผนที่และหน้าจอ Web-App / สั่งพิมพ์"
                   >
-                    <span>📸 บันทึกภาพ / พิมพ์ (Capture)</span>
+                    <span>📸 สั่งพิมพ์ / แคปหน้าจอ (Capture)</span>
                   </button>
                   <button
                     type="button"

@@ -113,7 +113,6 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
   const [request, setRequest] = useState<WeatherSituationRequest>(getInitialRequest);
   const [loadState, setLoadState] = useState<WeatherSituationLoadState>({ status: 'IDLE' });
   const [radarState, setRadarState] = useState<RadarLoadState>({ status: 'IDLE' });
-  const [showDevTools, setShowDevTools] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const executeLoad = useCallback(
@@ -181,8 +180,6 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
   }, [request, executeLoad]);
 
   const situation = getSituationData(loadState);
-  const isDemo = request.mode === 'DEMO';
-  const isLive = request.mode === 'LIVE';
   const isLoading = loadState.status === 'LOADING' || loadState.status === 'IDLE';
   const isLiveUnavailable = loadState.status === 'LIVE_UNAVAILABLE';
   const isError = loadState.status === 'ERROR';
@@ -253,21 +250,26 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
         disabled={isLoading}
       />
 
-      {/* Page Header with Location, Timestamp & Refresh */}
+      {/* Page Header with Location, Timestamp & Refresh & ThaiWater TWA Link */}
       <header className="weather-page-header">
         <div>
-          <span className="eyebrow">WEATHER SITUATION · {isDemo ? 'DEMO PREVIEW' : 'CONTROLLED LIVE PREVIEW'}</span>
+          <div className="weather-page-badge-strip" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span className="eyebrow" style={{ letterSpacing: '0.08em' }}>WEATHER &amp; RADAR INTELLIGENCE</span>
+            <span className="live-status-indicator">
+              <span className="live-dot" />
+              <span className="live-text">RADAR TELEMETRY</span>
+            </span>
+          </div>
           <h2>{request.label ?? `พิกัด ${request.latitude.toFixed(4)}, ${request.longitude.toFixed(4)}`}</h2>
           <p className="weather-page-location">
             📍 {request.latitude.toFixed(4)}, {request.longitude.toFixed(4)}
-            {isDemo && <span className="weather-page-location__demo"> (โหมดข้อมูลตัวอย่าง DEMO)</span>}
-            {isLive && <span className="weather-page-location__live"> (โหมดทดสอบสด CONTROLLED LIVE)</span>}
+            <span className="weather-page-location__mode"> (ระบบประมวลผลสภาพอากาศและเรดาร์ตรวจวัดกลุ่มฝน)</span>
           </p>
         </div>
 
         {situation && (
           <div className="weather-page-header__meta">
-            <span className="eyebrow">ข้อมูลถูกสร้างเมื่อ</span>
+            <span className="eyebrow">อัปเดตล่าสุด ณ</span>
             <time className="weather-page-header__generated">
               {formatGenerated(situation.generatedAt)}
             </time>
@@ -275,15 +277,27 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
           </div>
         )}
 
-        <button
-          type="button"
-          className="weather-refresh-btn"
-          onClick={handleRefresh}
-          disabled={isLoading}
-          aria-label="รีเฟรชข้อมูลสภาพอากาศ"
-        >
-          {isLoading ? '⟳ กำลังโหลด…' : '⟳ รีเฟรชข้อมูล'}
-        </button>
+        <div className="weather-page-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+          <a
+            href="https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=rr%2Csc&p=hide"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-pro-action btn-pro-action--primary"
+            style={{ textDecoration: 'none', padding: '6px 12px', fontSize: '0.74rem' }}
+            title="เปิดแผนที่ฝนและเรดาร์ตรวจวัดสด คลังข้อมูลน้ำแห่งชาติ (สสน.)"
+          >
+            🌧️ แผนที่ฝน &amp; เรดาร์สด ThaiWater ↗
+          </a>
+          <button
+            type="button"
+            className="weather-refresh-btn"
+            onClick={handleRefresh}
+            disabled={isLoading}
+            aria-label="รีเฟรชข้อมูลสภาพอากาศ"
+          >
+            {isLoading ? '⟳ กำลังโหลด…' : '⟳ รีเฟรชข้อมูล'}
+          </button>
+        </div>
       </header>
 
       {/* LIVE PREVIEW UNAVAILABLE State — No Silent Fallback! */}
@@ -301,7 +315,7 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
               className="weather-switch-demo-btn"
               onClick={() => handleModeChange('DEMO')}
             >
-              ➔ สลับเป็น DEMO PREVIEW (ดูข้อมูลตัวอย่าง)
+              ➔ สลับเป็นโหมดสำรอง (Baseline Preview)
             </button>
             <button
               type="button"
@@ -362,48 +376,44 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
         />
       </div>
 
-      {/* Section E: Time Alignment Matrix */}
-      <TimeAlignmentMatrix timeContext={timeContext} />
-
-      {/* Section F: Source Status & Semantic Comparison */}
-      <SourceComparisonCard
-        comparison={comparison}
-        tmdStatus={tmdStatus}
-        radarStatus={radarProviderStatus}
-        forecastStatus={forecastProviderStatus}
-      />
-
-      {/* Secondary Panels (Provenance & Agreement) */}
-      {situation && (
-        <div className="weather-secondary-panels">
-          {/* Source Provenance Panel */}
-          <SourcePanel
-            observed={situation.observed}
-            forecast={situation.forecast}
-          />
-
-          {/* Source Agreement & Limitations Panel */}
-          <AgreementPanel
-            agreement={situation.sourceAgreement}
-            limitations={situation.limitations}
-          />
-        </div>
-      )}
-
-      {/* Collapsible: Developer Tools & Advanced Mode (Hidden by default for clean UX) */}
-      <div className="weather-accordion" style={{ marginTop: '24px' }}>
-        <button
-          type="button"
+      {/* Collapsible Section: Governance, Semantic Comparison & Time Alignment */}
+      <details className="weather-governance-accordion" style={{ margin: '16px 0' }}>
+        <summary
           className="weather-accordion__trigger"
-          aria-expanded={showDevTools}
-          onClick={() => setShowDevTools((v) => !v)}
-          style={{ opacity: 0.7, fontSize: '0.8rem' }}
+          style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(15, 23, 42, 0.75)', border: '1px solid var(--border-subtle)', borderRadius: '8px', color: 'var(--muted)', cursor: 'pointer', listStyle: 'none' }}
         >
-          ⚙️ ข้อมูลและการตั้งค่าสำหรับนักพัฒนา (Developer Mode &amp; System Gates)
-          <span aria-hidden="true">{showDevTools ? '▲' : '▼'}</span>
-        </button>
-        {showDevTools && (
-          <div className="weather-dev-tools-drawer" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px', padding: '14px', background: 'rgba(15, 23, 42, 0.6)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+          <span>🔬 ข้อมูลเชิงลึกและธรรมาภิบาลข้อมูล (Data Provenance &amp; Time Alignment)</span>
+          <span style={{ fontSize: '0.75rem', color: '#38bdf8' }}>▼ คลิกเพื่อขยาย / ย่อเก็บ</span>
+        </summary>
+
+        <div className="weather-governance-content" style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '12px' }}>
+          {/* Time Alignment Matrix */}
+          <TimeAlignmentMatrix timeContext={timeContext} />
+
+          {/* Source Status & Semantic Comparison */}
+          <SourceComparisonCard
+            comparison={comparison}
+            tmdStatus={tmdStatus}
+            radarStatus={radarProviderStatus}
+            forecastStatus={forecastProviderStatus}
+          />
+
+          {/* Secondary Panels (Provenance & Agreement) */}
+          {situation && (
+            <div className="weather-secondary-panels">
+              <SourcePanel
+                observed={situation.observed}
+                forecast={situation.forecast}
+              />
+              <AgreementPanel
+                agreement={situation.sourceAgreement}
+                limitations={situation.limitations}
+              />
+            </div>
+          )}
+
+          {/* Advanced Settings */}
+          <div className="weather-dev-tools-drawer" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', background: 'rgba(15, 23, 42, 0.6)', borderRadius: '8px', border: '1px solid var(--border)' }}>
             <PreviewBadge />
             <ModeBadge mode={request.mode} />
             <WeatherExplainer />
@@ -415,14 +425,14 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
             <ClassificationGuide />
             <SystemGatePanel flags={GATE_FLAGS} />
           </div>
-        )}
-      </div>
+        </div>
+      </details>
 
       {/* Footer — Safety Reminder */}
       <footer className="weather-page-footer">
         <p>
-          ⚠ ข้อมูลนี้เป็น <strong>DEVELOPMENT PREVIEW ({isDemo ? 'DEMO' : 'CONTROLLED LIVE'})</strong> สำหรับการสนับสนุนการตัดสินใจ — ไม่ใช่การแจ้งเตือนภัยฉุกเฉินอย่างเป็นทางการ
-          การแจ้งเตือนภัยทางการโปรดติดตามจากกรมอุตุนิยมวิทยา (TMD) และหน่วยงานราชการที่มีอำนาจ
+          ⚠ ระบบสนับสนุนการตัดสินใจเฝ้าระวังภัยพิบัติแห่งชาติ (Decision-Support Information) · 
+          ข้อมูลการเตือนภัยฉุกเฉินทางการโปรดตรวจสอบจากกรมอุตุนิยมวิทยา (TMD) และกรมป้องกันและบรรเทาสาธารณภัย (ปภ.)
         </p>
       </footer>
     </div>

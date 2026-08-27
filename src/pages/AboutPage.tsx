@@ -20,7 +20,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
         <div className="about-page__logo-area" aria-label="FutureGreen Logo">
           <img
             src="/futuregreen-logo.png"
-            alt="FutureGreen Consulting Logo"
+            alt="Logo"
             className="about-page__logo"
             width="80"
             height="80"
