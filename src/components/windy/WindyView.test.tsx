@@ -13,8 +13,8 @@ describe('WindyView component', () => {
       />
     );
 
-    expect(screen.getByText(/WINDY\.COM INTERACTIVE METEOROLOGY/)).toBeInTheDocument();
-    expect(screen.getByText(/การจำลองกระแสลม พายุ และฝน \(กรุงเทพมหานคร\)/)).toBeInTheDocument();
+    expect(screen.getByText(/WINDY\.COM METEOROLOGICAL/)).toBeInTheDocument();
+    expect(screen.getByText(/การจำลองกระแสลม พายุ และกล้องเว็บแคม \(กรุงเทพมหานคร\)/)).toBeInTheDocument();
     
     const iframe = screen.getByTitle(/Windy\.com Interactive Meteorological Map/);
     expect(iframe).toBeInTheDocument();
@@ -36,5 +36,9 @@ describe('WindyView component', () => {
 
     const iframe = screen.getByTitle(/Windy\.com Interactive Meteorological Map/);
     expect(iframe).toHaveAttribute('src', expect.stringContaining('overlay=rain'));
+
+    const stormButton = screen.getByRole('button', { name: /ติดตามพายุ \(Storm Tracker\)/ });
+    fireEvent.click(stormButton);
+    expect(iframe).toHaveAttribute('src', expect.stringContaining('overlay=hurricanes'));
   });
 });

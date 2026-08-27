@@ -41,6 +41,7 @@ import { MySitesPanel } from '../components/mysites/MySitesPanel';
 import { CctvPanel } from '../components/cctv/CctvPanel';
 import { WindyView } from '../components/windy/WindyView';
 import { WindyEmbedModal } from '../components/windy/WindyEmbedModal';
+import { SeismoWatchView } from '../components/seismo/SeismoWatchView';
 
 const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
@@ -90,10 +91,11 @@ export function App() {
   const [radarMode] = useState<'DEMO' | 'LIVE'>('DEMO');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [windyModalOpen, setWindyModalOpen] = useState(false);
-  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'mysites' | 'about'>('gis');
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'mysites' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
   const isWindyView = appView === 'windy';
+  const isSeismoView = appView === 'seismo';
   const isMySitesView = appView === 'mysites';
   const isAboutView = appView === 'about';
 
@@ -156,6 +158,12 @@ export function App() {
       return [
         { label: 'แผนที่ GIS', path: '/', current: false },
         { label: 'ลมและพายุ (Windy.com)', path: '/windy', current: true },
+      ];
+    }
+    if (appView === 'seismo') {
+      return [
+        { label: 'แผนที่ GIS', path: '/', current: false },
+        { label: 'แผ่นดินไหว (SeismoWatch)', path: '/seismo', current: true },
       ];
     }
     if (appView === 'mysites') {
@@ -438,6 +446,16 @@ export function App() {
                 <span className="icon">🌀</span>
                 <span>ลม &amp; พายุ (Windy)</span>
                 <span className="tag">INTERACTIVE</span>
+              </button>
+              <button
+                type="button"
+                className={`module-nav-item${isSeismoView ? ' is-active' : ''}`}
+                onClick={() => setAppView('seismo')}
+                aria-pressed={isSeismoView}
+              >
+                <span className="icon">🌋</span>
+                <span>SeismoWatch</span>
+                <span className="tag" style={{ background: 'rgba(249, 115, 22, 0.2)', color: '#fb923c', borderColor: '#f97316' }}>แผ่นดินไหว</span>
               </button>
               <button
                 type="button"
@@ -760,6 +778,16 @@ export function App() {
                   zoom={currentCoords.zoom}
                   locationName={currentAreaName}
                 />
+              </div>
+            </ModuleErrorBoundary>
+          </div>
+        )}
+
+        {isSeismoView && (
+          <div className="full-content-column" aria-label="แผ่นดินไหว SeismoWatch">
+            <ModuleErrorBoundary moduleName="SeismoWatch">
+              <div className="seismo-page-wrapper" style={{ height: 'calc(100vh - 140px)', padding: '10px 14px' }}>
+                <SeismoWatchView onBack={() => setAppView('gis')} />
               </div>
             </ModuleErrorBoundary>
           </div>

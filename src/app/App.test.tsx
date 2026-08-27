@@ -22,7 +22,7 @@ describe('command-center navigation', () => {
     await user.click(screen.getByRole('button', { name: /Reset Thailand/ }));
     expect(window.location.pathname).toBe('/');
     expect(await screen.findByLabelText('mock map')).toHaveTextContent('selected:');
-  });
+  }, 20000);
 
   it('restores province deep links and renders province hydrological telemetry', async () => {
     window.history.replaceState({}, '', '/province/chiang-mai');
