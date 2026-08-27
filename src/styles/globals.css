@@ -2758,6 +2758,73 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
   padding: 13px;
 }
 
+.btn-refresh-telemetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  font-size: 0.65rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-refresh-telemetry:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.is-spinning {
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.cctv-filter-tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.cctv-tab-btn {
+  padding: 4px 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.cctv-tab-btn.is-active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.cctv-category-badge {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-bottom: 2px;
+}
+
 .cctv-station-list {
   display: flex;
   flex-direction: column;
