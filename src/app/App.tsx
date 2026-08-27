@@ -246,45 +246,37 @@ export function App() {
   return (
     <div className="command-center" data-theme={basemapMode}>
       <header className="app-header">
-        <div className="brand-lockup">
-          <a
-            href="#"
-            className="brand-logo-link"
-            onClick={(e) => { e.preventDefault(); setAppView('about'); }}
-            aria-label="FutureGreen — Thailand Disaster Watch — เกี่ยวกับระบบ"
-            title="FutureGreen Disaster Intelligence Platform"
-          >
-            <img
-              src="/futuregreen-logo.png"
-              alt="FutureGreen Logo"
-              className="brand-logo"
-              width="38"
-              height="38"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                if (fallback) fallback.style.display = 'grid';
-              }}
-            />
-            <span className="brand-logo-fallback" style={{ display: 'none' }} aria-hidden="true">
-              FG
-            </span>
-          </a>
-          <div>
-            <span className="eyebrow">THAILAND DISASTER WATCH</span>
-            <h1>{titleForNavigation(navigation)}</h1>
+        <div className="header-main-row">
+          <div className="brand-lockup">
+            <a
+              href="#"
+              className="brand-logo-link"
+              onClick={(e) => { e.preventDefault(); setAppView('about'); }}
+              aria-label="FutureGreen — Thailand Disaster Watch — เกี่ยวกับระบบ"
+              title="FutureGreen Disaster Intelligence Platform"
+            >
+              <img
+                src="/futuregreen-logo.png"
+                alt="FutureGreen Logo"
+                className="brand-logo"
+                width="38"
+                height="38"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                  if (fallback) fallback.style.display = 'grid';
+                }}
+              />
+              <span className="brand-logo-fallback" style={{ display: 'none' }} aria-hidden="true">
+                FG
+              </span>
+            </a>
+            <div className="brand-titles">
+              <span className="eyebrow">THAILAND DISASTER WATCH</span>
+              <h1>{titleForNavigation(navigation)}</h1>
+            </div>
           </div>
-        </div>
 
-        <div className="header-meta">
-          <div className="meta-pill meta-pill--danger">
-            <span className="status-dot status-dot--off" aria-hidden="true" />
-            <span>LIVE DATA NOT CONNECTED</span>
-          </div>
-          <div className="meta-pill meta-pill--dev">
-            <span>v1.1 PREVIEW</span>
-          </div>
-          <p className="caption">Decision-support information · Not an official emergency warning</p>
           <div className="header-actions">
             <button
               type="button"
@@ -304,6 +296,17 @@ export function App() {
               {basemapMode === 'dark' ? '☀' : '🌙'}
             </button>
           </div>
+        </div>
+
+        <div className="header-status-row">
+          <div className="meta-pill meta-pill--danger">
+            <span className="status-dot status-dot--off" aria-hidden="true" />
+            <span>LIVE DATA NOT CONNECTED</span>
+          </div>
+          <div className="meta-pill meta-pill--dev">
+            <span>v1.2 PREVIEW</span>
+          </div>
+          <p className="caption">Decision-support information · Not an official emergency warning</p>
         </div>
       </header>
 
