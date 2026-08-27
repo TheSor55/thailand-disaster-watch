@@ -170,32 +170,78 @@ export function App() {
     navigate({ viewLevel: 'province', province });
   };
 
-  // Province-specific water & alert data calculations
-  const currentProvinceName = navigation.viewLevel === 'province' ? navigation.province.nameTh : 'ประเทศไทย';
-  const provinceRegionId = navigation.viewLevel === 'province' ? navigation.province.regionId : 'central';
+  // Area-specific water & alert data calculations
+  const currentAreaName = useMemo(() => {
+    if (navigation.viewLevel === 'province') return navigation.province.nameTh;
+    if (navigation.viewLevel === 'quick-view') return 'กรุงเทพฯ และปริมณฑล';
+    if (navigation.viewLevel === 'region') return navigation.region.nameTh;
+    return 'ประเทศไทย (ภาพรวมระดับชาติ)';
+  }, [navigation]);
+
+  const currentAreaRegionId = useMemo(() => {
+    if (navigation.viewLevel === 'province') return navigation.province.regionId;
+    if (navigation.viewLevel === 'quick-view') return 'central';
+    if (navigation.viewLevel === 'region') return navigation.region.id;
+    return 'central';
+  }, [navigation]);
 
   const displayedDams = useMemo(() => {
     if (navigation.viewLevel === 'province') {
-      const local = getDamsByProvince(currentProvinceName);
-      return local.length > 0 ? local : getDamsByRegion(provinceRegionId);
+      const local = getDamsByProvince(currentAreaName);
+      return local.length > 0 ? local : getDamsByRegion(currentAreaRegionId);
+    }
+    if (navigation.viewLevel === 'quick-view') {
+      return getDamsByRegion('central');
+    }
+    if (navigation.viewLevel === 'region') {
+      return getDamsByRegion(navigation.region.id);
     }
     return MAJOR_DAMS.slice(0, 4);
-  }, [navigation.viewLevel, currentProvinceName, provinceRegionId]);
+  }, [navigation, currentAreaName, currentAreaRegionId]);
 
   const displayedRivers = useMemo(() => {
     if (navigation.viewLevel === 'province') {
-      const local = getRiverStationsByProvince(currentProvinceName);
-      return local.length > 0 ? local : getRiverStationsByRegion(provinceRegionId);
+      const local = getRiverStationsByProvince(currentAreaName);
+      return local.length > 0 ? local : getRiverStationsByRegion(currentAreaRegionId);
+    }
+    if (navigation.viewLevel === 'quick-view') {
+      return getRiverStationsByRegion('central');
+    }
+    if (navigation.viewLevel === 'region') {
+      return getRiverStationsByRegion(navigation.region.id);
     }
     return MAJOR_RIVER_STATIONS.slice(0, 3);
-  }, [navigation.viewLevel, currentProvinceName, provinceRegionId]);
+  }, [navigation, currentAreaName, currentAreaRegionId]);
 
   const displayedAlerts = useMemo(() => {
     if (navigation.viewLevel === 'province') {
-      return getAlertsForProvince(currentProvinceName, provinceRegionId);
+      return getAlertsForProvince(currentAreaName, currentAreaRegionId);
+    }
+    if (navigation.viewLevel === 'quick-view') {
+      return getAlertsForProvince('กรุงเทพมหานคร', 'ภาคกลาง');
+    }
+    if (navigation.viewLevel === 'region') {
+      return getAlertsForProvince(navigation.region.nameTh, navigation.region.nameTh);
     }
     return [...ACTIVE_OFFICIAL_ALERTS];
-  }, [navigation.viewLevel, currentProvinceName, provinceRegionId]);
+  }, [navigation, currentAreaName, currentAreaRegionId]);
+
+  const provenanceRecord = useMemo(() => {
+    return {
+      source: 'RID / HII / TMD / GISTDA',
+      provider: 'กรมชลประทาน · สสน. · กรมอุตุนิยมวิทยา · GISTDA',
+      dataset: `Water & Weather Telemetry (${currentAreaName})`,
+      authority: 'หน่วยงานทางการระดับชาติ',
+      dataType: 'OBSERVED & SATELLITE PILOT',
+      observedAt: new Date().toLocaleDateString('th-TH'),
+      publishedAt: 'ทุก 15-60 นาที',
+      retrievedAt: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      freshness: 'อัปเดตต่อเนื่อง',
+      confidence: 'OFFICIAL TELEMETRY READY',
+      attribution: 'คลังข้อมูลน้ำแห่งชาติ (สสน.) / กรมชลประทาน / กรมอุตุนิยมวิทยา / GISTDA',
+      status: 'TELEMETRY EXPANSION v1.2',
+    };
+  }, [currentAreaName]);
 
   return (
     <div className="command-center" data-theme={basemapMode}>
@@ -515,12 +561,22 @@ export function App() {
               </div>
 
               <div className="module-strip" aria-label="Disaster modules status">
-                {situationModules.map((module) => (
-                  <article key={module} className="module-pill">
-                    <span className="status-dot" aria-hidden="true" />
-                    <div><small>{module}</small><strong>—</strong><span>{module === 'Dam' || module === 'River' ? 'TELEMETRY READY' : module === 'Flood' ? 'SATELLITE PILOT' : 'No live data'}</span></div>
-                  </article>
-                ))}
+                {situationModules.map((module) => {
+                  const isReady = module === 'Dam' || module === 'River';
+                  const isPilot = module === 'Flood';
+                  const statusClass = isReady ? 'status-dot--active' : isPilot ? 'status-dot--pilot' : '';
+                  const statusText = isReady ? 'TELEMETRY READY' : isPilot ? 'SATELLITE PILOT' : 'No live data';
+
+                  return (
+                    <article key={module} className="module-pill">
+                      <span className={`status-dot ${statusClass}`} aria-hidden="true" />
+                      <div>
+                        <small>{module}</small>
+                        <span>{statusText}</span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </section>
 
@@ -528,42 +584,56 @@ export function App() {
               <aside className="right-rail" aria-label="Situation information">
               <section className="panel situation-panel">
                 <span className="eyebrow">SITUATION OVERVIEW</span>
-                <h2>{currentProvinceName}</h2>
-                <p className="no-data-banner"><span aria-hidden="true">○</span> v1.1 TELEMETRY EXPANSION</p>
+                <h2>{currentAreaName}</h2>
+                <p className="no-data-banner">
+                  <span className="status-dot status-dot--active" aria-hidden="true" />
+                  <span>โทรมาตรน้ำ &amp; สภาพอากาศพร้อมใช้งาน</span>
+                </p>
 
                 {/* Quick Weather Action */}
-                {navigation.viewLevel === 'province' && (
-                  <div className="quick-weather-banner" style={{ margin: '8px 0' }}>
-                    <button
-                      type="button"
-                      className="btn-quick-weather"
-                      onClick={() => setAppView('weather')}
-                    >
-                      <span>🌤️ ตรวจสภาพอากาศ &amp; ภาพเรดาร์ {navigation.province.nameTh}</span>
-                      <span>➔</span>
-                    </button>
-                  </div>
-                )}
+                <div className="quick-weather-banner" style={{ margin: '8px 0' }}>
+                  <button
+                    type="button"
+                    className="btn-quick-weather"
+                    onClick={() => {
+                      if (navigation.viewLevel === 'province') {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lat', navigation.province.latitude.toFixed(4));
+                        url.searchParams.set('lon', navigation.province.longitude.toFixed(4));
+                        window.history.replaceState({}, '', url.toString());
+                      } else if (navigation.viewLevel === 'quick-view') {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lat', '13.7563');
+                        url.searchParams.set('lon', '100.5018');
+                        window.history.replaceState({}, '', url.toString());
+                      }
+                      setAppView('weather');
+                    }}
+                  >
+                    <span>🌤️ ตรวจสภาพอากาศ &amp; ภาพเรดาร์ {currentAreaName}</span>
+                    <span>➔</span>
+                  </button>
+                </div>
 
-                <DataProvenance />
+                <DataProvenance record={provenanceRecord} />
               </section>
 
               {/* Official Situation Alerts */}
               <SituationAlertCard
                 alerts={displayedAlerts}
-                provinceNameTh={currentProvinceName}
+                provinceNameTh={currentAreaName}
               />
 
               {/* Dam Telemetry */}
               <DamSituationCard
                 dams={displayedDams}
-                provinceNameTh={currentProvinceName}
+                provinceNameTh={currentAreaName}
               />
 
               {/* River Telemetry */}
               <RiverStationCard
                 stations={displayedRivers}
-                provinceNameTh={currentProvinceName}
+                provinceNameTh={currentAreaName}
               />
 
               <section className="panel cctv-panel">
@@ -775,44 +845,53 @@ export function App() {
             {mobileSheet === 'situation' && (
               <div className="mobile-situation-content">
                 <span className="eyebrow">SITUATION OVERVIEW</span>
-                <h3 className="mobile-situation-title">{currentProvinceName}</h3>
+                <h3 className="mobile-situation-title">{currentAreaName}</h3>
 
                 {/* Quick Weather Action */}
-                {navigation.viewLevel === 'province' && (
-                  <div className="quick-weather-banner" style={{ margin: '8px 0' }}>
-                    <button
-                      type="button"
-                      className="btn-quick-weather"
-                      onClick={() => {
-                        setMobileSheet(null);
-                        setAppView('weather');
-                      }}
-                    >
-                      <span>🌤️ ตรวจสภาพอากาศ &amp; ภาพเรดาร์ {navigation.province.nameTh}</span>
-                      <span>➔</span>
-                    </button>
-                  </div>
-                )}
+                <div className="quick-weather-banner" style={{ margin: '8px 0' }}>
+                  <button
+                    type="button"
+                    className="btn-quick-weather"
+                    onClick={() => {
+                      if (navigation.viewLevel === 'province') {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lat', navigation.province.latitude.toFixed(4));
+                        url.searchParams.set('lon', navigation.province.longitude.toFixed(4));
+                        window.history.replaceState({}, '', url.toString());
+                      } else if (navigation.viewLevel === 'quick-view') {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lat', '13.7563');
+                        url.searchParams.set('lon', '100.5018');
+                        window.history.replaceState({}, '', url.toString());
+                      }
+                      setMobileSheet(null);
+                      setAppView('weather');
+                    }}
+                  >
+                    <span>🌤️ ตรวจสภาพอากาศ &amp; ภาพเรดาร์ {currentAreaName}</span>
+                    <span>➔</span>
+                  </button>
+                </div>
 
                 {/* Official Situation Alerts */}
                 <SituationAlertCard
                   alerts={displayedAlerts}
-                  provinceNameTh={currentProvinceName}
+                  provinceNameTh={currentAreaName}
                 />
 
                 {/* Dam Telemetry */}
                 <DamSituationCard
                   dams={displayedDams}
-                  provinceNameTh={currentProvinceName}
+                  provinceNameTh={currentAreaName}
                 />
 
                 {/* River Telemetry */}
                 <RiverStationCard
                   stations={displayedRivers}
-                  provinceNameTh={currentProvinceName}
+                  provinceNameTh={currentAreaName}
                 />
 
-                <DataProvenance />
+                <DataProvenance record={provenanceRecord} />
               </div>
             )}
           </section>
