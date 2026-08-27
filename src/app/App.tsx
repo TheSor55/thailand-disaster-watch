@@ -394,7 +394,13 @@ export function App() {
               </span>
             </a>
             <div className="brand-titles">
-              <span className="eyebrow">THAILAND DISASTER WATCH</span>
+              <div className="brand-badge-line" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="eyebrow">THAILAND DISASTER WATCH</span>
+                <span className="live-status-indicator">
+                  <span className="live-dot" />
+                  <span className="live-text">EOC LIVE TELEMETRY</span>
+                </span>
+              </div>
               <h1>{titleForNavigation(navigation)}</h1>
             </div>
           </div>
@@ -406,14 +412,16 @@ export function App() {
               aria-label="System Settings"
               aria-expanded={settingsOpen}
               onClick={() => setSettingsOpen((prev) => !prev)}
+              title="สถานะระบบและธรรมาภิบาลข้อมูล"
             >
               ⚙
             </button>
             <button
               type="button"
-              className="icon-button"
+              className="icon-button theme-toggle-btn"
               aria-label="Toggle Theme"
               onClick={() => setBasemapMode((prev) => (prev === 'dark' ? 'standard' : 'dark'))}
+              title={basemapMode === 'dark' ? 'เปลี่ยนเป็นธีมสว่าง (Standard)' : 'เปลี่ยนเป็นธีมมืด (Dark Command Mode)'}
             >
               {basemapMode === 'dark' ? '☀' : '🌙'}
             </button>
@@ -422,9 +430,9 @@ export function App() {
 
         <div className="header-status-row">
           <div className="meta-pill meta-pill--dev">
-            <span>v1.3.0</span>
+            <span>v1.3.0 · PROD</span>
           </div>
-          <p className="caption">Decision-support information · Not an official emergency warning</p>
+          <p className="caption">ระบบสนับสนุนการตัดสินใจเฝ้าระวังภัยพิบัติแห่งชาติ · ศูนย์ปฏิบัติการน้ำและภูมิอากาศ</p>
         </div>
       </header>
 
