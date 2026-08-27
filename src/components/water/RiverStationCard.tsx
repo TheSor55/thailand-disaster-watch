@@ -64,8 +64,17 @@ export function RiverStationCard({ stations, provinceNameTh }: RiverStationCardP
                 </div>
               </div>
 
-              <div className="river-footer">
+              <div className="river-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                 <small className="source-attr">แหล่งข้อมูล: {st.attribution}</small>
+                <a
+                  href="https://tiwrm.hii.or.th/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: '0.62rem', color: '#38bdf8', fontWeight: 600, textDecoration: 'underline' }}
+                  title="ตรวจสอบระดับน้ำโทรมาตรสดจาก สสน. (HII)"
+                >
+                  ตรวจค่าสด HII ↗
+                </a>
               </div>
             </div>
           );

@@ -41,6 +41,7 @@ import { CctvPanel } from '../components/cctv/CctvPanel';
 import { WindyView } from '../components/windy/WindyView';
 import { WindyEmbedModal } from '../components/windy/WindyEmbedModal';
 import { SeismoWatchView } from '../components/seismo/SeismoWatchView';
+import { ChaoPhrayaFlowView } from '../components/chaopraya/ChaoPhrayaFlowView';
 
 const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
@@ -91,11 +92,12 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [windyModalOpen, setWindyModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'mysites' | 'about'>('gis');
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'chaopraya' | 'mysites' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
   const isWindyView = appView === 'windy';
   const isSeismoView = appView === 'seismo';
+  const isChaoPhrayaView = appView === 'chaopraya';
   const isMySitesView = appView === 'mysites';
   const isAboutView = appView === 'about';
 
@@ -169,6 +171,12 @@ export function App() {
       return [
         { label: 'แผนที่ GIS', path: '/', current: false },
         { label: 'แผ่นดินไหว (SeismoWatch)', path: '/seismo', current: true },
+      ];
+    }
+    if (appView === 'chaopraya') {
+      return [
+        { label: 'แผนที่ GIS', path: '/', current: false },
+        { label: 'ผังน้ำลุ่มน้ำเจ้าพระยา (HII Flow)', path: '/chaopraya', current: true },
       ];
     }
     if (appView === 'mysites') {
@@ -519,6 +527,16 @@ export function App() {
               </button>
               <button
                 type="button"
+                className={`module-nav-item${isChaoPhrayaView ? ' is-active' : ''}`}
+                onClick={() => setAppView('chaopraya')}
+                aria-pressed={isChaoPhrayaView}
+              >
+                <span className="icon">🌊</span>
+                <span>ผังน้ำเจ้าพระยา</span>
+                <span className="tag" style={{ background: 'rgba(2, 132, 199, 0.25)', color: '#38bdf8', borderColor: '#0284c7' }}>LIVE HII</span>
+              </button>
+              <button
+                type="button"
                 className={`module-nav-item${isMySitesView ? ' is-active' : ''}`}
                 onClick={() => setAppView('mysites')}
                 aria-pressed={isMySitesView}
@@ -766,6 +784,7 @@ export function App() {
               <DamSituationCard
                 dams={displayedDams}
                 provinceNameTh={currentAreaName}
+                onOpenChaoPhrayaFlow={() => setAppView('chaopraya')}
               />
 
               {/* River Telemetry */}
@@ -870,6 +889,16 @@ export function App() {
             <ModuleErrorBoundary moduleName="SeismoWatch">
               <div className="seismo-page-wrapper" style={{ height: 'calc(100vh - 140px)', padding: '10px 14px' }}>
                 <SeismoWatchView onBack={() => setAppView('gis')} />
+              </div>
+            </ModuleErrorBoundary>
+          </div>
+        )}
+
+        {isChaoPhrayaView && (
+          <div className="full-content-column" aria-label="ผังน้ำลุ่มน้ำเจ้าพระยา">
+            <ModuleErrorBoundary moduleName="Chao Phraya Flow Diagram">
+              <div className="chaopraya-page-wrapper" style={{ minHeight: 'calc(100vh - 140px)', padding: '10px 14px' }}>
+                <ChaoPhrayaFlowView onBack={() => setAppView('gis')} />
               </div>
             </ModuleErrorBoundary>
           </div>
