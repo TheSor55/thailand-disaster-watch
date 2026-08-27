@@ -38,7 +38,15 @@ export function BcmReportModal({ site, onClose }: BcmReportModalProps) {
           {/* Executive Header Box */}
           <div className="bcm-exec-card">
             <div className="bcm-exec-main">
-              <span className="bcm-site-type">{site.category === 'FACTORY' ? '🏭 โรงงานอุตสาหกรรม' : '🏢 คลังสินค้า/สาขา'}</span>
+              <span className="bcm-site-type">
+                {site.category === 'FACTORY'
+                  ? '🏭 โรงงาน & สำนักงาน'
+                  : site.category === 'WAREHOUSE'
+                  ? '📦 ศูนย์กระจายสินค้า (DC)'
+                  : site.category === 'ESTATE'
+                  ? '🏗️ นิคมอุตสาหกรรม'
+                  : '🏢 สำนักงาน'}
+              </span>
               <h3 className="bcm-company-name">{site.name}</h3>
               {site.address && <p className="bcm-address">{site.address}</p>}
               <p className="bcm-meta-geo">

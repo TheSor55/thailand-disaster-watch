@@ -917,8 +917,14 @@ export function App() {
             <ModuleErrorBoundary moduleName="My Sites">
               <div className="mysites-page-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '16px' }}>
                 <header className="page-section-header" style={{ marginBottom: '16px' }}>
-                  <button type="button" className="btn-ghost" onClick={() => setAppView('gis')}>
-                    ← กลับไปหน้าแผนที่ GIS
+                  <button
+                    type="button"
+                    className="btn-command-back"
+                    onClick={() => setAppView('gis')}
+                    aria-label="กลับสู่แผนที่ GIS"
+                  >
+                    <span className="btn-back-icon">←</span>
+                    <span>กลับสู่แผนที่ GIS</span>
                   </button>
                 </header>
                 <MySitesPanel
