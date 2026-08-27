@@ -3579,14 +3579,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 }
 
 /* ==========================================
-   SeismoWatch Earthquake & Tsunami Viewer
+   SeismoWatch Earthquake & Tsunami Viewer - Mission Control Aesthetic
    ========================================== */
 .seismo-container-page {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   height: 100%;
-  min-height: 540px;
+  min-height: 560px;
 }
 
 .seismo-toolbar {
@@ -3595,80 +3595,132 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(9, 14, 23, 0.98));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
 }
 
-.seismo-toolbar-info h2 {
-  margin: 2px 0;
-  font-size: 1rem;
-  color: #f97316;
+.seismo-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
-.seismo-toolbar-info small {
-  color: var(--muted);
-  font-size: 0.7rem;
+.btn-command-back--seismo:hover {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: #f97316;
+  color: #fb923c;
 }
 
-.seismo-actions {
+.seismo-title-group h2 {
+  margin: 4px 0 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.seismo-badge-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-seismo-refresh {
-  padding: 6px 12px;
-  font-size: 0.72rem;
+.command-pill-seismo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.18);
+  border: 1px solid #f97316;
+  color: #fb923c;
+  letter-spacing: 0.05em;
+}
+
+.seismo-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f97316;
+  box-shadow: 0 0 6px #f97316;
+  animation: pulseGlow 1.8s infinite ease-in-out;
+}
+
+.seismo-actions-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-seismo-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 0.74rem;
   font-weight: 600;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface-raised);
-  color: var(--text);
+  border-radius: 8px;
+  text-decoration: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-.btn-seismo-refresh:hover {
+.btn-seismo-action--refresh {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #f1f5f9;
+}
+
+.btn-seismo-action--refresh:hover {
+  background: rgba(249, 115, 22, 0.15);
   border-color: #f97316;
-  color: #f97316;
+  color: #fb923c;
+  transform: translateY(-1px);
 }
 
-.btn-seismo-external {
-  padding: 6px 12px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  border-radius: 6px;
+.btn-seismo-action--launch {
   background: linear-gradient(135deg, #ea580c, #c2410c);
   border: 1px solid #f97316;
   color: #ffffff;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.15s ease;
 }
 
-.btn-seismo-external:hover {
-  background: #ea580c;
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+.btn-seismo-action--launch:hover {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.5);
+  transform: translateY(-1px);
 }
 
 .seismo-frame-wrap {
   flex: 1;
-  min-height: 520px;
-  border-radius: 12px;
+  min-height: calc(100vh - 220px);
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(249, 115, 22, 0.25);
   background: #090e17;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .seismo-iframe {
   width: 100%;
   height: 100%;
-  min-height: 520px;
+  min-height: calc(100vh - 220px);
   border: none;
+  display: block;
+}
+
+.seismo-footer-note {
+  font-size: 0.7rem;
+  color: var(--muted);
+  padding: 2px 6px;
 }
 
 /* ==========================================

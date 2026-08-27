@@ -1,3 +1,10 @@
+/**
+ * SeismoWatchView — Real-Time Seismic & Tsunami Intelligence Command View
+ *
+ * Integrated Earthquake & Tsunami monitoring subsystem powered by SeismoWatch (by FutureGreen)
+ * Sources: TMD Seismology, USGS Global Network, EMSC WebSockets
+ */
+
 import { useState } from 'react';
 
 interface SeismoWatchViewProps {
@@ -14,45 +21,59 @@ export function SeismoWatchView({ onBack }: SeismoWatchViewProps) {
 
   return (
     <div className="seismo-container-page" aria-label="SeismoWatch Earthquake & Seismic Monitoring">
-      {/* Header and Controls */}
-      <div className="seismo-toolbar">
-        <div className="seismo-toolbar-info">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {onBack && (
-              <button type="button" className="btn-ghost" onClick={onBack}>
-                ← กลับหน้าหลัก
-              </button>
-            )}
-            <span className="eyebrow">SEISMIC &amp; TSUNAMI WATCH</span>
+      {/* Top Command Toolbar */}
+      <header className="seismo-toolbar">
+        <div className="seismo-toolbar-left">
+          {onBack && (
+            <button
+              type="button"
+              className="btn-command-back btn-command-back--seismo"
+              onClick={onBack}
+              aria-label="← กลับหน้าหลัก GIS"
+            >
+              <span className="btn-back-icon">←</span>
+              <span>กลับหน้าหลัก GIS</span>
+            </button>
+          )}
+          <div className="seismo-title-group">
+            <div className="seismo-badge-row">
+              <span className="command-pill-seismo">
+                <span className="seismo-live-dot" />
+                <span>SEISMIC &amp; TSUNAMI WATCH</span>
+              </span>
+              <span className="command-pill-source">
+                TMD Seismology (กรมอุตุฯ) · USGS · EMSC WebSocket
+              </span>
+            </div>
+            <h2>🌋 SeismoWatch: แผนที่เฝ้าระวังแผ่นดินไหวและคลื่นสึนามิ</h2>
           </div>
-          <h2>🌋 SeismoWatch: แผนที่เฝ้าระวังแผ่นดินไหวและคลื่นสึนามิ</h2>
-          <small>
-            ระบบติดตามแรงสั่นสะเทือน แผ่นดินไหวในไทยและภูมิภาคอาเซียน (TMD Seismology &amp; USGS Data)
-          </small>
         </div>
 
-        <div className="seismo-actions">
+        <div className="seismo-actions-strip">
           <button
             type="button"
-            className="btn-seismo-refresh"
+            className="btn-seismo-action btn-seismo-action--refresh"
             onClick={handleRefresh}
-            title="รีเฟรชข้อมูลแผ่นดินไหวล่าสุด"
+            title="รีเฟรชข้อมูลเซนเซอร์แผ่นดินไหวล่าสุด"
           >
-            🔄 รีเฟรชแผนที่
+            <span className="btn-action-icon">🔄</span>
+            <span>รีเฟรชแผนที่สด</span>
           </button>
           <a
             href={seismoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-seismo-external"
-            title="เปิดระบบ SeismoWatch ในแท็บใหม่"
+            className="btn-seismo-action btn-seismo-action--launch"
+            title="เปิดระบบ SeismoWatch แบบเต็มจอในแท็บใหม่"
           >
-            🌐 เปิด SeismoWatch เต็มจอ ↗
+            <span className="btn-action-icon">🌐</span>
+            <span className="btn-action-text">เปิด SeismoWatch เต็มจอ</span>
+            <span className="btn-action-arrow">↗</span>
           </a>
         </div>
-      </div>
+      </header>
 
-      {/* Embedded SeismoWatch Frame */}
+      {/* Full-Bleed Mission-Control Frame */}
       <div className="seismo-frame-wrap">
         <iframe
           key={iframeKey}
@@ -65,11 +86,11 @@ export function SeismoWatchView({ onBack }: SeismoWatchViewProps) {
       </div>
 
       {/* Footer Attribution */}
-      <div className="seismo-footer-note">
-        <small>
-          ℹ️ ข้อมูลแผ่นดินไหวและการสั่นสะเทือนเชื่อมโยงจาก <strong>SeismoWatch by FutureGreen (@TheSor55)</strong> และกองเฝ้าระวังแผ่นดินไหว กรมอุตุนิยมวิทยา (TMD Seismology)
-        </small>
-      </div>
+      <footer className="seismo-footer-note">
+        <span>
+          ℹ️ ข้อมูลแผ่นดินไหวและแรงสั่นสะเทือนเชื่อมโยงแบบ Real-time จาก <strong>SeismoWatch by FutureGreen (คุณสรวิศ สุวรรณรงค์)</strong> ร่วมกับ กองเฝ้าระวังแผ่นดินไหว กรมอุตุนิยมวิทยา (TMD)
+        </span>
+      </footer>
     </div>
   );
 }
