@@ -90,6 +90,7 @@ export function App() {
   const [radarMode] = useState<'DEMO' | 'LIVE'>('DEMO');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [windyModalOpen, setWindyModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'mysites' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
@@ -97,6 +98,11 @@ export function App() {
   const isSeismoView = appView === 'seismo';
   const isMySitesView = appView === 'mysites';
   const isAboutView = appView === 'about';
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage((curr) => (curr === msg ? null : curr)), 3200);
+  }, []);
 
   const [mobileSheet, setMobileSheet] = useState<
     'navigation' | 'layers' | 'situation' | null
@@ -272,6 +278,67 @@ export function App() {
     }
     return OFFICIAL_CCTV_STATIONS;
   }, [navigation, currentAreaName, currentAreaRegionId]);
+
+  const handleShareSituation = useCallback(async () => {
+    const url = window.location.href;
+    const title = `Thailand Disaster Watch · สถานการณ์ ${currentAreaName}`;
+    const text = `ติดตามสถานการณ์น้ำและภัยพิบัติประจำ ${currentAreaName} (ระดับน้ำแม่น้ำ, เขื่อน, เรดาร์ฝน, และกล้อง CCTV)`;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+        return;
+      } catch {
+        // Fallback to clipboard
+      }
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
+        showToast('✅ คัดลอกลิงก์และสรุปสถานการณ์เรียบร้อยแล้ว!');
+      } catch {
+        showToast(`🔗 ลิงก์: ${url}`);
+      }
+    }
+  }, [currentAreaName, showToast]);
+
+  const handleCaptureMap = useCallback(() => {
+    showToast('📸 กำลังเตรียมพิมพ์และบันทึกภาพแผนที่...');
+    setTimeout(() => {
+      if (typeof window !== 'undefined') window.print();
+    }, 300);
+  }, [showToast]);
+
+  const handleExportPdf = useCallback(() => {
+    if (typeof window !== 'undefined') window.print();
+  }, []);
+
+  const handleBcmReport = useCallback(() => {
+    setAppView('mysites');
+    showToast('🏢 เปิดหน้าจัดการและพิมพ์รายงาน BCM');
+  }, [showToast]);
+
+  const handleCopySummary = useCallback(async () => {
+    const damCount = displayedDams.length;
+    const riverCount = displayedRivers.length;
+    const cctvCount = displayedCctv.length;
+    const summaryText =
+      `[สรุปสถานการณ์น้ำและภัยพิบัติ: ${currentAreaName}]\n` +
+      `📅 วันที่: ${new Date().toLocaleDateString('th-TH', { dateStyle: 'long' })}\n` +
+      `🌊 จุดตรวจวัดระดับน้ำแม่น้ำ: ${riverCount} สถานี\n` +
+      `🏞️ เขื่อนและอ่างเก็บน้ำ: ${damCount} แห่ง\n` +
+      `📹 กล้องตรวจการณ์ CCTV: ${cctvCount} จุด\n` +
+      `🌐 ตรวจสอบสดเพิ่มเติมที่: ${typeof window !== 'undefined' ? window.location.href : ''}\n` +
+      `-----------------------------------------\n` +
+      `ผู้จัดทำและลิขสิทธิ์การออกแบบ: คุณสรวิศ สุวรรณรงค์ (Sorawit Suwannarong) · FutureGreen Consulting`;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(summaryText);
+        showToast('✍ คัดลอกข้อความสรุปสถานการณ์เรียบร้อยแล้ว!');
+      } catch {
+        showToast('⚠ ไม่สามารถคัดลอกได้อัตโนมัติ');
+      }
+    }
+  }, [currentAreaName, displayedDams.length, displayedRivers.length, displayedCctv.length, showToast]);
 
   const provenanceRecord = useMemo(() => {
     return {
@@ -460,21 +527,6 @@ export function App() {
                 <span>My Sites</span>
                 <span className="tag">PROTOTYPE</span>
               </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Incident Watch — Coming Soon">
-                <span className="icon">🚨</span>
-                <span>Incident Watch</span>
-                <span className="tag">COMING SOON</span>
-              </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="BCM Actions — Coming Soon">
-                <span className="icon">🛡</span>
-                <span>BCM Actions</span>
-                <span className="tag">COMING SOON</span>
-              </button>
-              <button type="button" className="module-nav-item is-disabled" disabled aria-disabled="true" title="Reports — Coming Soon">
-                <span className="icon">📋</span>
-                <span>Reports</span>
-                <span className="tag">COMING SOON</span>
-              </button>
               <button
                 type="button"
                 className={`module-nav-item${isAboutView ? ' is-active' : ''}`}
@@ -484,6 +536,18 @@ export function App() {
                 <span className="icon">ℹ</span>
                 <span>เกี่ยวกับระบบ</span>
               </button>
+            </div>
+
+            {/* Author / Creator & License Branding Box */}
+            <div className="author-branding-box">
+              <div className="author-branding-inner">
+                <span className="author-badge-icon">🎖️</span>
+                <div className="author-badge-text">
+                  <span className="author-badge-label">ผู้จัดทำและลิขสิทธิ์การออกแบบ</span>
+                  <strong className="author-name">คุณสรวิศ สุวรรณรงค์</strong>
+                  <small className="author-sub">Sorawit Suwannarong · FutureGreen Consulting</small>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -720,24 +784,49 @@ export function App() {
                 <div className="panel-heading">
                   <div>
                     <span className="eyebrow">EXPORT &amp; SHARE</span>
-                    <h2>ส่งออกข้อมูล</h2>
+                    <h2>ส่งออกและแชร์ข้อมูล</h2>
                   </div>
                 </div>
                 <div className="share-grid">
-                  <button type="button" disabled aria-disabled="true" title="Share Situation — Coming Soon" className="share-button">
-                    <span>🔗 Share Situation</span>
+                  <button
+                    type="button"
+                    onClick={handleShareSituation}
+                    className="share-button btn-share-active"
+                    title="แชร์ลิงก์และรายงานสถานการณ์"
+                  >
+                    <span>🔗 แชร์สถานการณ์ (Share)</span>
                   </button>
-                  <button type="button" disabled aria-disabled="true" title="Capture Map — Coming Soon" className="share-button">
-                    <span>📸 Capture Map</span>
+                  <button
+                    type="button"
+                    onClick={handleCaptureMap}
+                    className="share-button btn-capture-active"
+                    title="บันทึกภาพแผนที่ / สั่งพิมพ์"
+                  >
+                    <span>📸 บันทึกภาพ / พิมพ์ (Capture)</span>
                   </button>
-                  <button type="button" disabled aria-disabled="true" title="Export PDF Report — Coming Soon" className="share-button">
-                    <span>📄 Export PDF Report</span>
+                  <button
+                    type="button"
+                    onClick={handleExportPdf}
+                    className="share-button btn-pdf-active"
+                    title="ส่งออกรายงาน PDF สรุปสถานการณ์"
+                  >
+                    <span>📄 รายงาน PDF สรุปสถานการณ์</span>
                   </button>
-                  <button type="button" disabled aria-disabled="true" title="BCM Report — Coming Soon" className="share-button">
-                    <span>🛡 BCM Report</span>
+                  <button
+                    type="button"
+                    onClick={handleBcmReport}
+                    className="share-button btn-bcm-active"
+                    title="เปิดหน้ารายงานแผนฉุกเฉิน BCM"
+                  >
+                    <span>🛡 แผนฉุกเฉิน BCM Action Plan</span>
                   </button>
-                  <button type="button" disabled aria-disabled="true" title="Copy Summary — Coming Soon" className="share-button">
-                    <span>✍ Copy Summary</span>
+                  <button
+                    type="button"
+                    onClick={handleCopySummary}
+                    className="share-button btn-copy-active"
+                    title="คัดลอกข้อความสรุปสถานการณ์ลง Clipboard"
+                  >
+                    <span>✍ คัดลอกข้อความสรุป (Copy Text)</span>
                   </button>
                 </div>
               </section>
@@ -833,20 +922,27 @@ export function App() {
         <button
           type="button"
           ref={(el) => { if (mobileSheet === 'navigation') mobileSheetTrigger.current = el; }}
-          className={`mobile-bottom-nav__item${mobileSheet === 'navigation' ? ' is-active' : ''}`}
-          onClick={() => setMobileSheet((prev) => (prev === 'navigation' ? null : 'navigation'))}
+          className={`mobile-bottom-nav__item${(isGisView && !mobileSheet) || mobileSheet === 'navigation' ? ' is-active' : ''}`}
+          onClick={() => {
+            setAppView('gis');
+            setMobileSheet((prev) => (prev === 'navigation' ? null : 'navigation'));
+          }}
           aria-expanded={mobileSheet === 'navigation'}
           aria-label="เปิดเมนูมือถือ"
         >
-          <span className="mobile-bottom-nav__icon">🗺</span>
+          <span className="mobile-bottom-nav__icon">🗺️</span>
           <span>แผนที่</span>
         </button>
         <button
           type="button"
           ref={(el) => { if (mobileSheet === 'layers') mobileSheetTrigger.current = el; }}
           className={`mobile-bottom-nav__item${mobileSheet === 'layers' ? ' is-active' : ''}`}
-          onClick={() => setMobileSheet((prev) => (prev === 'layers' ? null : 'layers'))}
+          onClick={() => {
+            setAppView('gis');
+            setMobileSheet((prev) => (prev === 'layers' ? null : 'layers'));
+          }}
           aria-expanded={mobileSheet === 'layers'}
+          aria-label="เปิด/ปิด ชั้นข้อมูล Layers"
         >
           <span className="mobile-bottom-nav__icon">▤</span>
           <span>Layers</span>
@@ -854,15 +950,23 @@ export function App() {
         <button
           type="button"
           className={`mobile-bottom-nav__item${isWeatherView ? ' is-active' : ''}`}
-          onClick={() => { setMobileSheet(null); setAppView('weather'); }}
+          onClick={() => {
+            setMobileSheet(null);
+            setAppView('weather');
+          }}
+          aria-label="หน้าสภาพอากาศ"
         >
-          <span className="mobile-bottom-nav__icon">🌤</span>
+          <span className="mobile-bottom-nav__icon">🌤️</span>
           <span>อากาศ</span>
         </button>
         <button
           type="button"
           className={`mobile-bottom-nav__item${isMySitesView ? ' is-active' : ''}`}
-          onClick={() => { setMobileSheet(null); setAppView('mysites'); }}
+          onClick={() => {
+            setMobileSheet(null);
+            setAppView('mysites');
+          }}
+          aria-label="หน้าพื้นที่เฝ้าระวัง My Sites"
         >
           <span className="mobile-bottom-nav__icon">🏢</span>
           <span>My Sites</span>
@@ -871,13 +975,24 @@ export function App() {
           type="button"
           ref={(el) => { if (mobileSheet === 'situation') mobileSheetTrigger.current = el; }}
           className={`mobile-bottom-nav__item${mobileSheet === 'situation' ? ' is-active' : ''}`}
-          onClick={() => setMobileSheet((prev) => (prev === 'situation' ? null : 'situation'))}
+          onClick={() => {
+            setAppView('gis');
+            setMobileSheet((prev) => (prev === 'situation' ? null : 'situation'));
+          }}
           aria-expanded={mobileSheet === 'situation'}
+          aria-label="ดูข้อมูลสถานการณ์"
         >
           <span className="mobile-bottom-nav__icon">📊</span>
           <span>สถานการณ์</span>
         </button>
       </nav>
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="global-toast-notification" role="status" aria-live="polite">
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
       {mobileSheet && (
         <div className="mobile-drawer-backdrop" onClick={() => setMobileSheet(null)}>

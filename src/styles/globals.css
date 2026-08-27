@@ -211,24 +211,31 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
   border-radius: 9px;
   color: var(--text);
   text-align: left;
-  background: var(--surface-raised);
+  background: rgba(15, 23, 42, 0.7);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-card:hover, .quick-view:hover {
+  border-color: var(--border-glow);
+  background: rgba(56, 189, 248, 0.08);
+  transform: translateY(-1px);
 }
 .nav-card small, .quick-view small {
   display: block;
   margin-top: 2px;
   color: var(--muted);
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 400;
 }
 .nav-card.is-active, .quick-view.is-active {
   border-color: var(--accent);
-  background: var(--accent-soft);
-  box-shadow: inset 3px 0 var(--accent);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.18), rgba(56, 189, 248, 0.05));
+  color: #38bdf8;
+  box-shadow: inset 3px 0 var(--accent), 0 0 16px rgba(56, 189, 248, 0.15);
 }
 .region-grid {
   display: grid;
@@ -237,23 +244,30 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   margin: 8px 0;
 }
 .region-button {
-  min-height: 50px;
+  min-height: 52px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 7px;
-  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   color: var(--text);
-  background: var(--surface-raised);
+  background: rgba(15, 23, 42, 0.65);
+  transition: all 0.18s ease;
 }
-.region-button strong { font-size: 0.7rem; }
-.region-button span { color: var(--muted); font-size: 0.58rem; }
+.region-button:hover {
+  border-color: var(--border-glow);
+  background: rgba(56, 189, 248, 0.1);
+  transform: translateY(-1px);
+}
+.region-button strong { font-size: 0.72rem; font-weight: 700; }
+.region-button span { color: var(--muted); font-size: 0.58rem; margin-top: 2px; }
 .region-button.is-active {
   border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-soft);
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.18);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
 }
 .quick-view { justify-content: flex-start; }
 .quick-view > span:first-child {
@@ -787,14 +801,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 
 /* Share & Export Panel */
 .share-export-panel {
-  padding: 13px;
+  padding: 14px;
   margin-top: 10px;
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 .share-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 7px;
+  margin-top: 10px;
 }
 .share-button {
   width: 100%;
@@ -802,25 +819,120 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   align-items: center;
   gap: 8px;
   padding: 9px 12px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
   color: var(--text);
-  background: var(--surface-raised);
+  background: rgba(15, 23, 42, 0.6);
   text-align: left;
-  font-size: 0.7rem;
-  font-weight: 500;
-  cursor: not-allowed;
-  opacity: 0.55;
-  transition: opacity 0.15s;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.share-button:hover:not(:disabled) {
+.share-button:hover {
   border-color: var(--accent);
-  background: var(--accent-soft);
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  transform: translateX(2px);
 }
-.share-button:disabled {
-  opacity: 0.48;
-  cursor: not-allowed;
-  border-color: color-mix(in srgb, var(--border) 40%, transparent);
+.share-button.btn-share-active:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+.share-button.btn-capture-active:hover {
+  border-color: #10b981;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+.share-button.btn-pdf-active:hover {
+  border-color: #f59e0b;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+.share-button.btn-bcm-active:hover {
+  border-color: #a855f7;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.12);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+}
+.share-button.btn-copy-active:hover {
+  border-color: #38bdf8;
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+/* Author / Creator & License Branding Box */
+.author-branding-box {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.7));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+.author-branding-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.author-badge-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.5));
+}
+.author-badge-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.author-badge-label {
+  font-size: 0.56rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.author-name {
+  font-size: 0.75rem;
+  color: #f8fafc;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+.author-sub {
+  font-size: 0.6rem;
+  color: #38bdf8;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+/* Global Floating Toast Notification */
+.global-toast-notification {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  color: #f8fafc;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75), 0 0 16px rgba(56, 189, 248, 0.35);
+  animation: toastFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 /* Mobile Situation Detail Enhancement */

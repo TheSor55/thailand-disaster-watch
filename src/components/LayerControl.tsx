@@ -1,14 +1,5 @@
 import type { BasemapMode } from '../map/ThailandMap';
 
-const futureLayers = [
-  'Rain Radar',
-  'Flood Forecast',
-  'River Telemetry',
-  'Dam Telemetry',
-  'CCTV',
-  'Warning Areas',
-];
-
 interface LayerControlProps {
   basemapMode: BasemapMode;
   showProvinces: boolean;
@@ -34,17 +25,41 @@ export function LayerControl({
     <div className="layer-control">
       <h3>Base map</h3>
       <div className="segmented-control" aria-label="เลือกรูปแบบแผนที่ฐาน">
-        <button type="button" className={basemapMode === 'standard' ? 'is-active' : ''} onClick={() => onBasemapChange('standard')}>Standard</button>
-        <button type="button" className={basemapMode === 'dark' ? 'is-active' : ''} onClick={() => onBasemapChange('dark')}>Dark</button>
-        <button type="button" disabled title="Terrain will be evaluated in a later phase">Terrain</button>
+        <button
+          type="button"
+          className={basemapMode === 'standard' ? 'is-active' : ''}
+          onClick={() => onBasemapChange('standard')}
+        >
+          Standard
+        </button>
+        <button
+          type="button"
+          className={basemapMode === 'dark' ? 'is-active' : ''}
+          onClick={() => onBasemapChange('dark')}
+        >
+          Dark
+        </button>
       </div>
 
       <h3>Administrative</h3>
       <label className="layer-row">
-        <span><i className="layer-swatch layer-swatch--boundary" />Province boundaries</span>
-        <input type="checkbox" checked={showProvinces} onChange={(event) => onProvinceVisibilityChange(event.target.checked)} />
+        <span>
+          <i className="layer-swatch layer-swatch--boundary" />
+          ขอบเขตจังหวัด (Province boundaries)
+        </span>
+        <input
+          type="checkbox"
+          checked={showProvinces}
+          onChange={(event) => onProvinceVisibilityChange(event.target.checked)}
+        />
       </label>
-      <div className="layer-row"><span><i className="layer-swatch layer-swatch--region" />Region highlight</span><span>Auto</span></div>
+      <div className="layer-row">
+        <span>
+          <i className="layer-swatch layer-swatch--region" />
+          เน้นพื้นที่ภาค (Region highlight)
+        </span>
+        <span style={{ color: '#38bdf8', fontWeight: 600 }}>Auto</span>
+      </div>
 
       <h3>Disaster &amp; Weather Observations</h3>
       <label className="layer-row">
@@ -75,10 +90,6 @@ export function LayerControl({
           aria-label="เปิด/ปิด เลเยอร์ภาพถ่ายดาวเทียมน้ำท่วมขัง"
         />
       </label>
-
-      {futureLayers.map((layer) => (
-        <div className="layer-row is-disabled" key={layer}><span>{layer}</span><b>PHASE 2+</b></div>
-      ))}
     </div>
   );
 }
