@@ -1,0 +1,70 @@
+PROPRIETARY AND COMMERCIAL SOFTWARE LICENSE AGREEMENT
+
+Copyright (c) 2026 Sorawit Suwannarong (คุณสรวิศ สุวรรณรงค์).
+All Rights Reserved.
+
+================================================================================
+IMPORTANT - READ CAREFULLY:
+This Software License Agreement ("Agreement") is a legal agreement between you 
+(either an individual or a single entity, "Licensee") and Sorawit Suwannarong 
+("Licensor", "Copyright Owner") for the software product "Thailand Disaster Watch" 
+(including source code, user interface designs, hydrodynamic visualization models, 
+BCM intelligence algorithms, documentation, and associated digital assets).
+================================================================================
+
+1. GRANT OF LICENSE
+-------------------
+This software is PROPRIETARY and strictly protected by international copyright laws 
+and intellectual property treaties. No license, express or implied, is granted to 
+any person or entity to:
+  (a) Use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+      of the Software or derivative works;
+  (b) Reverse engineer, decompile, disassemble, or extract architecture and source code;
+  (c) Deploy the Software into commercial production or offer it as a service (SaaS/PaaS)
+      without obtaining a valid, executed Commercial License Agreement from the Licensor.
+
+2. COMMERCIAL LICENSING & INQUIRIES
+-----------------------------------
+For commercial deployment, corporate integration, white-label licensing, or BCM enterprise 
+customization for industrial estates, distribution centers, and corporations, please contact:
+  Author & Lead Architect: Sorawit Suwannarong (คุณสรวิศ สุวรรณรงค์)
+  Platform: Thailand Disaster Watch / FutureGreen Intelligence
+  GitHub: https://github.com/TheSor55/thailand-disaster-watch
+
+3. THIRD-PARTY DATA & TELEMETRY RIGHTS DISCLAIMER (CRITICAL)
+-------------------------------------------------------------
+  (a) SEPARATION OF CODE AND DATA:
+      This Software incorporates adapters and visualization interfaces that connect to 
+      external public telemetries and government data sources. THE SALE, LICENSING, OR 
+      TRANSFER OF THIS SOFTWARE ENCOMPASSES SOLELY THE SOURCE CODE, SYSTEM ARCHITECTURE, 
+      AND USER INTERFACE ASSETS CREATED BY THE LICENSOR.
+      
+  (b) NO OWNERSHIP OF EXTERNAL DATA:
+      Licensor claims NO ownership, copyright, or exclusive rights over meteorological, 
+      hydrological, seismic, or remote-sensing data provided by external agencies, including 
+      but not limited to:
+      - Thai Meteorological Department (TMD / กรมอุตุนิยมวิทยา)
+      - Royal Irrigation Department (RID / กรมชลประทาน)
+      - Hydro-Informatics Institute (HII / สถาบันสารสนเทศทรัพยากรน้ำ - สสน. / ThaiWater)
+      - Geo-Informatics and Space Technology Development Agency (GISTDA / สำนักงานพัฒนาเทคโนโลยีอวกาศฯ)
+      - Department of Disaster Prevention and Mitigation (DDPM / กรมป้องกันและบรรเทาสาธารณภัย - ปภ.)
+      - United States Geological Survey (USGS)
+      - European-Mediterranean Seismological Centre (EMSC)
+      - RainViewer and Open-Meteo
+      
+  (c) COMPLIANCE:
+      Licensees and commercial operators are solely responsible for ensuring that their 
+      operational use of third-party telemetry and API feeds complies with the respective 
+      terms of service, data licensing policies, and laws of each origin authority.
+
+4. NO WARRANTY & DECISION-SUPPORT DISCLAIMER
+--------------------------------------------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE 
+FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR 
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE. 
+
+THIS SOFTWARE IS INTENDED FOR SITUATIONAL DECISION-SUPPORT ONLY AND DOES NOT SUPERSEDE 
+OFFICIAL EMERGENCY WARNINGS ISSUED BY LAWFUL GOVERNMENT AUTHORITIES.
