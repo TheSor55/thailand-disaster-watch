@@ -3097,6 +3097,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 /* ==========================================
    Print Stylesheet for 1-Page A4 PDF Executive Report & Clean Web Print
    ========================================== */
+/* ==========================================
+   Print Stylesheet for 1-Page A4 PDF Executive Report & Clean Web Print
+   ========================================== */
 @media print {
   @page {
     size: A4 auto;
@@ -3108,7 +3111,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
     text-shadow: none !important;
   }
 
-  html, body, #root {
+  html, body, #root, .command-center {
     background: #ffffff !important;
     color: #0f172a !important;
     height: auto !important;
@@ -3120,21 +3123,48 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
     font-size: 11pt !important;
   }
 
-  /* When printing BCM Report: hide all web chrome completely */
+  /* Hide interactive/ambient chrome during all printouts */
   .app-header,
   .breadcrumb-bar,
   .breadcrumb,
-  .workspace,
   .mobile-bottom-nav,
   .settings-drawer,
   .weather-page-actions,
   .weather-governance-accordion,
-  .bcm-modal-header button,
-  .bcm-modal-footer,
-  .toast-container,
   .weather-nav-bar,
-  .page-section-header {
+  .page-section-header,
+  .toast-container,
+  .btn-close-modal,
+  .bcm-modal-footer {
     display: none !important;
+  }
+
+  /* If printing with BCM Modal open: hide all other background panels */
+  .workspace:has(.bcm-modal-backdrop) .left-rail,
+  .workspace:has(.bcm-modal-backdrop) .right-rail,
+  .workspace:has(.bcm-modal-backdrop) .map-column,
+  .workspace:has(.bcm-modal-backdrop) .mysites-filter-tabs,
+  .workspace:has(.bcm-modal-backdrop) .mysites-list,
+  .workspace:has(.bcm-modal-backdrop) .mysites-panel > .panel-heading {
+    display: none !important;
+  }
+
+  /* Unravel all scroll and flex wrappers */
+  .workspace,
+  .full-content-column,
+  .mysites-page-container,
+  .mysites-panel {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
   }
 
   /* BCM Modal Print Layout — 1-Page Fit */
@@ -3148,6 +3178,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
     height: auto !important;
     min-height: 0 !important;
     overflow: visible !important;
+    z-index: auto !important;
   }
 
   .bcm-modal-content {
@@ -3156,12 +3187,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    max-height: none !important;
+    min-height: 0 !important;
     border: none !important;
     background: #ffffff !important;
     color: #0f172a !important;
     margin: 0 !important;
     padding: 0 !important;
+    box-shadow: none !important;
     overflow: visible !important;
     page-break-after: avoid !important;
     break-after: avoid !important;
@@ -3173,6 +3205,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
     color: #0f172a !important;
     padding: 6px 10px !important;
     margin-bottom: 8px !important;
+    display: block !important;
   }
 
   .bcm-modal-header h2 {
