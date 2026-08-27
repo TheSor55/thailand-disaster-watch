@@ -35,8 +35,8 @@ export const ACTIVE_OFFICIAL_ALERTS: readonly OfficialAlert[] = [
     validFrom: new Date().toISOString(),
     validTo: new Date(Date.now() + 86400000 * 2).toISOString(),
     summaryTh: 'ร่องมรสุมพาดผ่านภาคเหนือและภาคตะวันออกเฉียงเหนือตอนบน ขอให้ประชาชนระวังอันตรายจากฝนตกหนักและฝนสะสม',
-    officialUrl: 'https://www.tmd.go.th',
-    sourceAttribution: 'ประกาศทางการ กรมอุตุนิยมวิทยา (TMD)',
+    officialUrl: 'https://www.tmd.go.th/warning-and-events/warning-storm',
+    sourceAttribution: 'ประกาศทางการ กรมอุตุนิยมวิทยา (TMD Warning & Storms)',
   },
   {
     alertId: 'ddpm-flood-watch',

@@ -7,7 +7,7 @@ interface DamSituationCardProps {
 }
 
 const HII_FLOW_URL = 'https://tiwrm.hii.or.th/DATA/REPORT/php/chart/chaopraya/small/chaopraya.php';
-const HII_DAM_REPORT_URL = 'https://tiwrm.hii.or.th/DATA/REPORT/php/rid_bigdam.php';
+const HII_DAM_REPORT_URL = 'https://www.thaiwater.net/water/dam';
 
 export function DamSituationCard({ dams, provinceNameTh, onOpenChaoPhrayaFlow }: DamSituationCardProps) {
   if (dams.length === 0) {
