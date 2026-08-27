@@ -3094,30 +3094,234 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
 
-/* Print Stylesheet for A4 PDF */
+/* ==========================================
+   Print Stylesheet for 1-Page A4 PDF Executive Report & Clean Web Print
+   ========================================== */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4 auto;
+    margin: 8mm 10mm;
   }
-  #bcm-printable-area, #bcm-printable-area * {
-    visibility: visible;
+
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
   }
-  #bcm-printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+
+  html, body, #root {
     background: #ffffff !important;
     color: #0f172a !important;
-    padding: 20px;
+    height: auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 11pt !important;
   }
+
+  /* When printing BCM Report: hide all web chrome completely */
+  .app-header,
+  .breadcrumb-bar,
+  .breadcrumb,
+  .workspace,
+  .mobile-bottom-nav,
+  .settings-drawer,
+  .weather-page-actions,
+  .weather-governance-accordion,
+  .bcm-modal-header button,
+  .bcm-modal-footer,
+  .toast-container,
+  .weather-nav-bar,
+  .page-section-header {
+    display: none !important;
+  }
+
+  /* BCM Modal Print Layout — 1-Page Fit */
+  .bcm-modal-backdrop {
+    display: block !important;
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .bcm-modal-content {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .bcm-modal-header {
+    background: #f8fafc !important;
+    border-bottom: 2px solid #0284c7 !important;
+    color: #0f172a !important;
+    padding: 6px 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .bcm-modal-header h2 {
+    color: #0f172a !important;
+    font-size: 13pt !important;
+    margin: 2px 0 0 0 !important;
+  }
+
+  .bcm-badge {
+    color: #0284c7 !important;
+    font-size: 8pt !important;
+    font-weight: 800 !important;
+  }
+
+  .bcm-modal-body {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .bcm-exec-card {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .bcm-site-type {
+    font-size: 8.5pt !important;
+    color: #64748b !important;
+  }
+
   .bcm-company-name {
     color: #0369a1 !important;
+    font-size: 14pt !important;
+    margin: 2px 0 !important;
   }
-  .bcm-exec-card, .bcm-matrix-card, .bcm-recommendations {
+
+  .bcm-address {
+    font-size: 9pt !important;
+    color: #334155 !important;
+    margin: 2px 0 !important;
+  }
+
+  .bcm-meta-geo {
+    font-size: 8.5pt !important;
+    color: #64748b !important;
+    margin: 2px 0 0 0 !important;
+  }
+
+  .bcm-overall-risk {
+    background: #ffffff !important;
+    border: 2px solid currentColor !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    text-align: center !important;
+    min-width: 180px !important;
+  }
+
+  .bcm-overall-risk strong {
+    font-size: 12pt !important;
+    display: block !important;
+  }
+
+  .bcm-overall-risk span {
+    font-size: 7.5pt !important;
+    color: #64748b !important;
+  }
+
+  .bcm-matrix-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .bcm-matrix-card {
     background: #f8fafc !important;
-    border-color: #cbd5e1 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .bcm-matrix-card h4 {
+    font-size: 9.5pt !important;
     color: #0f172a !important;
+    margin: 0 0 3px 0 !important;
+  }
+
+  .bcm-matrix-card .bcm-metric {
+    font-size: 9pt !important;
+    margin: 2px 0 !important;
+  }
+
+  .bcm-matrix-card small {
+    font-size: 8pt !important;
+    color: #64748b !important;
+  }
+
+  .bcm-recommendations {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .bcm-recommendations h4 {
+    font-size: 10pt !important;
+    color: #0f172a !important;
+    margin: 0 0 4px 0 !important;
+  }
+
+  .bcm-actions-list {
+    margin: 0 !important;
+    padding-left: 16px !important;
+  }
+
+  .bcm-actions-list li {
+    font-size: 8.5pt !important;
+    line-height: 1.35 !important;
+    margin-bottom: 2px !important;
+    color: #1e293b !important;
+  }
+
+  .bcm-report-footer {
+    font-size: 7.5pt !important;
+    color: #64748b !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding-top: 4px !important;
+    margin-top: 2px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .bcm-report-footer p, .bcm-report-footer small {
+    margin: 1px 0 !important;
+    line-height: 1.25 !important;
   }
 }
 

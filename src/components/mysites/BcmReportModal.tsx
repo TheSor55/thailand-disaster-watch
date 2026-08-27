@@ -26,7 +26,7 @@ export function BcmReportModal({ site, onClose }: BcmReportModalProps) {
       >
         <header className="bcm-modal-header">
           <div className="bcm-brand-title">
-            <span className="bcm-badge">FUTUREGREEN DISASTER INTELLIGENCE</span>
+            <span className="bcm-badge">THAILAND DISASTER WATCH · BCM INTELLIGENCE</span>
             <h2>รายงานประเมินความเสี่ยงอุทกภัยและความต่อเนื่องทางธุรกิจ (BCM Report)</h2>
           </div>
           <button type="button" className="btn-close-modal" onClick={onClose} aria-label="ปิดหน้าต่าง">
@@ -109,14 +109,14 @@ export function BcmReportModal({ site, onClose }: BcmReportModalProps) {
             <ul className="bcm-actions-list">
               <li>✓ <strong>การปฏิบัติการ:</strong> ดำเนินกิจกรรมการผลิตและกระจายสินค้าได้ตามปกติ</li>
               <li>✓ <strong>การเตรียมความพร้อม:</strong> ตรวจสอบระบบปั๊มน้ำระบายฉุกเฉิน, ทางระบายน้ำรอบอาคาร และเครื่องกำเนิดไฟฟ้าสำรอง (Generator) ตามรอบประจำสัปดาห์</li>
-              <li>✓ <strong>การเฝ้าระวัง:</strong> กำหนดให้ผู้จัดการส่วนอาคารตรวจสอบภาพเรดาร์ตรวจอากาศผ่าน FutureGreen แพลตฟอร์ม ทุก 6 ชั่วโมงในช่วงฤดูมรสุม</li>
+              <li>✓ <strong>การเฝ้าระวัง:</strong> กำหนดให้ผู้จัดการส่วนอาคารตรวจสอบภาพเรดาร์ตรวจอากาศผ่าน Thailand Disaster Watch แพลตฟอร์ม ทุก 6 ชั่วโมงในช่วงฤดูมรสุม</li>
             </ul>
           </div>
 
           {/* Report Footer & Disclaimer */}
           <div className="bcm-report-footer">
             <p>
-              แหล่งข้อมูลอ้างอิง: กรมอุตุนิยมวิทยา (TMD), กรมชลประทาน (RID), สำนักงานพัฒนาเทคโนโลยีอวกาศฯ (GISTDA) · FutureGreen Platform v1.2
+              แหล่งข้อมูลอ้างอิง: กรมอุตุนิยมวิทยา (TMD), กรมชลประทาน (RID), สำนักงานพัฒนาเทคโนโลยีอวกาศฯ (GISTDA) · Thailand Disaster Watch v1.3 · ผู้จัดทำและลิขสิทธิ์: คุณสรวิศ สุวรรณรงค์ (Sorawit Suwannarong)
             </p>
             <small>
               หมายเหตุ: รายงานนี้จัดทำขึ้นเพื่อสนับสนุนการตัดสินใจเชิงบริหารและบริหารความต่อเนื่องทางธุรกิจ (BCM) การแจ้งเตือนภัยขั้นวิกฤตระดับชาติเป็นอำนาจของ ปภ. และหน่วยงานราชการทางการ
