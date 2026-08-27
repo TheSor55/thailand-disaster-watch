@@ -26,7 +26,6 @@ import { DataProvenance } from '../components/DataProvenance';
 import { LayerControl } from '../components/LayerControl';
 import { ModuleErrorBoundary } from '../components/ModuleErrorBoundary';
 import { NavigationSearch } from '../components/NavigationSearch';
-import { SafetyBanner } from '../components/SafetyBanner';
 import { SystemHealthPanel } from '../components/SystemHealthPanel';
 import { RadarControlPanel } from '../components/radar/RadarControlPanel';
 import { fetchRadarFramesUI, type RadarFrame } from '../services/radar';
@@ -347,18 +346,12 @@ export function App() {
         </div>
 
         <div className="header-status-row">
-          <div className="meta-pill meta-pill--danger">
-            <span className="status-dot status-dot--off" aria-hidden="true" />
-            <span>LIVE DATA NOT CONNECTED</span>
-          </div>
           <div className="meta-pill meta-pill--dev">
-            <span>v1.2 PREVIEW</span>
+            <span>v1.3.0</span>
           </div>
           <p className="caption">Decision-support information · Not an official emergency warning</p>
         </div>
       </header>
-
-      <SafetyBanner state="NO_LIVE_DATA" />
 
       {settingsOpen && (
         <section className="settings-drawer" aria-label="System Settings Drawer">

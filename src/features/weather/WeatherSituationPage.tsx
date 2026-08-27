@@ -113,8 +113,7 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
   const [request, setRequest] = useState<WeatherSituationRequest>(getInitialRequest);
   const [loadState, setLoadState] = useState<WeatherSituationLoadState>({ status: 'IDLE' });
   const [radarState, setRadarState] = useState<RadarLoadState>({ status: 'IDLE' });
-  const [showGates, setShowGates] = useState(false);
-  const [showClassification, setShowClassification] = useState(false);
+  const [showDevTools, setShowDevTools] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const executeLoad = useCallback(
@@ -246,22 +245,6 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
           </button>
         </div>
       )}
-
-      {/* Prominent Development Preview Banner — always visible */}
-      <PreviewBadge />
-
-      {/* Explicit Data Mode Indicator Badge */}
-      <ModeBadge mode={request.mode} />
-
-      {/* Lightweight Explainer / Semantics Guide */}
-      <WeatherExplainer />
-
-      {/* Mode Selector (DEMO vs CONTROLLED LIVE) */}
-      <ModeSelector
-        mode={request.mode}
-        onModeChange={handleModeChange}
-        disabled={isLoading}
-      />
 
       {/* Controlled Location Selector */}
       <LocationSelector
@@ -407,45 +390,39 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
         </div>
       )}
 
-      {/* Collapsible: Data Classification Guide */}
-      <div className="weather-accordion">
+      {/* Collapsible: Developer Tools & Advanced Mode (Hidden by default for clean UX) */}
+      <div className="weather-accordion" style={{ marginTop: '24px' }}>
         <button
           type="button"
           className="weather-accordion__trigger"
-          aria-expanded={showClassification}
-          onClick={() => setShowClassification((v) => !v)}
-          aria-controls="classification-guide-panel"
+          aria-expanded={showDevTools}
+          onClick={() => setShowDevTools((v) => !v)}
+          style={{ opacity: 0.7, fontSize: '0.8rem' }}
         >
-          ประเภทข้อมูล (Data Classification Guide)
-          <span aria-hidden="true">{showClassification ? '▲' : '▼'}</span>
+          ⚙️ ข้อมูลและการตั้งค่าสำหรับนักพัฒนา (Developer Mode &amp; System Gates)
+          <span aria-hidden="true">{showDevTools ? '▲' : '▼'}</span>
         </button>
-        <div id="classification-guide-panel" hidden={!showClassification}>
-          <ClassificationGuide />
-        </div>
-      </div>
-
-      {/* Collapsible: System Gate Status (Developer Info) */}
-      <div className="weather-accordion">
-        <button
-          type="button"
-          className="weather-accordion__trigger"
-          aria-expanded={showGates}
-          onClick={() => setShowGates((v) => !v)}
-          aria-controls="system-gate-panel"
-        >
-          System Gate Status (Developer Info)
-          <span aria-hidden="true">{showGates ? '▲' : '▼'}</span>
-        </button>
-        <div id="system-gate-panel" hidden={!showGates}>
-          <SystemGatePanel flags={GATE_FLAGS} />
-        </div>
+        {showDevTools && (
+          <div className="weather-dev-tools-drawer" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px', padding: '14px', background: 'rgba(15, 23, 42, 0.6)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <PreviewBadge />
+            <ModeBadge mode={request.mode} />
+            <WeatherExplainer />
+            <ModeSelector
+              mode={request.mode}
+              onModeChange={handleModeChange}
+              disabled={isLoading}
+            />
+            <ClassificationGuide />
+            <SystemGatePanel flags={GATE_FLAGS} />
+          </div>
+        )}
       </div>
 
       {/* Footer — Safety Reminder */}
       <footer className="weather-page-footer">
         <p>
-          ⚠ ข้อมูลนี้เป็น <strong>DEVELOPMENT PREVIEW ({isDemo ? 'DEMO' : 'CONTROLLED LIVE'})</strong> เท่านั้น — ไม่ใช่ระบบเตือนภัยทางการ
-          การแจ้งเตือนภัยทางการโปรดติดตามจากกรมอุตุนิยมวิทยา (TMD) และหน่วยงานที่มีอำนาจ
+          ⚠ ข้อมูลนี้เป็น <strong>DEVELOPMENT PREVIEW ({isDemo ? 'DEMO' : 'CONTROLLED LIVE'})</strong> สำหรับการสนับสนุนการตัดสินใจ — ไม่ใช่การแจ้งเตือนภัยฉุกเฉินอย่างเป็นทางการ
+          การแจ้งเตือนภัยทางการโปรดติดตามจากกรมอุตุนิยมวิทยา (TMD) และหน่วยงานราชการที่มีอำนาจ
         </p>
       </footer>
     </div>
