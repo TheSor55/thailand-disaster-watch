@@ -470,10 +470,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
 }
 .cctv-panel > p { color: var(--muted); font-size: 0.65rem; text-align: center; }
 
-.timeline-bar { min-height: 56px; display: grid; grid-template-columns: 1fr minmax(300px, 50%); align-items: center; gap: 20px; padding: 7px 20px; border-top: 1px solid var(--border); background: var(--surface); }
-.timeline-bar > div:first-child { display: flex; flex-direction: column; gap: 2px; }.timeline-bar strong { font-size: .68rem; }
-.timeline-options { display: grid; grid-template-columns: repeat(6,1fr); position: relative; }.timeline-options::before { content: ''; position: absolute; top: 8px; right: 8%; left: 8%; height: 1px; background: var(--border); }
-.timeline-options span { position: relative; padding-top: 17px; color: var(--muted); font-size: .58rem; text-align: center; }.timeline-options span::before { content: ''; position: absolute; z-index: 1; top: 5px; left: 50%; width: 6px; height: 6px; transform: translateX(-50%); border: 1px solid #64748b; border-radius: 50%; background: var(--surface); }
+.timeline-bar { display: none !important; }
+
+/* Mobile Bottom Navigation Bar */
+.mobile-bottom-nav {
+  display: none;
+}
 
 .header-actions { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .mobile-menu-button, .mobile-dock { display: none; }
@@ -561,31 +563,63 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
   .left-rail { order: 2; display: grid; grid-template-columns: 1fr 1fr; overflow: visible; }
   .right-rail { order: 3; grid-template-columns: 1fr; }
   .summary-strip { grid-template-columns: repeat(3, 1fr); }
-  .timeline-bar { grid-template-columns: 1fr; padding: 10px 12px; }
+  .summary-strip { grid-template-columns: repeat(3, 1fr); }
+  .timeline-bar { display: none !important; }
   .mobile-menu-button { display: inline-grid; }
-  .mobile-dock {
-    position: sticky;
-    z-index: 15;
+
+  /* Fixed Mobile Bottom Navigation Bar (Thumb friendly) */
+  .mobile-bottom-nav {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
     bottom: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
-    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    left: 0;
+    right: 0;
+    z-index: 900;
+    background: rgba(11, 20, 38, 0.95);
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 4px 2px calc(4px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
   }
-  .mobile-dock button {
+
+  .mobile-bottom-nav__item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: 5px;
-    border: 0;
-    color: var(--muted);
+    justify-content: center;
+    padding: 4px 1px;
     background: transparent;
-    font-size: 0.58rem;
+    border: none;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.62rem;
+    font-weight: 600;
+    line-height: 1.15;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 44px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
-  .mobile-dock button span { color: var(--accent); font-size: 0.9rem; }
+
+  .mobile-bottom-nav__item.is-active {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.15);
+  }
+
+  .mobile-bottom-nav__icon {
+    font-size: 1.15rem;
+    margin-bottom: 2px;
+    line-height: 1;
+    display: block;
+  }
+
+  .workspace {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom)) !important;
+  }
 }
 @media (max-width: 800px) and (orientation: landscape) and (max-height: 540px) {
   .map-column { min-height: 420px; grid-template-rows: auto minmax(300px, 68dvh) auto; }

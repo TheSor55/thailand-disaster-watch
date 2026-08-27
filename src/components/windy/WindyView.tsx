@@ -32,9 +32,9 @@ export function WindyView({
   // Dynamic direct link with target mode/layer
   const directLinkUrl =
     activeLayer === 'hurricanes'
-      ? `https://www.windy.com/?hurricanes,${lat.toFixed(4)},${lon.toFixed(4)},${zoom}`
+      ? 'https://www.windy.com/th/-%E0%B8%95%E0%B8%B4%E0%B8%94%E0%B8%95%E0%B8%B2%E0%B8%A1%E0%B8%9E%E0%B8%B2%E0%B8%A2%E0%B8%B8%E0%B9%80%E0%B8%AE%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%A3%E0%B8%B4%E0%B9%80%E0%B8%84%E0%B8%99/hurricanes'
       : activeLayer === 'cams'
-      ? `https://www.windy.com/?cams,${lat.toFixed(4)},${lon.toFixed(4)},${zoom}`
+      ? `https://www.windy.com/?cams,${lat.toFixed(4)},${lon.toFixed(4)},8`
       : `https://www.windy.com/?${activeLayer},${lat.toFixed(4)},${lon.toFixed(4)},${zoom}`;
 
   return (
@@ -110,6 +110,46 @@ export function WindyView({
           </a>
         </div>
       </div>
+
+      {/* Helper Banner when in Live Cams mode */}
+      {activeLayer === 'cams' && (
+        <div style={{ background: 'rgba(234, 179, 8, 0.15)', border: '1px solid #eab308', borderRadius: '8px', padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <strong style={{ color: '#fde047' }}>📹 กล้องเว็บแคมสด (Webcams กว่า 100+ จุดทั่วไทย):</strong>
+            <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#e2e8f0' }}>
+              เนื่องจากวิดเจ็ตฝัง (Embed Iframe) ไม่รองรับการแสดงหมุดภาพกล้องสด สามารถคลิกปุ่มสีเหลืองเพื่อเปิดดูหมุดกล้องและ Time-lapse ความละเอียดสูงบน Windy.com ได้ทันที
+            </p>
+          </div>
+          <a
+            href={`https://www.windy.com/?cams,${lat.toFixed(4)},${lon.toFixed(4)},8`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ padding: '8px 16px', background: '#eab308', color: '#000', fontWeight: 'bold', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          >
+            📹 เปิดดูหมุดกล้อง Webcams บน Windy.com ↗
+          </a>
+        </div>
+      )}
+
+      {/* Helper Banner when in Storm Tracker mode */}
+      {activeLayer === 'hurricanes' && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', borderRadius: '8px', padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <strong style={{ color: '#fca5a5' }}>🌪️ ระบบติดตามพายุ (Tropical Cyclone &amp; Storm Tracker):</strong>
+            <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#e2e8f0' }}>
+              ดูรายชื่อพายุทุกลูกในทะเลจีนใต้และแปซิฟิก พร้อมศูนย์กลางตาพายุ และวิถีการเคลื่อนตัวล่วงหน้า 5 วัน (ฟรี)
+            </p>
+          </div>
+          <a
+            href="https://www.windy.com/th/-%E0%B8%95%E0%B8%B4%E0%B8%94%E0%B8%95%E0%B8%B2%E0%B8%A1%E0%B8%9E%E0%B8%B2%E0%B8%A2%E0%B8%B8%E0%B9%80%E0%B8%AE%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%A3%E0%B8%B4%E0%B9%80%E0%B8%84%E0%B8%99/hurricanes"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ padding: '8px 16px', background: '#ef4444', color: '#fff', fontWeight: 'bold', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          >
+            🌪️ เปิดระบบติดตามพายุเต็มจอ (ฟรี) ↗
+          </a>
+        </div>
+      )}
 
       {/* Embedded Interactive Frame */}
       <div className="windy-frame-wrap">

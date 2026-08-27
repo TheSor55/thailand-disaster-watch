@@ -829,13 +829,6 @@ export function App() {
         )}
       </main>
 
-      <footer className="timeline-bar">
-        <div><span className="eyebrow">SITUATION TIMELINE</span><strong>Timeline unavailable — live data not connected</strong></div>
-        <div className="timeline-options" aria-label="Timeline unavailable">
-          {['-24h', '-12h', '-6h', '-3h', '-1h', 'Now'].map((time) => <span key={time}>{time}</span>)}
-        </div>
-      </footer>
-
       <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
         <button
           type="button"
