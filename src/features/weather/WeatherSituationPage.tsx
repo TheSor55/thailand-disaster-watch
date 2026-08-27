@@ -41,6 +41,7 @@ import {
   compareWeatherAndRadarSources,
 } from '../../domain/intelligence';
 import type { WeatherSituation } from '../../domain/weather';
+import { WindyView } from '../../components/windy/WindyView';
 
 const GATE_FLAGS = [
   { key: 'WEATHER_SITUATION_PIPELINE_ENABLED', label: 'Weather Pipeline', value: 'false' },
@@ -347,7 +348,7 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
           loading={isLoading}
         />
 
-        {/* Section B: Radar Observation (RainViewer) — Remote Sensing Composite */}
+        {/* Section B: Radar Intelligence Card (RainViewer) — Remote-Sensed Observation */}
         <RadarIntelligenceCard
           radarState={radarState}
           onNavigateToMap={onBack}
@@ -365,6 +366,16 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
           forecast={situation?.forecast ?? null}
           horizon="3h"
           loading={isLoading}
+        />
+      </div>
+
+      {/* Section E: Windy.com Interactive Meteorology (Wind, Rain, Clouds, Storm) */}
+      <div className="weather-windy-section" style={{ margin: '16px 0' }}>
+        <WindyView
+          lat={request.latitude}
+          lon={request.longitude}
+          zoom={8}
+          locationName={request.label ?? 'ประเทศไทย'}
         />
       </div>
 

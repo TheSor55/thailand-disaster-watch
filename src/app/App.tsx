@@ -33,10 +33,14 @@ import { fetchRadarFramesUI, type RadarFrame } from '../services/radar';
 import { getDamsByProvince, getDamsByRegion, MAJOR_DAMS } from '../domain/dam';
 import { getRiverStationsByProvince, getRiverStationsByRegion, MAJOR_RIVER_STATIONS } from '../domain/river';
 import { getAlertsForProvince, ACTIVE_OFFICIAL_ALERTS } from '../domain/warning';
+import { getCctvStationsByProvince, getCctvStationsByRegion, OFFICIAL_CCTV_STATIONS } from '../domain/cctv';
 import { DamSituationCard } from '../components/water/DamSituationCard';
 import { RiverStationCard } from '../components/water/RiverStationCard';
 import { SituationAlertCard } from '../components/alerts/SituationAlertCard';
 import { MySitesPanel } from '../components/mysites/MySitesPanel';
+import { CctvPanel } from '../components/cctv/CctvPanel';
+import { WindyView } from '../components/windy/WindyView';
+import { WindyEmbedModal } from '../components/windy/WindyEmbedModal';
 
 const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
@@ -85,9 +89,11 @@ export function App() {
   const [isRadarPlaying, setIsRadarPlaying] = useState(false);
   const [radarMode] = useState<'DEMO' | 'LIVE'>('DEMO');
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [appView, setAppView] = useState<'gis' | 'weather' | 'mysites' | 'about'>('gis');
+  const [windyModalOpen, setWindyModalOpen] = useState(false);
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'mysites' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
+  const isWindyView = appView === 'windy';
   const isMySitesView = appView === 'mysites';
   const isAboutView = appView === 'about';
 
@@ -146,6 +152,12 @@ export function App() {
         { label: 'สภาพอากาศ (Weather Situation)', path: '/weather', current: true },
       ];
     }
+    if (appView === 'windy') {
+      return [
+        { label: 'แผนที่ GIS', path: '/', current: false },
+        { label: 'ลมและพายุ (Windy.com)', path: '/windy', current: true },
+      ];
+    }
     if (appView === 'mysites') {
       return [
         { label: 'แผนที่ GIS', path: '/', current: false },
@@ -183,6 +195,20 @@ export function App() {
     if (navigation.viewLevel === 'quick-view') return 'central';
     if (navigation.viewLevel === 'region') return navigation.region.id;
     return 'central';
+  }, [navigation]);
+
+  const currentCoords = useMemo(() => {
+    if (navigation.viewLevel === 'province') {
+      return {
+        lat: navigation.province.latitude,
+        lon: navigation.province.longitude,
+        zoom: 8,
+      };
+    }
+    if (navigation.viewLevel === 'quick-view') {
+      return { lat: 13.7563, lon: 100.5018, zoom: 9 };
+    }
+    return { lat: 13.7563, lon: 100.5018, zoom: 6 };
   }, [navigation]);
 
   const displayedDams = useMemo(() => {
@@ -224,6 +250,20 @@ export function App() {
       return getAlertsForProvince(navigation.region.nameTh, navigation.region.nameTh);
     }
     return [...ACTIVE_OFFICIAL_ALERTS];
+  }, [navigation, currentAreaName, currentAreaRegionId]);
+
+  const displayedCctv = useMemo(() => {
+    if (navigation.viewLevel === 'province') {
+      const local = getCctvStationsByProvince(currentAreaName);
+      return local.length > 0 ? local : getCctvStationsByRegion(currentAreaRegionId);
+    }
+    if (navigation.viewLevel === 'quick-view') {
+      return getCctvStationsByRegion('central');
+    }
+    if (navigation.viewLevel === 'region') {
+      return getCctvStationsByRegion(navigation.region.id);
+    }
+    return OFFICIAL_CCTV_STATIONS;
   }, [navigation, currentAreaName, currentAreaRegionId]);
 
   const provenanceRecord = useMemo(() => {
@@ -391,6 +431,16 @@ export function App() {
               </button>
               <button
                 type="button"
+                className={`module-nav-item${isWindyView ? ' is-active' : ''}`}
+                onClick={() => setAppView('windy')}
+                aria-pressed={isWindyView}
+              >
+                <span className="icon">🌀</span>
+                <span>ลม &amp; พายุ (Windy)</span>
+                <span className="tag">INTERACTIVE</span>
+              </button>
+              <button
+                type="button"
                 className={`module-nav-item${isMySitesView ? ' is-active' : ''}`}
                 onClick={() => setAppView('mysites')}
                 aria-pressed={isMySitesView}
@@ -519,15 +569,25 @@ export function App() {
                   <span className="eyebrow">CURRENT VIEW</span>
                   <h2>{titleForNavigation(navigation)}</h2>
                 </div>
-                {navigation.viewLevel !== 'national' && (
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <button
                     className="btn-ghost"
                     type="button"
-                    onClick={() => navigate({ viewLevel: 'national' })}
+                    onClick={() => setWindyModalOpen(true)}
+                    title="เปิดแผนที่กระแสลมและพายุ Windy Interactive"
                   >
-                    ↺ Reset Thailand
+                    🌀 Windy Overlay
                   </button>
-                )}
+                  {navigation.viewLevel !== 'national' && (
+                    <button
+                      className="btn-ghost"
+                      type="button"
+                      onClick={() => navigate({ viewLevel: 'national' })}
+                    >
+                      ↺ Reset Thailand
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="map-container-wrap">
@@ -565,7 +625,7 @@ export function App() {
 
               <div className="module-strip" aria-label="Disaster modules status">
                 {situationModules.map((module) => {
-                  const isReady = module === 'Dam' || module === 'River';
+                  const isReady = module === 'Dam' || module === 'River' || module === 'CCTV';
                   const isPilot = module === 'Flood';
                   const statusClass = isReady ? 'status-dot--active' : isPilot ? 'status-dot--pilot' : '';
                   const statusText = isReady ? 'TELEMETRY READY' : isPilot ? 'SATELLITE PILOT' : 'No live data';
@@ -639,14 +699,11 @@ export function App() {
                 provinceNameTh={currentAreaName}
               />
 
-              <section className="panel cctv-panel">
-                <div className="panel-heading"><h2>CCTV Watch</h2><span className="eyebrow">PHASE 2+</span></div>
-                <div className="cctv-placeholder" aria-hidden="true"><span>▦</span></div>
-                <p>No authorized CCTV source connected</p>
-                <dl className="cctv-fields">
-                  {['Station', 'Location', 'Owner', 'Observed', 'Status'].map((field) => <div key={field}><dt>{field}</dt><dd>—</dd></div>)}
-                </dl>
-              </section>
+              {/* CCTV Live Station Telemetry */}
+              <CctvPanel
+                stations={displayedCctv}
+                provinceNameTh={currentAreaName}
+              />
 
               <section className="panel share-export-panel">
                 <div className="panel-heading">
@@ -684,6 +741,26 @@ export function App() {
               <Suspense fallback={<div className="page-loading" role="status">กำลังโหลดหน้าสภาพอากาศ…</div>}>
                 <WeatherSituationPage onBack={() => setAppView('gis')} />
               </Suspense>
+            </ModuleErrorBoundary>
+          </div>
+        )}
+
+        {isWindyView && (
+          <div className="full-content-column" aria-label="ลมและพายุ Windy.com">
+            <ModuleErrorBoundary moduleName="Windy View">
+              <div className="windy-page-wrapper" style={{ height: 'calc(100vh - 140px)', padding: '10px 14px' }}>
+                <header className="page-section-header" style={{ marginBottom: '10px' }}>
+                  <button type="button" className="btn-ghost" onClick={() => setAppView('gis')}>
+                    ← กลับไปหน้าแผนที่ GIS
+                  </button>
+                </header>
+                <WindyView
+                  lat={currentCoords.lat}
+                  lon={currentCoords.lon}
+                  zoom={currentCoords.zoom}
+                  locationName={currentAreaName}
+                />
+              </div>
             </ModuleErrorBoundary>
           </div>
         )}
@@ -894,11 +971,28 @@ export function App() {
                   provinceNameTh={currentAreaName}
                 />
 
+                {/* CCTV Live Station Telemetry */}
+                <CctvPanel
+                  stations={displayedCctv}
+                  provinceNameTh={currentAreaName}
+                />
+
                 <DataProvenance record={provenanceRecord} />
               </div>
             )}
           </section>
         </div>
+      )}
+
+      {/* Windy.com Interactive Overlay Modal */}
+      {windyModalOpen && (
+        <WindyEmbedModal
+          lat={currentCoords.lat}
+          lon={currentCoords.lon}
+          zoom={currentCoords.zoom}
+          locationName={currentAreaName}
+          onClose={() => setWindyModalOpen(false)}
+        />
       )}
     </div>
   );

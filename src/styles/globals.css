@@ -2749,5 +2749,510 @@ button:focus-visible, input:focus-visible { outline: 2px solid #22d3ee; outline-
   }
 }
 
+/* ==========================================
+   v1.3 CCTV Watch & Windy Meteorological View
+   ========================================== */
+
+/* CCTV Station Cards in Right Rail / Drawer */
+.cctv-station-panel {
+  padding: 13px;
+}
+
+.cctv-station-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cctv-card {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cctv-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cctv-card-header h4 {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.cctv-card-header small {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.cctv-status-tag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.cctv-status--normal {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.cctv-status--monitoring {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.35);
+}
+
+.cctv-status--warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.cctv-status--critical {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.cctv-card-body {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.cctv-thumbnail-preview {
+  position: relative;
+  width: 80px;
+  height: 56px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: repeating-linear-gradient(135deg, #0b1728, #0b1728 6px, #0d1d30 6px, #0d1d30 12px);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.cctv-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  text-align: center;
+  padding: 2px;
+}
+
+.cctv-thumb-overlay span {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.cctv-thumb-overlay small {
+  font-size: 0.5rem;
+  color: #cbd5e1;
+}
+
+.cctv-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.68rem;
+}
+
+.cctv-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cctv-meta-row span {
+  color: var(--muted);
+}
+
+.cctv-meta-row strong {
+  color: var(--text);
+}
+
+.btn-cctv-inspect {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 5px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cctv-inspect:hover {
+  background: rgba(56, 189, 248, 0.22);
+  color: #ffffff;
+}
+
+/* CCTV Modal Viewer */
+.cctv-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 18, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.cctv-modal-content {
+  width: min(100%, 720px);
+  max-height: 90vh;
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cctv-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #1e293b;
+  border-bottom: 1px solid var(--border);
+}
+
+.cctv-modal-header h3 {
+  margin: 2px 0;
+  font-size: 1.05rem;
+  color: #f8fafc;
+}
+
+.cctv-modal-header small {
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.cctv-modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cctv-live-feed-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: #030812;
+}
+
+.cctv-viewport {
+  position: relative;
+  width: 100%;
+}
+
+.cctv-hud-top {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.cctv-live-rec {
+  color: #ef4444;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.cctv-timestamp {
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.cctv-hud-bottom {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 0.64rem;
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.cctv-scene-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cctv-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cctv-stat-card {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cctv-stat-card small {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.cctv-stat-card strong {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.cctv-stat-card .unit {
+  font-size: 0.72rem;
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.status-online {
+  color: #10b981 !important;
+}
+
+.cctv-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #334155;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.cctv-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.cctv-bar--normal { background: #10b981; }
+.cctv-bar--warning { background: #f59e0b; }
+.cctv-bar--danger { background: #ef4444; }
+
+.cctv-provenance-note {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.cctv-modal-footer {
+  padding: 12px 18px;
+  background: #1e293b;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ==========================================
+   Windy.com Meteorological Viewer
+   ========================================== */
+.windy-container-page {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 520px;
+}
+
+.windy-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.windy-toolbar-info h2 {
+  margin: 2px 0;
+  font-size: 1rem;
+  color: #38bdf8;
+}
+
+.windy-toolbar-info small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.windy-layer-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-windy-layer {
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-windy-layer:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.btn-windy-layer.is-active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.btn-windy-external {
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  border: 1px solid #38bdf8;
+  color: #ffffff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-windy-external:hover {
+  background: #0284c7;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.windy-frame-wrap {
+  flex: 1;
+  min-height: 480px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #07111f;
+}
+
+.windy-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  border: none;
+}
+
+.windy-footer-note {
+  font-size: 0.68rem;
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+/* Windy Modal Backdrop */
+.windy-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 18, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.windy-modal-content {
+  width: min(100%, 960px);
+  height: min(90vh, 720px);
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.windy-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #1e293b;
+  border-bottom: 1px solid var(--border);
+}
+
+.windy-modal-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #38bdf8;
+}
+
+.windy-modal-body {
+  flex: 1;
+  padding: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+
 
 
