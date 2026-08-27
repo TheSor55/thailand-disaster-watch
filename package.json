@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "vite --host localhost --port 3000",
-    "build": "pnpm build:web && pnpm build:worker",
+    "build": "npm run build:web && npm run build:worker",
     "build:web": "vite build",
     "build:worker": "node scripts/build-worker.mjs",
     "preview": "vite preview --host localhost --port 3000",
@@ -15,8 +15,8 @@
     "typecheck": "tsc -b",
     "test:baseline": "node --test tests/project-baseline.test.mjs",
     "test:unit": "vitest run",
-    "test": "pnpm test:baseline && pnpm test:unit",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "test": "npm run test:baseline && npm run test:unit",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
     "maplibre-gl": "^6.5.0",
