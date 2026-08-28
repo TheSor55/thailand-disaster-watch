@@ -231,14 +231,14 @@ export function ThailandMap({
     try {
       const isDark = basemapMode === 'dark';
       if (map.getLayer('background')) {
-        map.setPaintProperty('background', 'background-color', isDark ? '#07111f' : '#f1f5f9');
+        map.setPaintProperty('background', 'background-color', isDark ? '#0a1120' : '#f8fafc');
       }
       if (map.getLayer('osm-basemap')) {
-        map.setPaintProperty('osm-basemap', 'raster-opacity', isDark ? 0.72 : 0.88);
-        map.setPaintProperty('osm-basemap', 'raster-saturation', isDark ? -0.62 : 0);
-        map.setPaintProperty('osm-basemap', 'raster-contrast', isDark ? 0.18 : 0);
-        map.setPaintProperty('osm-basemap', 'raster-brightness-min', isDark ? 0.12 : 0.5);
-        map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.68 : 1);
+        map.setPaintProperty('osm-basemap', 'raster-opacity', isDark ? 0.85 : 0.95);
+        map.setPaintProperty('osm-basemap', 'raster-saturation', isDark ? -0.18 : 0);
+        map.setPaintProperty('osm-basemap', 'raster-contrast', isDark ? 0.14 : 0);
+        map.setPaintProperty('osm-basemap', 'raster-brightness-min', isDark ? 0.22 : 0.5);
+        map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.88 : 1);
       }
     } catch {
       /* safe ignore */
