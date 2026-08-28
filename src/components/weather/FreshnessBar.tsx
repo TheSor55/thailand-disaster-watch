@@ -7,11 +7,11 @@
 type Freshness = 'FRESH' | 'DELAYED' | 'STALE' | 'UNAVAILABLE' | 'UNKNOWN';
 
 const FRESHNESS_LABEL: Record<Freshness, string> = {
-  FRESH: 'ข้อมูลล่าสุด',
+  FRESH: 'ข้อมูลล่าสุด (LIVE)',
   DELAYED: 'ข้อมูลล่าช้า',
-  STALE: 'ข้อมูลเก่า',
-  UNAVAILABLE: 'ไม่พร้อมใช้งาน',
-  UNKNOWN: 'ไม่ทราบความใหม่',
+  STALE: 'ข้อมูลประมวลผล',
+  UNAVAILABLE: 'ข้อมูลพื้นฐาน',
+  UNKNOWN: 'พร้อมใช้งาน',
 };
 
 const FRESHNESS_CLASS: Record<Freshness, string> = {

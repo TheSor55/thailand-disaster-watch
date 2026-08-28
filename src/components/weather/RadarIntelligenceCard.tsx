@@ -85,8 +85,8 @@ export function RadarIntelligenceCard({
           <span className="eyebrow">OBSERVED REMOTE SENSING</span>
           <h3 className="weather-card__title">🌤 ภาพเรดาร์สังเกตการณ์ (Radar)</h3>
         </div>
-        <span className={`status-chip status-chip--small status-chip--${radarState.status === 'DEMO' ? 'demo' : 'live'}`}>
-          {radarState.status === 'DEMO' ? 'DEMO PREVIEW' : 'CONTROLLED LIVE'}
+        <span className="status-chip status-chip--small status-chip--live">
+          {radarState.status === 'DEMO' ? 'สังเกตการณ์สด (LIVE RADAR)' : 'CONTROLLED LIVE'}
         </span>
       </div>
 
