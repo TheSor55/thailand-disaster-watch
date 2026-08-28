@@ -12,7 +12,7 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
 
   const [mode, setMode] = useState<'SNAPSHOT' | 'VIDEO'>('SNAPSHOT');
   const [timestamp, setTimestamp] = useState<string>(() => new Date().toLocaleString('th-TH'));
-  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
+  const [cacheBuster, setCacheBuster] = useState<number>(0);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   // Live real-time clock update
