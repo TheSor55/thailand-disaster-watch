@@ -45,31 +45,31 @@ const STORM_TRACK_DATA = {
   features: [
     {
       type: 'Feature' as const,
-      properties: { name: 'แนวพายุหมุนเขตร้อน แนวที่ 1' },
+      properties: { name: 'แนวร่องมรสุม / เส้นทางพายุ แนวที่ 1' },
       geometry: {
         type: 'LineString' as const,
         coordinates: [
-          [119.0, 14.8],
-          [113.0, 13.5],
-          [108.0, 12.2],
-          [102.5, 10.8],
-          [97.0, 9.4],
-          [92.0, 8.0],
+          [120.0, 15.2],
+          [114.0, 13.8],
+          [108.5, 12.5],
+          [102.5, 11.2],
+          [97.0, 9.8],
+          [91.5, 8.5],
         ],
       },
     },
     {
       type: 'Feature' as const,
-      properties: { name: 'แนวพายุหมุนเขตร้อน แนวที่ 2' },
+      properties: { name: 'แนวร่องมรสุม / เส้นทางพายุ แนวที่ 2' },
       geometry: {
         type: 'LineString' as const,
         coordinates: [
-          [119.0, 16.2],
-          [112.5, 14.9],
-          [107.0, 13.6],
-          [101.5, 12.3],
-          [96.0, 11.0],
-          [91.0, 9.5],
+          [120.0, 16.6],
+          [113.5, 15.2],
+          [107.8, 13.9],
+          [101.8, 12.6],
+          [96.0, 11.2],
+          [90.5, 9.8],
         ],
       },
     },
@@ -92,37 +92,47 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
   const [showDams, setShowDams] = useState<boolean>(true);
   const [showRivers, setShowRivers] = useState<boolean>(true);
 
-  // 1. Fetch Real-time RainViewer Live Radar Frames
+  // 1. Fetch Real Live RainViewer Radar Metadata
   useEffect(() => {
     let isCancelled = false;
-    fetch('https://api.rainviewer.com/public/weather-maps.json')
-      .then((res) => res.json())
-      .then((data: { host?: string; radar?: { past?: Array<{ time: number; path: string }> } }) => {
-        if (isCancelled || !data?.radar?.past || !data.host) return;
+
+    async function loadLiveRadar() {
+      try {
+        const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+        if (!res.ok) throw new Error('Failed to fetch maps.json');
+        const data = (await res.json()) as {
+          host?: string;
+          radar?: { past?: Array<{ time: number; path: string }> };
+        };
+
+        if (isCancelled || !data?.host || !data?.radar?.past || data.radar.past.length === 0) return;
+
         const host = data.host;
         const pastList = data.radar.past;
         const loadedFrames: RadarFrameItem[] = pastList.map((item) => ({
           time: item.time,
           tileUrl: `${host}${item.path}/256/{z}/{x}/{y}/2/1_1.png`,
         }));
+
         if (loadedFrames.length > 0) {
           setFrames(loadedFrames);
           setActiveFrameIndex(loadedFrames.length - 1);
         }
-      })
-      .catch(() => {
-        const nowSec = Math.floor(Date.now() / 1000);
-        setFrames([
-          { time: nowSec, tileUrl: 'https://tilecache.rainviewer.com/v2/radar/nowcast/256/{z}/{x}/{y}/2/1_1.png' },
-        ]);
-      });
+      } catch {
+        /* safe ignore */
+      }
+    }
+
+    loadLiveRadar();
+    const interval = setInterval(loadLiveRadar, 5 * 60 * 1000); // refresh metadata every 5 min
 
     return () => {
       isCancelled = true;
+      clearInterval(interval);
     };
   }, []);
 
-  // 2. Initialize MapLibre GL Map
+  // 2. Initialize MapLibre GL Map & Vector Layers
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -133,160 +143,168 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         center: [100.8, 13.8],
         zoom: 5.6,
         minZoom: 4.0,
-        maxZoom: 14,
+        maxZoom: 12.5,
         attributionControl: false,
       });
 
       map.addControl(new NavigationControl({ showCompass: true, showZoom: true }), 'top-right');
       map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left');
 
-      map.on('load', () => {
-        // Add Storm Tracks Layer
-        map.addSource('storm-track-source', {
-          type: 'geojson',
-          data: STORM_TRACK_DATA,
-        });
+      const setupVectorLayers = () => {
+        // --- Storm Tracks Layer ---
+        if (!map.getSource('storm-track-source')) {
+          map.addSource('storm-track-source', {
+            type: 'geojson',
+            data: STORM_TRACK_DATA,
+          });
 
-        map.addLayer({
-          id: 'storm-track-glow',
-          type: 'line',
-          source: 'storm-track-source',
-          paint: {
-            'line-color': '#0284c7',
-            'line-width': 6,
-            'line-opacity': 0.5,
-          },
-        });
+          map.addLayer({
+            id: 'storm-track-glow',
+            type: 'line',
+            source: 'storm-track-source',
+            paint: {
+              'line-color': '#0284c7',
+              'line-width': 7,
+              'line-opacity': 0.45,
+            },
+          });
 
-        map.addLayer({
-          id: 'storm-track-line',
-          type: 'line',
-          source: 'storm-track-source',
-          paint: {
-            'line-color': '#38bdf8',
-            'line-width': 2.5,
-            'line-dasharray': [4, 3],
-          },
-        });
+          map.addLayer({
+            id: 'storm-track-line',
+            type: 'line',
+            source: 'storm-track-source',
+            paint: {
+              'line-color': '#38bdf8',
+              'line-width': 3,
+              'line-dasharray': [4, 3],
+            },
+          });
+        }
 
-        // Add Dams GeoJSON
-        const damsGeoJson = {
-          type: 'FeatureCollection' as const,
-          features: MAJOR_DAMS.map((dam) => {
-            const coords = DAM_COORDINATES[dam.damId] || [100.5, 13.7];
-            return {
-              type: 'Feature' as const,
-              properties: {
-                id: dam.damId,
-                name: dam.nameTh,
-                province: dam.province,
-                storage: dam.currentStorageMcm,
-                capacity: dam.capacityMcm,
-                percent: dam.storagePercent,
-                inflow: dam.inflowMcm,
-                outflow: dam.outflowMcm,
-                status: dam.status,
-                label: `🏞️ ${dam.nameTh} (${dam.storagePercent}%)`,
-              },
-              geometry: {
-                type: 'Point' as const,
-                coordinates: coords,
-              },
-            };
-          }),
-        };
+        // --- Dams Layer ---
+        if (!map.getSource('dams-source')) {
+          const damsGeoJson = {
+            type: 'FeatureCollection' as const,
+            features: MAJOR_DAMS.map((dam) => {
+              const coords = DAM_COORDINATES[dam.damId] || [100.5, 13.7];
+              return {
+                type: 'Feature' as const,
+                properties: {
+                  id: dam.damId,
+                  name: dam.nameTh,
+                  province: dam.province,
+                  storage: dam.currentStorageMcm,
+                  capacity: dam.capacityMcm,
+                  percent: dam.storagePercent,
+                  inflow: dam.inflowMcm,
+                  outflow: dam.outflowMcm,
+                  status: dam.status,
+                  label: `${dam.nameTh} (${dam.storagePercent}%)`,
+                },
+                geometry: {
+                  type: 'Point' as const,
+                  coordinates: coords,
+                },
+              };
+            }),
+          };
 
-        map.addSource('dams-source', {
-          type: 'geojson',
-          data: damsGeoJson,
-        });
+          map.addSource('dams-source', {
+            type: 'geojson',
+            data: damsGeoJson,
+          });
 
-        map.addLayer({
-          id: 'dams-circles',
-          type: 'circle',
-          source: 'dams-source',
-          paint: {
-            'circle-radius': 8,
-            'circle-color': '#0284c7',
-            'circle-stroke-width': 2.5,
-            'circle-stroke-color': '#ffffff',
-          },
-        });
+          map.addLayer({
+            id: 'dams-circles',
+            type: 'circle',
+            source: 'dams-source',
+            paint: {
+              'circle-radius': 9,
+              'circle-color': '#0284c7',
+              'circle-stroke-width': 2.5,
+              'circle-stroke-color': '#ffffff',
+            },
+          });
 
-        map.addLayer({
-          id: 'dams-labels',
-          type: 'symbol',
-          source: 'dams-source',
-          layout: {
-            'text-field': ['get', 'label'],
-            'text-size': 11,
-            'text-offset': [0, 1.4],
-            'text-anchor': 'top',
-          },
-          paint: {
-            'text-color': '#f8fafc',
-            'text-halo-color': '#0f172a',
-            'text-halo-width': 2,
-          },
-        });
+          map.addLayer({
+            id: 'dams-labels',
+            type: 'symbol',
+            source: 'dams-source',
+            layout: {
+              'text-field': ['get', 'label'],
+              'text-size': 11.5,
+              'text-offset': [0, 1.4],
+              'text-anchor': 'top',
+              'text-font': ['Open Sans Semibold'],
+            },
+            paint: {
+              'text-color': '#ffffff',
+              'text-halo-color': '#0f172a',
+              'text-halo-width': 2.5,
+            },
+          });
+        }
 
-        // Add Rivers GeoJSON
-        const riversGeoJson = {
-          type: 'FeatureCollection' as const,
-          features: MAJOR_RIVER_STATIONS.map((st) => {
-            const coords = RIVER_COORDINATES[st.stationCode] || [100.5, 14.0];
-            return {
-              type: 'Feature' as const,
-              properties: {
-                code: st.stationCode,
-                name: st.stationNameTh,
-                river: st.riverName,
-                province: st.province,
-                discharge: st.dischargeCms,
-                status: st.status,
-                label: `🌊 ${st.stationCode} ${st.stationNameTh}`,
-              },
-              geometry: {
-                type: 'Point' as const,
-                coordinates: coords,
-              },
-            };
-          }),
-        };
+        // --- Rivers Layer ---
+        if (!map.getSource('rivers-source')) {
+          const riversGeoJson = {
+            type: 'FeatureCollection' as const,
+            features: MAJOR_RIVER_STATIONS.map((st) => {
+              const coords = RIVER_COORDINATES[st.stationCode] || [100.5, 14.0];
+              return {
+                type: 'Feature' as const,
+                properties: {
+                  code: st.stationCode,
+                  name: st.stationNameTh,
+                  river: st.riverName,
+                  province: st.province,
+                  discharge: st.dischargeCms,
+                  status: st.status,
+                  label: `${st.stationCode} ${st.stationNameTh}`,
+                },
+                geometry: {
+                  type: 'Point' as const,
+                  coordinates: coords,
+                },
+              };
+            }),
+          };
 
-        map.addSource('rivers-source', {
-          type: 'geojson',
-          data: riversGeoJson,
-        });
+          map.addSource('rivers-source', {
+            type: 'geojson',
+            data: riversGeoJson,
+          });
 
-        map.addLayer({
-          id: 'rivers-circles',
-          type: 'circle',
-          source: 'rivers-source',
-          paint: {
-            'circle-radius': 7,
-            'circle-color': '#10b981',
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ffffff',
-          },
-        });
+          map.addLayer({
+            id: 'rivers-circles',
+            type: 'circle',
+            source: 'rivers-source',
+            paint: {
+              'circle-radius': 8,
+              'circle-color': '#10b981',
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#ffffff',
+            },
+          });
 
-        map.addLayer({
-          id: 'rivers-labels',
-          type: 'symbol',
-          source: 'rivers-source',
-          layout: {
-            'text-field': ['get', 'label'],
-            'text-size': 10.5,
-            'text-offset': [0, 1.3],
-            'text-anchor': 'top',
-          },
-          paint: {
-            'text-color': '#6ee7b7',
-            'text-halo-color': '#064e3b',
-            'text-halo-width': 2,
-          },
-        });
+          map.addLayer({
+            id: 'rivers-labels',
+            type: 'symbol',
+            source: 'rivers-source',
+            layout: {
+              'text-field': ['get', 'label'],
+              'text-size': 11,
+              'text-offset': [0, 1.3],
+              'text-anchor': 'top',
+              'text-font': ['Open Sans Semibold'],
+            },
+            paint: {
+              'text-color': '#a7f3d0',
+              'text-halo-color': '#064e3b',
+              'text-halo-width': 2.5,
+            },
+          });
+        }
 
         // Click Handler for Dams
         map.on('click', 'dams-circles', (e) => {
@@ -295,14 +313,16 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
           const coords = (e.features[0].geometry as { coordinates: [number, number] }).coordinates;
 
           popupRef.current?.remove();
-          popupRef.current = new Popup({ closeButton: true, offset: 12 })
+          popupRef.current = new Popup({ closeButton: true, offset: 14 })
             .setLngLat(coords)
             .setHTML(`
-              <div style="font-family: sans-serif; padding: 4px 6px; color: #0f172a;">
+              <div style="font-family: system-ui, sans-serif; padding: 4px 6px; color: #0f172a; min-width: 220px;">
                 <strong style="font-size: 14px; color: #0284c7;">🏞️ ${p.name} (จ.${p.province})</strong>
-                <p style="margin: 4px 0 2px; font-size: 12px;">ปริมาตรน้ำกักเก็บ: <strong>${p.storage} / ${p.capacity} ล้าน ลบ.ม.</strong></p>
-                <div style="background: #e0f2fe; border-radius: 4px; padding: 3px 6px; margin: 4px 0; font-size: 12px;">
-                  ความจุ: <strong style="color: #0369a1;">${p.percent}%</strong> · น้ำไหลเข้า: ${p.inflow} · ระบาย: ${p.outflow} ลบ.ม./วัน
+                <p style="margin: 4px 0 2px; font-size: 12px; color: #334155;">ปริมาตรน้ำกักเก็บ: <strong>${p.storage} / ${p.capacity} ล้าน ลบ.ม.</strong></p>
+                <div style="background: #e0f2fe; border-radius: 6px; padding: 4px 8px; margin: 6px 0; font-size: 12px; border: 1px solid #bae6fd;">
+                  ความจุ: <strong style="color: #0369a1; font-size: 13px;">${p.percent}%</strong><br/>
+                  น้ำไหลเข้า: <strong>${p.inflow}</strong> ล้าน ลบ.ม./วัน<br/>
+                  ระบายน้ำ: <strong>${p.outflow}</strong> ล้าน ลบ.ม./วัน
                 </div>
               </div>
             `)
@@ -316,14 +336,15 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
           const coords = (e.features[0].geometry as { coordinates: [number, number] }).coordinates;
 
           popupRef.current?.remove();
-          popupRef.current = new Popup({ closeButton: true, offset: 12 })
+          popupRef.current = new Popup({ closeButton: true, offset: 14 })
             .setLngLat(coords)
             .setHTML(`
-              <div style="font-family: sans-serif; padding: 4px 6px; color: #0f172a;">
+              <div style="font-family: system-ui, sans-serif; padding: 4px 6px; color: #0f172a; min-width: 220px;">
                 <strong style="font-size: 14px; color: #059669;">🌊 สถานี ${p.code} (${p.name})</strong>
-                <p style="margin: 4px 0 2px; font-size: 12px;">แม่น้ำ: <strong>${p.river} (จ.${p.province})</strong></p>
-                <div style="background: #d1fae5; border-radius: 4px; padding: 3px 6px; margin: 4px 0; font-size: 12px;">
-                  อัตราการไหล: <strong style="color: #047857;">${p.discharge} ลบ.ม./วินาที</strong> (สถานะ: ${p.status})
+                <p style="margin: 4px 0 2px; font-size: 12px; color: #334155;">ลุ่มน้ำ: <strong>${p.river} (จ.${p.province})</strong></p>
+                <div style="background: #d1fae5; border-radius: 6px; padding: 4px 8px; margin: 6px 0; font-size: 12px; border: 1px solid #a7f3d0;">
+                  อัตราการไหล: <strong style="color: #047857; font-size: 13px;">${p.discharge} ลบ.ม./วินาที</strong><br/>
+                  สถานะ: <strong>${p.status}</strong>
                 </div>
               </div>
             `)
@@ -334,7 +355,13 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         map.on('mouseleave', 'dams-circles', () => { map.getCanvas().style.cursor = ''; });
         map.on('mouseenter', 'rivers-circles', () => { map.getCanvas().style.cursor = 'pointer'; });
         map.on('mouseleave', 'rivers-circles', () => { map.getCanvas().style.cursor = ''; });
-      });
+      };
+
+      if (map.isStyleLoaded()) {
+        setupVectorLayers();
+      } else {
+        map.once('load', setupVectorLayers);
+      }
 
       mapRef.current = map;
     } catch {
@@ -361,7 +388,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
     const sourceId = 'thaiwater-radar-source';
     const layerId = 'thaiwater-radar-layer';
 
-    const updateLayer = () => {
+    const updateRadar = () => {
       if (!showRadar) {
         if (map.getLayer(layerId)) {
           map.setLayoutProperty(layerId, 'visibility', 'none');
@@ -382,10 +409,10 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
           tiles: [currentFrame.tileUrl],
           tileSize: 256,
           maxzoom: 12,
-          attribution: 'Weather radar telemetry data by RainViewer / ThaiWater',
+          attribution: 'Weather radar telemetry by RainViewer / ThaiWater',
         });
 
-        // Insert below vector markers
+        // Add below dams circles
         const beforeLayer = map.getLayer('dams-circles') ? 'dams-circles' : undefined;
 
         map.addLayer(
@@ -407,13 +434,13 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
     };
 
     if (map.isStyleLoaded()) {
-      updateLayer();
+      updateRadar();
     } else {
-      map.once('load', updateLayer);
+      map.once('load', updateRadar);
     }
   }, [frames, activeFrameIndex, showRadar, radarOpacity]);
 
-  // 4. Update Layer Visibilities
+  // 4. Update Layer Visibilities on Toggle
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
@@ -511,7 +538,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
               checked={showRadar}
               onChange={(e) => setShowRadar(e.target.checked)}
             />
-            <span>🌧️ เรดาร์กลุ่มฝนสด ({frames.length} เฟรม)</span>
+            <span>🌧️ เรดาร์กลุ่มฝนสด ({frames.length > 0 ? `${frames.length} เฟรม` : 'กำลังโหลด...'})</span>
           </label>
           <label className="ctrl-checkbox-label">
             <input
@@ -582,7 +609,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
             />
 
             <span className="timeline-frame-counter">
-              เฟรม {activeFrameIndex + 1}/{frames.length}
+              เฟรม {activeFrameIndex + 1}/{frames.length || 1}
             </span>
           </div>
 
