@@ -27,7 +27,7 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
         <header className="cctv-modal-header">
           <div>
             <span className="eyebrow" style={{ color: '#38bdf8', fontWeight: 700 }}>
-              {isCoastal ? '🌊 COASTAL MARINE CAMERA' : '🏞️ MUNICIPAL / RIVER CCTV'} · {station.providerNameTh}
+              {isCoastal ? '🌊 COASTAL MARINE CAMERA' : '🏞️ RIVER/CANAL CAMERA'} · {station.providerNameTh}
             </span>
             <h3 style={{ margin: '4px 0', fontSize: '1.05rem', color: '#f8fafc' }}>{station.nameTh}</h3>
             <small style={{ color: '#94a3b8' }}>{station.waterwayTh} · จ.{station.provinceNameTh}</small>
