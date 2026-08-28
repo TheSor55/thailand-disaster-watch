@@ -30,24 +30,24 @@ const DAM_COORDINATES: Record<string, [number, number]> = {
 };
 
 const RIVER_COORDINATES: Record<string, [number, number]> = {
-  'station-c2': [100.1264, 15.6706],
-  'station-c13': [100.1814, 15.1583],
-  'station-c29a': [100.5233, 14.1683],
-  'station-c35': [100.5617, 14.3483],
-  'station-n1': [99.0033, 18.7883],
-  'station-n67': [100.1283, 15.6967],
-  'station-m7': [104.8583, 15.2283],
-  'station-e1': [101.3717, 14.0533],
+  'C.2': [100.1264, 15.6706],
+  'C.13': [100.1814, 15.1583],
+  'C.29A': [100.5233, 14.1683],
+  'C.35': [100.5617, 14.3483],
+  'N.1': [99.0033, 18.7883],
+  'N.67': [100.1283, 15.6967],
+  'M.7': [104.8583, 15.2283],
+  'E.1': [101.3717, 14.0533],
 };
 
-const STORM_TRACK_GEOJSON: GeoJSON.FeatureCollection = {
-  type: 'FeatureCollection',
+const STORM_TRACK_DATA = {
+  type: 'FeatureCollection' as const,
   features: [
     {
-      type: 'Feature',
+      type: 'Feature' as const,
       properties: { name: 'แนวพายุหมุนเขตร้อน แนวที่ 1' },
       geometry: {
-        type: 'LineString',
+        type: 'LineString' as const,
         coordinates: [
           [119.0, 14.8],
           [113.0, 13.5],
@@ -59,10 +59,10 @@ const STORM_TRACK_GEOJSON: GeoJSON.FeatureCollection = {
       },
     },
     {
-      type: 'Feature',
+      type: 'Feature' as const,
       properties: { name: 'แนวพายุหมุนเขตร้อน แนวที่ 2' },
       geometry: {
-        type: 'LineString',
+        type: 'LineString' as const,
         coordinates: [
           [119.0, 16.2],
           [112.5, 14.9],
@@ -97,10 +97,10 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
     let isCancelled = false;
     fetch('https://api.rainviewer.com/public/weather-maps.json')
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: { host?: string; radar?: { past?: Array<{ time: number; path: string }> } }) => {
         if (isCancelled || !data?.radar?.past || !data.host) return;
         const host = data.host;
-        const pastList: Array<{ time: number; path: string }> = data.radar.past;
+        const pastList = data.radar.past;
         const loadedFrames: RadarFrameItem[] = pastList.map((item) => ({
           time: item.time,
           tileUrl: `${host}${item.path}/256/{z}/{x}/{y}/2/1_1.png`,
@@ -111,10 +111,9 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         }
       })
       .catch(() => {
-        // Safe fallback
         const nowSec = Math.floor(Date.now() / 1000);
         setFrames([
-          { time: nowSec, tileUrl: `https://tilecache.rainviewer.com/v2/radar/nowcast/256/{z}/{x}/{y}/2/1_1.png` },
+          { time: nowSec, tileUrl: 'https://tilecache.rainviewer.com/v2/radar/nowcast/256/{z}/{x}/{y}/2/1_1.png' },
         ]);
       });
 
@@ -145,7 +144,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         // Add Storm Tracks Layer
         map.addSource('storm-track-source', {
           type: 'geojson',
-          data: STORM_TRACK_GEOJSON,
+          data: STORM_TRACK_DATA,
         });
 
         map.addLayer({
@@ -171,12 +170,12 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         });
 
         // Add Dams GeoJSON
-        const damsGeoJson: GeoJSON.FeatureCollection = {
-          type: 'FeatureCollection',
+        const damsGeoJson = {
+          type: 'FeatureCollection' as const,
           features: MAJOR_DAMS.map((dam) => {
             const coords = DAM_COORDINATES[dam.damId] || [100.5, 13.7];
             return {
-              type: 'Feature',
+              type: 'Feature' as const,
               properties: {
                 id: dam.damId,
                 name: dam.nameTh,
@@ -190,7 +189,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
                 label: `🏞️ ${dam.nameTh} (${dam.storagePercent}%)`,
               },
               geometry: {
-                type: 'Point',
+                type: 'Point' as const,
                 coordinates: coords,
               },
             };
@@ -232,24 +231,23 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         });
 
         // Add Rivers GeoJSON
-        const riversGeoJson: GeoJSON.FeatureCollection = {
-          type: 'FeatureCollection',
+        const riversGeoJson = {
+          type: 'FeatureCollection' as const,
           features: MAJOR_RIVER_STATIONS.map((st) => {
-            const coords = RIVER_COORDINATES[st.stationId] || [100.5, 14.0];
+            const coords = RIVER_COORDINATES[st.stationCode] || [100.5, 14.0];
             return {
-              type: 'Feature',
+              type: 'Feature' as const,
               properties: {
-                id: st.stationId,
                 code: st.stationCode,
-                name: st.nameTh,
+                name: st.stationNameTh,
                 river: st.riverName,
                 province: st.province,
                 discharge: st.dischargeCms,
                 status: st.status,
-                label: `🌊 ${st.stationCode} ${st.nameTh}`,
+                label: `🌊 ${st.stationCode} ${st.stationNameTh}`,
               },
               geometry: {
-                type: 'Point',
+                type: 'Point' as const,
                 coordinates: coords,
               },
             };
@@ -294,7 +292,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         map.on('click', 'dams-circles', (e) => {
           if (!e.features?.[0]) return;
           const p = e.features[0].properties as { name: string; province: string; percent: number; storage: number; capacity: number; inflow: number; outflow: number };
-          const coords = (e.features[0].geometry as GeoJSON.Point).coordinates as [number, number];
+          const coords = (e.features[0].geometry as { coordinates: [number, number] }).coordinates;
 
           popupRef.current?.remove();
           popupRef.current = new Popup({ closeButton: true, offset: 12 })
@@ -315,7 +313,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
         map.on('click', 'rivers-circles', (e) => {
           if (!e.features?.[0]) return;
           const p = e.features[0].properties as { code: string; name: string; river: string; province: string; discharge: number; status: string };
-          const coords = (e.features[0].geometry as GeoJSON.Point).coordinates as [number, number];
+          const coords = (e.features[0].geometry as { coordinates: [number, number] }).coordinates;
 
           popupRef.current?.remove();
           popupRef.current = new Popup({ closeButton: true, offset: 12 })
