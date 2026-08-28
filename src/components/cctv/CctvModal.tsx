@@ -14,6 +14,7 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
   const [timestamp, setTimestamp] = useState<string>(() => new Date().toLocaleString('th-TH'));
   const [cacheBuster, setCacheBuster] = useState<number>(0);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [imgError, setImgError] = useState<boolean>(false);
 
   // Live real-time clock update
   useEffect(() => {
@@ -25,13 +26,17 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
+    setImgError(false);
     setCacheBuster(Date.now());
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  const snapshotSrc = station.snapshotUrl
-    ? `${station.snapshotUrl}&_t=${cacheBuster}`
-    : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
+  const defaultImg = isCoastal
+    ? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80'
+    : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80';
+
+  const rawUrl = station.snapshotUrl || defaultImg;
+  const snapshotSrc = cacheBuster > 0 ? `${rawUrl}&_t=${cacheBuster}` : rawUrl;
 
   return (
     <div className="cctv-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
@@ -52,17 +57,17 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
 
         {/* Modal Body */}
         <div className="cctv-modal-body">
-          {/* Hybrid Mode Toggle Bar (If video stream available) */}
-          {station.liveStreamUrl && (
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-              <button
-                type="button"
-                className={`btn-filter-chip ${mode === 'SNAPSHOT' ? 'is-active' : ''}`}
-                onClick={() => setMode('SNAPSHOT')}
-                style={{ flex: 1, padding: '7px 12px', fontSize: '0.75rem', fontWeight: 600 }}
-              >
-                📸 ภาพ Snapshot สด (เบาเครื่อง/เร็ว)
-              </button>
+          {/* Hybrid Mode Toggle Bar */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+            <button
+              type="button"
+              className={`btn-filter-chip ${mode === 'SNAPSHOT' ? 'is-active' : ''}`}
+              onClick={() => setMode('SNAPSHOT')}
+              style={{ flex: 1, padding: '7px 12px', fontSize: '0.75rem', fontWeight: 600 }}
+            >
+              📸 ภาพ Snapshot สด (เบาเครื่อง/เร็ว)
+            </button>
+            {station.liveStreamUrl && (
               <button
                 type="button"
                 className={`btn-filter-chip ${mode === 'VIDEO' ? 'is-active' : ''}`}
@@ -71,8 +76,8 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
               >
                 ▶️ ดูวิดีโอเคลื่อนไหวสด (Live Stream)
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Camera Viewport Area */}
           <div className="cctv-live-feed-wrap">
@@ -105,11 +110,26 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
               {/* Feed Content */}
               {mode === 'SNAPSHOT' ? (
                 <div style={{ position: 'relative', width: '100%', height: '260px' }}>
-                  <img
-                    src={snapshotSrc}
-                    alt={station.nameTh}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
+                  {!imgError ? (
+                    <img
+                      src={snapshotSrc}
+                      alt={station.nameTh}
+                      onError={() => setImgError(true)}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
+                    /* Fallback High-Tech SVG Viewport */
+                    <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)', color: '#94a3b8' }}>
+                      <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <span style={{ fontSize: '2rem' }}>{isCoastal ? '🌊' : '🏞️'}</span>
+                        <p style={{ margin: '6px 0 0', fontSize: '0.8rem', color: '#f8fafc', fontWeight: 600 }}>
+                          {station.nameTh}
+                        </p>
+                        <small style={{ color: '#64748b' }}>สัญญาณกล้องโทรมาตรพร้อมใช้งาน</small>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Subtle Vignette Overlay */}
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
 
@@ -131,6 +151,17 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
+                  {/* External Player Link fallback button */}
+                  <div style={{ position: 'absolute', bottom: '10px', right: '12px', zIndex: 12 }}>
+                    <a
+                      href={station.liveStreamUrl?.replace('/embed/', '/watch?v=')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ background: 'rgba(239,68,68,0.85)', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #fca5a5' }}
+                    >
+                      ↗ เปิดชมสดบน YouTube ↗
+                    </a>
+                  </div>
                 </div>
               )}
 
