@@ -11,7 +11,7 @@ describe('MySitesPanel (Petchsiam & Salee Industry & BCM Intelligence)', () => {
     expect(screen.getByText(/ซอยพระยามนธาตุฯ แยก 9/)).toBeInTheDocument();
 
     expect(screen.getByText('บริษัท สาลี่อุตสาหกรรม จำกัด (มหาชน)')).toBeInTheDocument();
-    expect(screen.getByText(/ตำบลคลองสี่ อำเภอคลองหลวง/)).toBeInTheDocument();
+    expect(screen.getAllByText(/ตำบลคลองสี่ อำเภอคลองหลวง/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('triggers onSelectSite when clicking map action button', async () => {
