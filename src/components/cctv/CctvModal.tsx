@@ -27,7 +27,6 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
         onClick={(e) => e.stopPropagation()}
         style={{
           width: 'min(100%, 520px)',
-          maxHeight: 'calc(100vh - 24px)',
           maxHeight: 'calc(100dvh - 24px)',
           display: 'flex',
           flexDirection: 'column',
