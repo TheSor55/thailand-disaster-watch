@@ -2,7 +2,7 @@
  * CCTV Water & Coastal/Flood Monitoring Domain Model
  *
  * Source: Local Municipalities (เทศบาลเมืองปทุมธานี, เทศบาลนครรังสิต, เทศบาลนครนนทบุรี, เทศบาลนครปากเกร็ด, นิคมฯ บางกะดี),
- * Hydro-Informatics Institute (HII / ThaiWater), BMA Drainage Department, RID, DMCR, Marine Department
+ * BMA Drainage Department, RID (Royal Irrigation Department), HII (ThaiWater), DMCR, Marine Department
  * Classification: TELEMETRY & LIVE CAMERA (กล้องโทรมาตรและตรวจวัดระดับน้ำสด)
  * Authority: Official Government Observational Infrastructure
  */
@@ -33,7 +33,101 @@ export interface CctvStation {
 }
 
 export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
-  // --- 1. กล้องตรวจการณ์ระดับน้ำเทศบาลและชุมชน (ปทุมธานี / นนทบุรี / กทม.) ---
+  // =========================================================================
+  // 1. สายแม่น้ำเจ้าพระยาหลัก (สิงห์บุรี ➔ อ่างทอง ➔ อยุธยา ➔ ปทุมธานี ➔ นนทบุรี ➔ กทม.)
+  // =========================================================================
+
+  // --- สิงห์บุรี ---
+  {
+    id: 'cctv-singburi-c3',
+    nameTh: 'สถานีตรวจวัดระดับน้ำ C.3 อ.พรหมบุรี (แม่น้ำเจ้าพระยา - สิงห์บุรี)',
+    nameEn: 'Chao Phraya River Station C.3 Phrom Buri (Sing Buri)',
+    provinceNameTh: 'สิงห์บุรี',
+    regionId: 'central',
+    category: 'RIVER',
+    categoryLabelTh: 'แม่น้ำเจ้าพระยา / อ.พรหมบุรี สิงห์บุรี',
+    waterwayTh: 'แม่น้ำเจ้าพระยา (อ.พรหมบุรี จ.สิงห์บุรี)',
+    latitude: 14.8167,
+    longitude: 100.4500,
+    provider: 'RID',
+    providerNameTh: 'กรมชลประทาน (สำนักชลประทานที่ 12)',
+    status: 'ONLINE',
+    waterLevelStatus: 'NORMAL',
+    waterLevelMsl: 8.90,
+    bankLevelMsl: 11.50,
+    updatedAt: new Date().toISOString(),
+    liveStreamUrl: 'https://singburi.thaiwater.net/',
+    sourceAttribution: 'ศูนย์ปฏิบัติการน้ำอัจฉริยะ กรมชลประทาน (RID Station C.3 สิงห์บุรี)',
+  },
+
+  // --- อ่างทอง ---
+  {
+    id: 'cctv-angthong-c7a',
+    nameTh: 'สถานีตรวจวัดระดับน้ำ C.7A หน้าศาลากลางอ่างทอง (แม่น้ำเจ้าพระยา)',
+    nameEn: 'Chao Phraya River Station C.7A Ang Thong City Hall',
+    provinceNameTh: 'อ่างทอง',
+    regionId: 'central',
+    category: 'RIVER',
+    categoryLabelTh: 'แม่น้ำเจ้าพระยา / หน้าศาลากลางอ่างทอง',
+    waterwayTh: 'แม่น้ำเจ้าพระยา (หน้าศาลากลาง จ.อ่างทอง)',
+    latitude: 14.5894,
+    longitude: 100.4551,
+    provider: 'RID',
+    providerNameTh: 'กรมชลประทาน (สำนักชลประทานที่ 12) / ปภ.อ่างทอง',
+    status: 'ONLINE',
+    waterLevelStatus: 'NORMAL',
+    waterLevelMsl: 6.45,
+    bankLevelMsl: 9.32,
+    updatedAt: new Date().toISOString(),
+    liveStreamUrl: 'https://angthong.thaiwater.net/',
+    sourceAttribution: 'ศูนย์ปฏิบัติการน้ำอัจฉริยะ กรมชลประทาน (RID Station C.7A อ่างทอง)',
+  },
+
+  // --- พระนครศรีอยุธยา ---
+  {
+    id: 'cctv-ayutthaya-c35',
+    nameTh: 'สถานีตรวจวัดระดับน้ำ C.35 วัดไชยวัฒนาราม (เกาะเมืองอยุธยา)',
+    nameEn: 'Chao Phraya River Station C.35 Wat Chaiwatthanaram (Ayutthaya)',
+    provinceNameTh: 'พระนครศรีอยุธยา',
+    regionId: 'central',
+    category: 'RIVER',
+    categoryLabelTh: 'แม่น้ำเจ้าพระยา / โบราณสถานเกาะเมือง',
+    waterwayTh: 'แม่น้ำเจ้าพระยา (วัดไชยวัฒนาราม อ.พระนครศรีอยุธยา)',
+    latitude: 14.3432,
+    longitude: 100.5422,
+    provider: 'HII',
+    providerNameTh: 'สถาบันสารสนเทศทรัพยากรน้ำ (สสน.) / กรมชลประทาน',
+    status: 'ONLINE',
+    waterLevelStatus: 'NORMAL',
+    waterLevelMsl: 3.20,
+    bankLevelMsl: 4.80,
+    updatedAt: new Date().toISOString(),
+    liveStreamUrl: 'https://ayutthaya.thaiwater.net/',
+    sourceAttribution: 'สถาบันสารสนเทศทรัพยากรน้ำ (สสน.) / ศูนย์ข้อมูลน้ำอยุธยา (ThaiWater)',
+  },
+  {
+    id: 'cctv-hii-c29a',
+    nameTh: 'สถานีตรวจวัดแม่น้ำเจ้าพระยา C.29A บางไทร (อยุธยา)',
+    nameEn: 'Chao Phraya River Station C.29A (Bang Sai)',
+    provinceNameTh: 'พระนครศรีอยุธยา',
+    regionId: 'central',
+    category: 'RIVER',
+    categoryLabelTh: 'แม่น้ำสายหลัก (เจ้าพระยาตอนล่าง)',
+    waterwayTh: 'แม่น้ำเจ้าพระยา (ศูนย์ศิลปาชีพบางไทร)',
+    latitude: 14.1678,
+    longitude: 100.5186,
+    provider: 'HII',
+    providerNameTh: 'สถาบันสารสนเทศทรัพยากรน้ำ (สสน.) / กรมชลประทาน',
+    status: 'ONLINE',
+    waterLevelStatus: 'MONITORING',
+    waterLevelMsl: 2.15,
+    bankLevelMsl: 3.50,
+    updatedAt: new Date().toISOString(),
+    liveStreamUrl: 'https://twa.thaiwater.net/th/cctv',
+    sourceAttribution: 'คลังข้อมูลน้ำแห่งชาติ สสน. (HII ThaiWater C.29A)',
+  },
+
+  // --- ปทุมธานี ---
   {
     id: 'cctv-pathum-theppathum',
     nameTh: 'ระดับน้ำแม่น้ำเจ้าพระยา สวนเทพปทุม (เทศบาลเมืองปทุมธานี)',
@@ -97,6 +191,8 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     liveStreamUrl: 'http://58.8.52.120:8080/efe9797f-f7b2-46b2-baef-e54d9a9e6e9a.html',
     sourceAttribution: 'นิคมอุตสาหกรรมบางกะดี (Bangkadi Industrial Park Telemetry Feed)',
   },
+
+  // --- นนทบุรี ---
   {
     id: 'cctv-nont-pier',
     nameTh: 'สถานีตรวจการณ์ระดับน้ำท่าน้ำนนทบุรี (เทศบาลนครนนทบุรี)',
@@ -160,6 +256,29 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     liveStreamUrl: 'http://182.52.224.70/?page=cctv',
     sourceAttribution: 'เทศบาลนครนนทบุรี (Nonthaburi Flood Control Center)',
   },
+
+  // --- กรุงเทพมหานคร ---
+  {
+    id: 'cctv-bkk-chaophraya-pakklong',
+    nameTh: 'สถานีตรวจวัดแม่น้ำเจ้าพระยา ปากคลองตลาด (กทม.)',
+    nameEn: 'Chao Phraya River Pak Khlong Talat Station (BMA)',
+    provinceNameTh: 'กรุงเทพมหานคร',
+    regionId: 'central',
+    category: 'RIVER',
+    categoryLabelTh: 'แม่น้ำเจ้าพระยา / สำนักการระบายน้ำ กทม.',
+    waterwayTh: 'แม่น้ำเจ้าพระยา (ปากคลองตลาด / สะพานพุทธ)',
+    latitude: 13.7408,
+    longitude: 100.4988,
+    provider: 'BMA',
+    providerNameTh: 'สำนักการระบายน้ำ กรุงเทพมหานคร',
+    status: 'ONLINE',
+    waterLevelStatus: 'NORMAL',
+    waterLevelMsl: 1.65,
+    bankLevelMsl: 2.80,
+    updatedAt: new Date().toISOString(),
+    liveStreamUrl: 'http://weather.bangkok.go.th/KlongMap',
+    sourceAttribution: 'สำนักการระบายน้ำ กรุงเทพมหานคร (BMA Weather & KlongMap Telemetry)',
+  },
   {
     id: 'cctv-bma-c301',
     nameTh: 'สถานีสูบน้ำคลองบางบอน (กทม.)',
@@ -181,29 +300,10 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     liveStreamUrl: 'https://dds.bangkok.go.th/',
     sourceAttribution: 'สำนักการระบายน้ำ กรุงเทพมหานคร (BMA Flood Control Center)',
   },
-  {
-    id: 'cctv-hii-c29a',
-    nameTh: 'สถานีตรวจวัดแม่น้ำเจ้าพระยา C.29A (บางไทร อยุธยา)',
-    nameEn: 'Chao Phraya River Station C.29A (Bang Sai)',
-    provinceNameTh: 'พระนครศรีอยุธยา',
-    regionId: 'central',
-    category: 'RIVER',
-    categoryLabelTh: 'แม่น้ำสายหลัก (เจ้าพระยา)',
-    waterwayTh: 'แม่น้ำเจ้าพระยา (บางไทร)',
-    latitude: 14.1678,
-    longitude: 100.5186,
-    provider: 'HII',
-    providerNameTh: 'สถาบันสารสนเทศทรัพยากรน้ำ (สสน.) / กรมชลประทาน',
-    status: 'ONLINE',
-    waterLevelStatus: 'MONITORING',
-    waterLevelMsl: 2.15,
-    bankLevelMsl: 3.50,
-    updatedAt: new Date().toISOString(),
-    liveStreamUrl: 'https://twa.thaiwater.net/th/cctv',
-    sourceAttribution: 'คลังข้อมูลน้ำแห่งชาติ สสน. (HII ThaiWater)',
-  },
 
-  // --- 2. ชายหาด & ทะเลอ่าวไทย / ภาคตะวันออก ---
+  // =========================================================================
+  // 2. ชายหาด & ทะเลอ่าวไทย / ภาคตะวันออก (Coastal Gulf & Eastern Coast)
+  // =========================================================================
   {
     id: 'cctv-gulf-pattaya',
     nameTh: 'สถานีตรวจการณ์ชายหาดพัทยา-จอมเทียน (อ่าวไทย)',
@@ -293,7 +393,9 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     sourceAttribution: 'กรมทรัพยากรทางทะเลและชายฝั่ง (DMCR Samui)',
   },
 
-  // --- 3. ชายหาด & ทะเลฝั่งอันดามัน ---
+  // =========================================================================
+  // 3. ชายหาด & ทะเลฝั่งอันดามัน (Andaman Coast)
+  // =========================================================================
   {
     id: 'cctv-andaman-patong',
     nameTh: 'สถานีตรวจการณ์ชายหาดป่าตอง (ภูเก็ต)',
