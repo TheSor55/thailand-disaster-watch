@@ -944,6 +944,7 @@ export function App() {
                     window.history.replaceState({}, '', url.toString());
                     setAppView('weather');
                   }}
+                  onBackToMenu={() => setAppView('gis')}
                 />
               </div>
             </ModuleErrorBoundary>

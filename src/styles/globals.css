@@ -2837,6 +2837,150 @@ button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-
 }
 
 /* ==========================================
+   Bottom Jump Bar & Floating Action Dock (Top / Menu)
+   ========================================== */
+.mysites-bottom-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0 10px;
+  margin-top: 16px;
+  border-top: 1px dashed rgba(56, 189, 248, 0.2);
+}
+
+.btn-bottom-jump {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-bottom-jump--top {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(2, 132, 199, 0.25));
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.btn-bottom-jump--top:hover {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(2, 132, 199, 0.45));
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
+}
+
+.btn-bottom-jump--menu {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #cbd5e1;
+}
+
+.btn-bottom-jump--menu:hover {
+  background: rgba(30, 41, 59, 1);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating Action Dock at Bottom Right */
+.mysites-floating-dock {
+  position: fixed;
+  bottom: 30px;
+  right: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px) scale(0.95);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mysites-floating-dock.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.btn-dock-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.btn-dock-action--top {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #38bdf8;
+}
+
+.btn-dock-action--top:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(2, 132, 199, 0.45);
+}
+
+.btn-dock-action--menu {
+  background: rgba(30, 41, 59, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.btn-dock-action--menu:hover {
+  background: #334155;
+  color: #38bdf8;
+  border-color: #38bdf8;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.dock-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.dock-text {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 640px) {
+  .mysites-floating-dock {
+    bottom: 84px; /* Above mobile dock */
+    right: 16px;
+  }
+  .btn-dock-action {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ==========================================
    v1.2 BCM Executive Report Modal & Print
    ========================================== */
 .bcm-modal-backdrop {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BcmReportModal } from './BcmReportModal';
 
 export interface PinnedSite {
@@ -421,12 +421,30 @@ const INITIAL_SITES: PinnedSite[] = [
 interface MySitesPanelProps {
   onSelectSite?: (site: PinnedSite) => void;
   onCheckWeather?: (site: PinnedSite) => void;
+  onBackToMenu?: () => void;
 }
 
-export function MySitesPanel({ onSelectSite, onCheckWeather }: MySitesPanelProps) {
+export function MySitesPanel({ onSelectSite, onCheckWeather, onBackToMenu }: MySitesPanelProps) {
   const [sites] = useState<PinnedSite[]>(INITIAL_SITES);
   const [filter, setFilter] = useState<'ALL' | 'FACTORY' | 'WAREHOUSE' | 'ESTATE'>('ALL');
   const [activeBcmSite, setActiveBcmSite] = useState<PinnedSite | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY || document.documentElement.scrollTop || 0;
+      setShowScrollTop(scrollPos > 120);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.mysites-page-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.full-content-column')?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const filteredSites =
     filter === 'ALL'
@@ -571,6 +589,56 @@ export function MySitesPanel({ onSelectSite, onCheckWeather }: MySitesPanelProps
             </article>
           );
         })}
+      </div>
+
+      {/* Bottom Jump & Navigation Bar */}
+      <div className="mysites-bottom-bar">
+        <button
+          type="button"
+          className="btn-bottom-jump btn-bottom-jump--top"
+          onClick={scrollToTop}
+          aria-label="กลับขึ้นด้านบนสุด"
+        >
+          <span className="jump-icon">⬆️</span>
+          <span>กลับขึ้นด้านบนสุด (Top)</span>
+        </button>
+        {onBackToMenu && (
+          <button
+            type="button"
+            className="btn-bottom-jump btn-bottom-jump--menu"
+            onClick={onBackToMenu}
+            aria-label="กลับสู่หน้าหลักแผนที่ GIS"
+          >
+            <span className="jump-icon">🗺️</span>
+            <span>กลับสู่หน้าหลักแผนที่ GIS (Main Menu)</span>
+          </button>
+        )}
+      </div>
+
+      {/* Floating Action Dock (Always accessible when scrolled) */}
+      <div className={`mysites-floating-dock ${showScrollTop ? 'is-visible' : ''}`}>
+        <button
+          type="button"
+          className="btn-dock-action btn-dock-action--top"
+          onClick={scrollToTop}
+          title="กลับขึ้นด้านบนสุด (Top)"
+          aria-label="กลับขึ้นด้านบนสุด"
+        >
+          <span className="dock-icon">⬆️</span>
+          <span className="dock-text">TOP</span>
+        </button>
+        {onBackToMenu && (
+          <button
+            type="button"
+            className="btn-dock-action btn-dock-action--menu"
+            onClick={onBackToMenu}
+            title="กลับสู่หน้าหลักแผนที่ GIS"
+            aria-label="กลับสู่หน้าหลักแผนที่ GIS"
+          >
+            <span className="dock-icon">🗺️</span>
+            <span className="dock-text">เมนู GIS</span>
+          </button>
+        )}
       </div>
 
       {/* BCM Report Executive Modal */}
