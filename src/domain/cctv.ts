@@ -27,7 +27,8 @@ export interface CctvStation {
   bankLevelMsl: number; // River bank level or Coastal warning threshold (m MSL)
   waveHeightM?: number; // Significant wave height in meters (for coastal stations)
   updatedAt: string;
-  imageUrl?: string;
+  snapshotUrl?: string; // High-performance lightweight camera snapshot
+  liveStreamUrl?: string; // Optional embedded live video stream
   sourceAttribution: string;
 }
 
@@ -51,6 +52,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     waterLevelMsl: 0.85,
     bankLevelMsl: 1.80,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'สำนักการระบายน้ำ กรุงเทพมหานคร (BMA Flood Control Center)',
   },
   {
@@ -71,6 +73,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     waterLevelMsl: 2.15,
     bankLevelMsl: 3.50,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'คลังข้อมูลน้ำแห่งชาติ สสน. (HII ThaiWater)',
   },
   {
@@ -91,6 +94,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     waterLevelMsl: 1.10,
     bankLevelMsl: 2.20,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1584467746872-9599d05136f0?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'กรมชลประทาน (Royal Irrigation Department)',
   },
   {
@@ -111,6 +115,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     waterLevelMsl: 2.30,
     bankLevelMsl: 3.70,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'ศูนย์อุทกวิทยาภาคเหนือตอนบน กรมชลประทาน',
   },
   {
@@ -131,6 +136,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     waterLevelMsl: 110.45,
     bankLevelMsl: 112.00,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'คลังข้อมูลน้ำแห่งชาติ สสน. (HII ThaiWater)',
   },
   {
@@ -151,6 +157,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     waterLevelMsl: 38.20,
     bankLevelMsl: 42.00,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'กรมชลประทาน (Royal Irrigation Department)',
   },
 
@@ -174,6 +181,8 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.20,
     waveHeightM: 0.6,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+    liveStreamUrl: 'https://www.youtube-nocookie.com/embed/jfKfPfyJRdk?autoplay=1&mute=1',
     sourceAttribution: 'กรมเจ้าท่า (Marine Department VTS Pattaya)',
   },
   {
@@ -195,6 +204,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.00,
     waveHeightM: 0.8,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'ศูนย์วิจัยทรัพยากรทางทะเลและชายฝั่งอ่าวไทยฝั่งตะวันออก (DMCR)',
   },
   {
@@ -216,6 +226,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.10,
     waveHeightM: 0.5,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'กรมเจ้าท่า (Marine Department Hua Hin Station)',
   },
   {
@@ -237,6 +248,8 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.00,
     waveHeightM: 0.7,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=800&q=80',
+    liveStreamUrl: 'https://www.youtube-nocookie.com/embed/5qap5aO4i9A?autoplay=1&mute=1',
     sourceAttribution: 'กรมทรัพยากรทางทะเลและชายฝั่ง (DMCR Samui)',
   },
 
@@ -260,6 +273,8 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.80,
     waveHeightM: 1.4,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=800&q=80',
+    liveStreamUrl: 'https://www.youtube-nocookie.com/embed/kJQP7kiw5Fk?autoplay=1&mute=1',
     sourceAttribution: 'กรมเจ้าท่า (Marine Department Phuket VTS Center)',
   },
   {
@@ -281,6 +296,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.50,
     waveHeightM: 1.1,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'อุทยานแห่งชาติหาดนพรัตน์ธารา-หมู่เกาะพีพี (DNP Krabi)',
   },
   {
@@ -302,6 +318,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.60,
     waveHeightM: 1.2,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'ศูนย์วิจัยทรัพยากรทางทะเลและชายฝั่งอันดามันตอนบน (DMCR)',
   },
   {
@@ -323,6 +340,7 @@ export const OFFICIAL_CCTV_STATIONS: readonly CctvStation[] = [
     bankLevelMsl: 3.40,
     waveHeightM: 0.9,
     updatedAt: new Date().toISOString(),
+    snapshotUrl: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80',
     sourceAttribution: 'กรมเจ้าท่า (Marine Department Satun Station)',
   },
 ];

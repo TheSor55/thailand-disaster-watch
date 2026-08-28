@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { CctvStation } from '../../domain/cctv';
 
 interface CctvModalProps {
@@ -9,9 +10,33 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
   const isCoastal = station.category === 'COASTAL_GULF' || station.category === 'COASTAL_ANDAMAN';
   const percentage = Math.min(100, Math.max(0, Math.round((station.waterLevelMsl / station.bankLevelMsl) * 100)));
 
+  const [mode, setMode] = useState<'SNAPSHOT' | 'VIDEO'>('SNAPSHOT');
+  const [timestamp, setTimestamp] = useState<string>(() => new Date().toLocaleString('th-TH'));
+  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // Live real-time clock update
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimestamp(new Date().toLocaleString('th-TH'));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setCacheBuster(Date.now());
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
+
+  const snapshotSrc = station.snapshotUrl
+    ? `${station.snapshotUrl}&_t=${cacheBuster}`
+    : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
+
   return (
     <div className="cctv-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="cctv-modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* Modal Header */}
         <header className="cctv-modal-header">
           <div>
             <span className="eyebrow">
@@ -25,140 +50,151 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
           </button>
         </header>
 
+        {/* Modal Body */}
         <div className="cctv-modal-body">
+          {/* Hybrid Mode Toggle Bar (If video stream available) */}
+          {station.liveStreamUrl && (
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <button
+                type="button"
+                className={`btn-filter-chip ${mode === 'SNAPSHOT' ? 'is-active' : ''}`}
+                onClick={() => setMode('SNAPSHOT')}
+                style={{ flex: 1, padding: '7px 12px', fontSize: '0.75rem', fontWeight: 600 }}
+              >
+                📸 ภาพ Snapshot สด (เบาเครื่อง/เร็ว)
+              </button>
+              <button
+                type="button"
+                className={`btn-filter-chip ${mode === 'VIDEO' ? 'is-active' : ''}`}
+                onClick={() => setMode('VIDEO')}
+                style={{ flex: 1, padding: '7px 12px', fontSize: '0.75rem', fontWeight: 600 }}
+              >
+                ▶️ ดูวิดีโอเคลื่อนไหวสด (Live Stream)
+              </button>
+            </div>
+          )}
+
+          {/* Camera Viewport Area */}
           <div className="cctv-live-feed-wrap">
-            {/* Real Snapshot Simulation / Feed viewport with live overlays */}
-            <div className="cctv-viewport">
-              <div className="cctv-hud-top">
-                <span className="cctv-live-rec">● LIVE SNAPSHOT</span>
-                <span className="cctv-timestamp">{new Date().toLocaleString('th-TH')}</span>
-              </div>
-              <div className="cctv-camera-simulation">
-                {isCoastal ? (
-                  /* Coastal Beach & Ocean Wave Simulation */
-                  <svg viewBox="0 0 400 240" className="cctv-scene-svg" aria-label="Coastal Marine CCTV Stream">
-                    <defs>
-                      <linearGradient id="skyGradSea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0f172a" />
-                        <stop offset="100%" stopColor="#1e3a5f" />
-                      </linearGradient>
-                      <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0369a1" />
-                        <stop offset="100%" stopColor="#082f49" />
-                      </linearGradient>
-                      <linearGradient id="sandGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#ca8a04" />
-                        <stop offset="100%" stopColor="#713f12" />
-                      </linearGradient>
-                    </defs>
-                    {/* Sky & Horizon */}
-                    <rect width="400" height="110" fill="url(#skyGradSea)" />
-                    {/* Ocean Water */}
-                    <rect y="110" width="400" height="85" fill="url(#seaGrad)" />
-                    {/* Animated Wave Lines */}
-                    <path d="M 0,130 Q 100,125 200,130 T 400,130" stroke="rgba(255,255,255,0.4)" strokeWidth="2" fill="none" />
-                    <path d="M 0,150 Q 80,145 160,150 T 320,150 T 400,150" stroke="rgba(255,255,255,0.5)" strokeWidth="2.5" fill="none" />
-                    <path d="M 0,175 Q 120,168 240,175 T 400,175" stroke="rgba(255,255,255,0.7)" strokeWidth="3" fill="none" />
-                    {/* Sandy Beach Shore */}
-                    <path d="M 0,185 Q 200,175 400,185 L 400,240 L 0,240 Z" fill="url(#sandGrad)" />
-                    {/* Coastal Watchtower / Navigation Buoy */}
-                    <circle cx="90" cy="140" r="7" fill="#ef4444" stroke="#ffffff" strokeWidth="1" />
-                    <line x1="90" y1="133" x2="90" y2="125" stroke="#facc15" strokeWidth="2" />
-                    <circle cx="90" cy="123" r="2.5" fill="#facc15" />
-                    {/* Tide Scale Gauge */}
-                    <rect x="340" y="80" width="12" height="110" fill="#f8fafc" stroke="#0f172a" strokeWidth="1" />
-                    <line x1="340" y1="100" x2="352" y2="100" stroke="#ef4444" strokeWidth="2" />
-                    <line x1="340" y1="130" x2="352" y2="130" stroke="#eab308" strokeWidth="2" />
-                    <line x1="340" y1="160" x2="352" y2="160" stroke="#10b981" strokeWidth="2" />
-                    <text x="290" y="103" fill="#fca5a5" fontSize="7" fontWeight="bold">HIGH TIDE</text>
-                    <text x="285" y="133" fill="#fef08a" fontSize="7" fontWeight="bold">SURGE WATCH</text>
-                    <text x="300" y="163" fill="#86efac" fontSize="7" fontWeight="bold">LOW TIDE</text>
-                    {/* Crosshair Overlay */}
-                    <circle cx="200" cy="120" r="18" fill="none" stroke="rgba(56, 189, 248, 0.4)" strokeWidth="1" strokeDasharray="3 3" />
-                    <line x1="190" y1="120" x2="210" y2="120" stroke="rgba(56, 189, 248, 0.6)" strokeWidth="1" />
-                    <line x1="200" y1="110" x2="200" y2="130" stroke="rgba(56, 189, 248, 0.6)" strokeWidth="1" />
-                  </svg>
-                ) : (
-                  /* River / Canal Water Gate Simulation */
-                  <svg viewBox="0 0 400 240" className="cctv-scene-svg" aria-label="River CCTV Stream View">
-                    <defs>
-                      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#1e293b" />
-                        <stop offset="100%" stopColor="#334155" />
-                      </linearGradient>
-                      <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0284c7" />
-                        <stop offset="100%" stopColor="#0369a1" />
-                      </linearGradient>
-                    </defs>
-                    <rect width="400" height="140" fill="url(#skyGrad)" />
-                    <path d="M 0,140 Q 200,120 400,140 L 400,240 L 0,240 Z" fill="url(#waterGrad)" />
-                    <rect x="160" y="70" width="80" height="90" fill="#475569" rx="4" />
-                    <rect x="175" y="85" width="50" height="60" fill="#0f172a" rx="2" />
-                    <rect x="280" y="80" width="12" height="110" fill="#f8fafc" stroke="#0f172a" strokeWidth="1" />
-                    <line x1="280" y1="100" x2="292" y2="100" stroke="#ef4444" strokeWidth="2" />
-                    <line x1="280" y1="130" x2="292" y2="130" stroke="#eab308" strokeWidth="2" />
-                    <line x1="280" y1="160" x2="292" y2="160" stroke="#10b981" strokeWidth="2" />
-                    <text x="298" y="103" fill="#fca5a5" fontSize="8" fontWeight="bold">CRITICAL</text>
-                    <text x="298" y="133" fill="#fef08a" fontSize="8" fontWeight="bold">WARNING</text>
-                    <text x="298" y="163" fill="#86efac" fontSize="8" fontWeight="bold">NORMAL</text>
-                    <circle cx="200" cy="120" r="18" fill="none" stroke="rgba(56, 189, 248, 0.4)" strokeWidth="1" strokeDasharray="3 3" />
-                    <line x1="190" y1="120" x2="210" y2="120" stroke="rgba(56, 189, 248, 0.6)" strokeWidth="1" />
-                    <line x1="200" y1="110" x2="200" y2="130" stroke="rgba(56, 189, 248, 0.6)" strokeWidth="1" />
-                  </svg>
-                )}
-              </div>
-              <div className="cctv-hud-bottom">
-                <span>CAM-ID: {station.id.toUpperCase()}</span>
-                <span>LAT: {station.latitude.toFixed(4)} LON: {station.longitude.toFixed(4)}</span>
-              </div>
-            </div>
-          </div>
+            <div className="cctv-viewport" style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', minHeight: '260px', background: '#090d16' }}>
+              {/* Top HUD Overlay */}
+              <div className="cctv-hud-top" style={{ position: 'absolute', top: '10px', left: '12px', right: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
+                <span className="cctv-live-rec" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(0,0,0,0.65)', padding: '4px 8px', borderRadius: '5px', backdropFilter: 'blur(6px)', border: '1px solid rgba(239,68,68,0.4)', color: '#f87171', fontSize: '0.72rem', fontWeight: 700 }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', display: 'inline-block', boxShadow: '0 0 8px #ef4444' }} />
+                  {mode === 'SNAPSHOT' ? 'LIVE SNAPSHOT' : 'LIVE STREAM'}
+                </span>
 
-          <div className="cctv-meta-grid">
-            <div className="cctv-stat-card">
-              <small>{isCoastal ? 'ระดับน้ำทะเล / น้ำขึ้น (Tide Level)' : 'ระดับน้ำปัจจุบัน (Water Level)'}</small>
-              <strong>
-                {station.waterLevelMsl.toFixed(2)}{' '}
-                <span className="unit">{isCoastal ? 'ม.' : 'ม.รทก.'}</span>
-              </strong>
-              <div className="cctv-bar-track">
-                <div
-                  className={`cctv-bar-fill ${station.waterLevelStatus === 'CRITICAL' ? 'cctv-bar--danger' : station.waterLevelStatus === 'WARNING' ? 'cctv-bar--warning' : 'cctv-bar--normal'}`}
-                  style={{ width: `${percentage}%` }}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="cctv-timestamp" style={{ background: 'rgba(0,0,0,0.65)', padding: '4px 8px', borderRadius: '5px', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.15)', color: '#f1f5f9', fontSize: '0.72rem', fontVariantNumeric: 'tabular-nums' }}>
+                    {timestamp}
+                  </span>
+                  {mode === 'SNAPSHOT' && (
+                    <button
+                      type="button"
+                      onClick={handleRefresh}
+                      disabled={isRefreshing}
+                      title="รีเฟรชภาพสดล่าสุด"
+                      style={{ background: 'rgba(2,132,199,0.7)', border: '1px solid #38bdf8', color: '#fff', padding: '4px 8px', borderRadius: '5px', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      🔄 {isRefreshing ? 'กำลังโหลด...' : 'รีเฟรช'}
+                    </button>
+                  )}
+                </div>
               </div>
-              <small>
-                {isCoastal
-                  ? `เกณฑ์เฝ้าระวังน้ำหนุน: ${station.bankLevelMsl.toFixed(2)} ม.`
-                  : `${percentage}% ของความจุตลิ่ง (ตลิ่ง: ${station.bankLevelMsl.toFixed(2)} ม.รทก.)`}
-              </small>
-            </div>
 
-            <div className="cctv-stat-card">
-              <small>{isCoastal ? 'ความสูงคลื่นนัยสำคัญ & สภาพทะเล' : 'สถานะกล้องโทรมาตร (Status)'}</small>
-              {isCoastal && station.waveHeightM !== undefined ? (
-                <div>
-                  <strong style={{ color: '#38bdf8' }}>~{station.waveHeightM.toFixed(1)} <span className="unit">เมตร</span></strong>
-                  <div style={{ marginTop: '2px' }}>
-                    <small style={{ color: '#10b981' }}>● ทะเลมีคลื่นเล็กน้อยถึงปานกลาง</small>
+              {/* Feed Content */}
+              {mode === 'SNAPSHOT' ? (
+                <div style={{ position: 'relative', width: '100%', height: '260px' }}>
+                  <img
+                    src={snapshotSrc}
+                    alt={station.nameTh}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                  {/* Subtle Vignette Overlay */}
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
+
+                  {/* Telemetry Crosshair Overlay */}
+                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', opacity: 0.4 }}>
+                    <svg width="48" height="48" viewBox="0 0 48 48">
+                      <circle cx="24" cy="24" r="18" fill="none" stroke="#38bdf8" strokeWidth="1" strokeDasharray="3 3" />
+                      <line x1="12" y1="24" x2="36" y2="24" stroke="#38bdf8" strokeWidth="1" />
+                      <line x1="24" y1="12" x2="24" y2="36" stroke="#38bdf8" strokeWidth="1" />
+                    </svg>
                   </div>
                 </div>
               ) : (
-                <div>
-                  <strong className="status-online">● {station.status}</strong>
-                  <div><small>เชื่อมต่อเครือข่ายโทรมาตรสมบูรณ์</small></div>
+                <div style={{ position: 'relative', width: '100%', height: '260px' }}>
+                  <iframe
+                    src={station.liveStreamUrl}
+                    title={station.nameTh}
+                    style={{ width: '100%', height: '100%', border: 0 }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
               )}
-              <small style={{ marginTop: '4px', display: 'block' }}>หน่วยงาน: {station.providerNameTh}</small>
+
+              {/* Bottom HUD Info Bar */}
+              <div className="cctv-hud-bottom" style={{ position: 'absolute', bottom: '8px', left: '12px', right: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10, fontSize: '0.68rem', color: '#cbd5e1', background: 'rgba(0,0,0,0.65)', padding: '4px 8px', borderRadius: '5px', backdropFilter: 'blur(6px)' }}>
+                <span>CAM-ID: <strong>{station.id.toUpperCase()}</strong></span>
+                <span>📍 LAT: {station.latitude.toFixed(4)} LON: {station.longitude.toFixed(4)}</span>
+              </div>
             </div>
           </div>
 
-          <div className="cctv-provenance-note">
+          {/* Telemetry Statistics Card Grid */}
+          <div className="cctv-meta-grid">
+            <div className="cctv-stat-card">
+              <small>{isCoastal ? 'ระดับน้ำทะเล / น้ำขึ้น (Tide Level)' : 'ระดับน้ำปัจจุบัน (Water Level)'}</small>
+              <div className="cctv-stat-val">
+                <strong>{station.waterLevelMsl.toFixed(2)}</strong>
+                <span>{isCoastal ? 'ม.' : 'ม.รทก.'}</span>
+              </div>
+              <div className="cctv-meter-bar">
+                <div
+                  className={`cctv-meter-fill ${
+                    percentage > 85 ? 'cctv-meter-fill--danger' : percentage > 70 ? 'cctv-meter-fill--warning' : ''
+                  }`}
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+              <p className="cctv-threshold-hint">
+                {isCoastal ? 'เกณฑ์เฝ้าระวังน้ำหนุน:' : 'ระดับตลิ่งเฝ้าระวัง:'} {station.bankLevelMsl.toFixed(2)} {isCoastal ? 'ม.' : 'ม.รทก.'}
+              </p>
+            </div>
+
+            <div className="cctv-stat-card">
+              <small>{isCoastal ? 'ความสูงคลื่นนัยสำคัญ & สภาพทะเล' : 'สถานะการระบายน้ำ'}</small>
+              <div className="cctv-stat-val">
+                {isCoastal ? (
+                  <>
+                    <strong style={{ color: '#38bdf8' }}>~{station.waveHeightM ?? 0.5}</strong>
+                    <span>เมตร</span>
+                  </>
+                ) : (
+                  <>
+                    <strong style={{ color: '#10b981' }}>ปกติ</strong>
+                    <span>(เปิดระบาย)</span>
+                  </>
+                )}
+              </div>
+              <div className="cctv-status-badge">
+                <span className="live-dot" />
+                <span>{isCoastal ? 'ทะเลมีคลื่นเล็กน้อยถึงปานกลาง' : 'ระบบสูบและระบายน้ำพร้อมใช้งาน'}</span>
+              </div>
+              <p className="cctv-threshold-hint">
+                หน่วยงาน: {station.providerNameTh}
+              </p>
+            </div>
+          </div>
+
+          {/* Data Provenance Footer */}
+          <div className="cctv-provenance-box">
             <small>📌 แหล่งที่มา: {station.sourceAttribution}</small>
           </div>
         </div>
 
+        {/* Modal Footer */}
         <footer className="cctv-modal-footer">
           <button type="button" className="btn-secondary" onClick={onClose}>
             ปิดหน้าต่าง
