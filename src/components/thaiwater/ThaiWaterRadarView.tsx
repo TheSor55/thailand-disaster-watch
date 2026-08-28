@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Map as MapLibreMap, NavigationControl, ScaleControl, Popup } from 'maplibre-gl';
 import { createMapStyle } from '../../map/mapStyle';
-import { MAJOR_DAMS, type DamTelemetry } from '../../domain/dam';
-import { MAJOR_RIVER_STATIONS, type RiverStationTelemetry } from '../../domain/river';
+import { MAJOR_DAMS } from '../../domain/dam';
+import { MAJOR_RIVER_STATIONS } from '../../domain/river';
 
 interface ThaiWaterRadarViewProps {
   onBack?: () => void;
