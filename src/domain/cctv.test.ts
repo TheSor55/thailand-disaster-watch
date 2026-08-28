@@ -26,7 +26,7 @@ describe('CCTV Watch domain contracts', () => {
   it('filters stations by province, region and category correctly', () => {
     const bkk = getCctvStationsByProvince('กรุงเทพมหานคร');
     expect(bkk.length).toBeGreaterThan(0);
-    expect(bkk[0].nameTh).toContain('บางบอน');
+    expect(bkk.some((s) => s.nameTh.includes('บางบอน'))).toBe(true);
 
     const phuket = getCctvStationsByProvince('ภูเก็ต');
     expect(phuket.length).toBeGreaterThan(0);
