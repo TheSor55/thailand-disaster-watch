@@ -408,7 +408,7 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
           type: 'raster',
           tiles: [currentFrame.tileUrl],
           tileSize: 256,
-          maxzoom: 12,
+          maxzoom: 7,
           attribution: 'Weather radar telemetry by RainViewer / ThaiWater',
         });
 

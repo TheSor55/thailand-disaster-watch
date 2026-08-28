@@ -331,7 +331,7 @@ export function ThailandMap({
         type: 'raster',
         tiles: [radarTileUrl],
         tileSize: 256,
-        maxzoom: 12,
+        maxzoom: 7,
         attribution: 'Weather radar data by RainViewer',
       });
 
