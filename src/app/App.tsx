@@ -42,6 +42,7 @@ import { WindyView } from '../components/windy/WindyView';
 import { WindyEmbedModal } from '../components/windy/WindyEmbedModal';
 import { SeismoWatchView } from '../components/seismo/SeismoWatchView';
 import { ChaoPhrayaFlowView } from '../components/chaopraya/ChaoPhrayaFlowView';
+import { ThaiWaterRadarView } from '../components/thaiwater/ThaiWaterRadarView';
 
 const ThailandMap = lazy(() =>
   import('../map/ThailandMap').then((module) => ({ default: module.ThailandMap })),
@@ -92,13 +93,14 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [windyModalOpen, setWindyModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'chaopraya' | 'mysites' | 'about'>('gis');
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'chaopraya' | 'mysites' | 'thaiwater' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
   const isWindyView = appView === 'windy';
   const isSeismoView = appView === 'seismo';
   const isChaoPhrayaView = appView === 'chaopraya';
   const isMySitesView = appView === 'mysites';
+  const isThaiWaterView = appView === 'thaiwater';
   const isAboutView = appView === 'about';
 
   const showToast = useCallback((msg: string) => {
@@ -545,13 +547,23 @@ export function App() {
               </button>
               <button
                 type="button"
+                className={`module-nav-item${isThaiWaterView ? ' is-active' : ''}`}
+                onClick={() => setAppView('thaiwater')}
+                aria-pressed={isThaiWaterView}
+              >
+                <span className="icon">🌧️</span>
+                <span>เรดาร์สด สสน.</span>
+                <span className="tag" style={{ background: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', borderColor: '#0284c7' }}>THAIWATER</span>
+              </button>
+              <button
+                type="button"
                 className={`module-nav-item${isMySitesView ? ' is-active' : ''}`}
                 onClick={() => setAppView('mysites')}
                 aria-pressed={isMySitesView}
               >
                 <span className="icon">🏢</span>
                 <span>My Sites</span>
-                <span className="tag">PROTOTYPE</span>
+                <span className="tag">33 SITES</span>
               </button>
               <button
                 type="button"
@@ -907,6 +919,16 @@ export function App() {
             <ModuleErrorBoundary moduleName="Chao Phraya Flow Diagram">
               <div className="chaopraya-page-wrapper" style={{ minHeight: 'calc(100vh - 140px)', padding: '10px 14px' }}>
                 <ChaoPhrayaFlowView onBack={() => setAppView('gis')} />
+              </div>
+            </ModuleErrorBoundary>
+          </div>
+        )}
+
+        {isThaiWaterView && (
+          <div className="full-content-column" aria-label="แผนที่เรดาร์และพายุ สสน.">
+            <ModuleErrorBoundary moduleName="ThaiWater Radar">
+              <div className="thaiwater-page-wrapper" style={{ height: 'calc(100vh - 140px)', padding: '10px 14px' }}>
+                <ThaiWaterRadarView onBack={() => setAppView('gis')} />
               </div>
             </ModuleErrorBoundary>
           </div>
