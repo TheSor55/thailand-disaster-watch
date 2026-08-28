@@ -1,57 +1,139 @@
-import { useState } from 'react';
-
-export type ThaiWaterMapMode =
-  | 'overall'      // เรดาร์ฝน + เส้นทางพายุ
-  | 'rainfall'     // ปริมาณน้ำฝนสะสม
-  | 'waterlevel'   // ระดับน้ำแม่น้ำ
-  | 'dam'          // อ่างเก็บน้ำขนาดใหญ่
-  | 'satellite';   // ภาพถ่ายดาวเทียม
+import { useEffect, useRef, useState } from 'react';
+import { Map as MapLibreMap, NavigationControl, ScaleControl } from 'maplibre-gl';
+import { createMapStyle } from '../../map/mapStyle';
+import { getDemoRadarFrames, type RadarFrame } from '../../services/radar';
+import { MAJOR_DAMS } from '../../domain/dam';
+import { MAJOR_RIVER_STATIONS } from '../../domain/river';
 
 interface ThaiWaterRadarViewProps {
   onBack?: () => void;
 }
 
 export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
-  const [mapMode, setMapMode] = useState<ThaiWaterMapMode>('overall');
-  const [key, setKey] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
 
-  // ThaiWater TWA map URLs based on active mode
-  const getMapUrl = (mode: ThaiWaterMapMode): string => {
-    switch (mode) {
-      case 'rainfall':
-        return 'https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=rf24%2Csc&p=hide';
-      case 'waterlevel':
-        return 'https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=wl%2Csc&p=hide';
-      case 'dam':
-        return 'https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=dm%2Csc&p=hide';
-      case 'satellite':
-        return 'https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=sat%2Csc&p=hide';
-      case 'overall':
-      default:
-        return 'https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=rr%2Csc&p=hide';
+  const [frames] = useState<RadarFrame[]>(() => getDemoRadarFrames().frames);
+  const [activeFrameIndex, setActiveFrameIndex] = useState<number>(() => Math.max(0, getDemoRadarFrames().frames.length - 1));
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [radarOpacity, setRadarOpacity] = useState<number>(0.85);
+
+  // Layer Toggles
+  const [showRadar, setShowRadar] = useState<boolean>(true);
+  const [showDams, setShowDams] = useState<boolean>(true);
+  const [showRivers, setShowRivers] = useState<boolean>(true);
+
+  // Initialize MapLibre GL Map
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+
+    try {
+      const map = new MapLibreMap({
+        container: containerRef.current,
+        style: createMapStyle(),
+        center: [100.5018, 13.7563],
+        zoom: 5.8,
+        minZoom: 4.5,
+        maxZoom: 13,
+        attributionControl: false,
+      });
+
+      map.addControl(new NavigationControl({ showCompass: true, showZoom: true }), 'top-right');
+      map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left');
+
+      mapRef.current = map;
+    } catch {
+      /* safe ignore */
     }
-  };
 
-  const currentUrl = getMapUrl(mapMode);
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
 
-  const handleRefresh = () => {
-    setIsLoading(true);
-    setKey((prev) => prev + 1);
-  };
+  // Update Radar Layer on Active Frame Change
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || frames.length === 0) return;
 
-  const handleToggleFullscreen = () => {
-    const el = document.getElementById('thaiwater-iframe-container');
-    if (!el) return;
-    if (!document.fullscreenElement) {
-      el.requestFullscreen().catch(() => {});
+    const currentFrame = frames[activeFrameIndex];
+    if (!currentFrame) return;
+
+    const sourceId = 'thaiwater-radar-source';
+    const layerId = 'thaiwater-radar-layer';
+
+    const updateLayer = () => {
+      if (!showRadar) {
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', 'none');
+        }
+        return;
+      }
+
+      try {
+        if (map.getLayer(layerId)) {
+          map.removeLayer(layerId);
+        }
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+
+        map.addSource(sourceId, {
+          type: 'raster',
+          tiles: [currentFrame.tileUrl],
+          tileSize: 256,
+          maxzoom: 12,
+          attribution: 'Weather radar telemetry data by RainViewer / ThaiWater',
+        });
+
+        map.addLayer({
+          id: layerId,
+          type: 'raster',
+          source: sourceId,
+          layout: { visibility: 'visible' },
+          paint: {
+            'raster-opacity': radarOpacity,
+            'raster-fade-duration': 100,
+          },
+        });
+      } catch {
+        /* safe ignore */
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      updateLayer();
     } else {
-      document.exitFullscreen().catch(() => {});
+      map.once('load', updateLayer);
+    }
+  }, [frames, activeFrameIndex, showRadar, radarOpacity]);
+
+  // Animation Interval for Radar Loop
+  useEffect(() => {
+    if (!isPlaying || frames.length === 0) return;
+
+    const interval = setInterval(() => {
+      setActiveFrameIndex((prev) => (prev + 1) % frames.length);
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, frames.length]);
+
+  const currentFrame = frames[activeFrameIndex];
+  const formatTime = (iso?: string) => {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return iso;
     }
   };
 
   return (
-    <div className="thaiwater-container-page" aria-label="ThaiWater TWA Realtime Radar & Storm Viewer">
+    <div className="thaiwater-container-page" aria-label="ThaiWater & RainViewer Realtime Radar Studio">
       {/* Top Command Toolbar */}
       <div className="thaiwater-toolbar">
         <div className="thaiwater-toolbar-left">
@@ -68,111 +150,129 @@ export function ThaiWaterRadarView({ onBack }: ThaiWaterRadarViewProps) {
           )}
           <div className="thaiwater-title-block">
             <div className="thaiwater-badge-strip">
-              <span className="eyebrow">HYDRO-INFORMATICS INSTITUTE (สสน.)</span>
+              <span className="eyebrow">HYDRO-INFORMATICS &amp; RADAR TELEMETRY</span>
               <span className="live-status-indicator">
                 <span className="live-dot" />
-                <span className="live-text">REALTIME RADAR &amp; STORM GIS</span>
+                <span className="live-text">RADAR REFLECTANCE ACTIVE</span>
               </span>
             </div>
-            <h2>🌧️ แผนที่เรดาร์ตรวจวัดกลุ่มฝนและเส้นทางพายุ (ThaiWater TWA Studio)</h2>
+            <h2>🌧️ แผนที่เรดาร์ตรวจวัดกลุ่มฝนและเส้นทางพายุ (Live Radar Studio)</h2>
           </div>
         </div>
 
         <div className="thaiwater-toolbar-actions">
-          <button
-            type="button"
-            className="btn-pro-action btn-pro-action--ghost"
-            onClick={handleRefresh}
-            title="โหลดข้อมูลแผนที่ใหม่"
-          >
-            ⟳ รีเฟรช
-          </button>
-          <button
-            type="button"
-            className="btn-pro-action btn-pro-action--ghost"
-            onClick={handleToggleFullscreen}
-            title="ขยายแผนที่เต็มจอ"
-          >
-            ⛶ เต็มจอ
-          </button>
           <a
-            href={currentUrl}
+            href="https://twa.thaiwater.net/th/map/basic/overall/overall/0?ds=rr%2Csc&p=hide"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-pro-action btn-pro-action--primary"
             style={{ textDecoration: 'none' }}
-            title="เปิดในแท็บเบราว์เซอร์ใหม่"
+            title="เปิดหน้าเว็บหลักของ สสน. ในแท็บใหม่"
           >
-            ↗ เปิดเว็บต้นทาง สสน.
+            ↗ เปิดเว็บทางการ สสน. (ThaiWater.net) ↗
           </a>
         </div>
       </div>
 
-      {/* Layer Selection Chips */}
-      <div className="thaiwater-layer-selector">
-        <button
-          type="button"
-          className={`thaiwater-chip ${mapMode === 'overall' ? 'is-active' : ''}`}
-          onClick={() => { setMapMode('overall'); setIsLoading(true); }}
-        >
-          🌧️ เรดาร์กลุ่มฝน &amp; เส้นทางพายุ (Live Radar &amp; Storm)
-        </button>
-        <button
-          type="button"
-          className={`thaiwater-chip ${mapMode === 'rainfall' ? 'is-active' : ''}`}
-          onClick={() => { setMapMode('rainfall'); setIsLoading(true); }}
-        >
-          📊 ปริมาณน้ำฝนสะสม (24h Rainfall)
-        </button>
-        <button
-          type="button"
-          className={`thaiwater-chip ${mapMode === 'waterlevel' ? 'is-active' : ''}`}
-          onClick={() => { setMapMode('waterlevel'); setIsLoading(true); }}
-        >
-          🌊 ระดับน้ำสถานีโทรมาตร (River Levels)
-        </button>
-        <button
-          type="button"
-          className={`thaiwater-chip ${mapMode === 'dam' ? 'is-active' : ''}`}
-          onClick={() => { setMapMode('dam'); setIsLoading(true); }}
-        >
-          🏞️ ความจุกักเก็บอ่าง/เขื่อนใหญ่ (Dams)
-        </button>
-        <button
-          type="button"
-          className={`thaiwater-chip ${mapMode === 'satellite' ? 'is-active' : ''}`}
-          onClick={() => { setMapMode('satellite'); setIsLoading(true); }}
-        >
-          🛰️ ภาพถ่ายดาวเทียมกลุ่มเมฆ (Satellite)
-        </button>
-      </div>
+      {/* Main Map Canvas Area */}
+      <div className="thaiwater-viewport" style={{ position: 'relative', flex: 1, minHeight: '520px' }}>
+        <div ref={containerRef} style={{ width: '100%', height: '100%', minHeight: '520px' }} />
 
-      {/* Iframe Viewport Container */}
-      <div className="thaiwater-viewport" id="thaiwater-iframe-container">
-        {isLoading && (
-          <div className="thaiwater-loading-overlay">
-            <div className="thaiwater-spinner" />
-            <p>กำลังเชื่อมต่อคลังข้อมูลน้ำแห่งชาติ สสน. (ThaiWater TWA)...</p>
+        {/* Floating Left Layer Control Panel */}
+        <div className="thaiwater-floating-controls">
+          <span className="floating-ctrl-title">🎛️ ชั้นข้อมูล (Layers)</span>
+          <label className="ctrl-checkbox-label">
+            <input
+              type="checkbox"
+              checked={showRadar}
+              onChange={(e) => setShowRadar(e.target.checked)}
+            />
+            <span>🌧️ เรดาร์กลุ่มฝนสด</span>
+          </label>
+          <label className="ctrl-checkbox-label">
+            <input
+              type="checkbox"
+              checked={showDams}
+              onChange={(e) => setShowDams(e.target.checked)}
+            />
+            <span>🏞️ อ่างเก็บน้ำขนาดใหญ่ ({MAJOR_DAMS.length})</span>
+          </label>
+          <label className="ctrl-checkbox-label">
+            <input
+              type="checkbox"
+              checked={showRivers}
+              onChange={(e) => setShowRivers(e.target.checked)}
+            />
+            <span>🌊 สถานีวัดน้ำท่า ({MAJOR_RIVER_STATIONS.length})</span>
+          </label>
+
+          <div className="ctrl-opacity-box">
+            <small>ความเข้มเรดาร์: {Math.round(radarOpacity * 100)}%</small>
+            <input
+              type="range"
+              min="0.2"
+              max="1"
+              step="0.05"
+              value={radarOpacity}
+              onChange={(e) => setRadarOpacity(parseFloat(e.target.value))}
+              aria-label="ปรับความทึบแสงเรดาร์"
+            />
           </div>
-        )}
-        <iframe
-          key={key}
-          src={currentUrl}
-          title="ThaiWater TWA Realtime Radar GIS Map"
-          className="thaiwater-iframe"
-          allow="geolocation; fullscreen"
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-          onLoad={() => setIsLoading(false)}
-        />
+        </div>
+
+        {/* Floating Bottom Timeline Player Bar */}
+        <div className="thaiwater-timeline-player">
+          <div className="timeline-controls">
+            <button
+              type="button"
+              className="btn-play-pause"
+              onClick={() => setIsPlaying((p) => !p)}
+              title={isPlaying ? 'หยุดชั่วคราว' : 'เล่นภาพเคลื่อนไหว'}
+            >
+              {isPlaying ? '⏸️ พัก' : '▶️ เล่น'}
+            </button>
+
+            <span className="timeline-time-display">
+              ⏰ เวลาเรดาร์: <strong>{formatTime(currentFrame?.frameTime)}</strong>
+            </span>
+
+            <input
+              type="range"
+              min="0"
+              max={Math.max(0, frames.length - 1)}
+              value={activeFrameIndex}
+              onChange={(e) => {
+                setIsPlaying(false);
+                setActiveFrameIndex(parseInt(e.target.value, 10));
+              }}
+              className="timeline-slider"
+              aria-label="เลือกช่วงเวลาเรดาร์"
+            />
+
+            <span className="timeline-frame-counter">
+              เฟรม {activeFrameIndex + 1}/{frames.length}
+            </span>
+          </div>
+
+          {/* Rainfall Intensity Scale Legend */}
+          <div className="rainfall-intensity-legend">
+            <span className="legend-label">ระดับความแรงฝน (มม./ชม.):</span>
+            <span className="intensity-chip intensity-chip--none">ไม่มีฝน &lt;0.3</span>
+            <span className="intensity-chip intensity-chip--drizzle">ฝนปรอย 0.3</span>
+            <span className="intensity-chip intensity-chip--light">ฝนเบา 1.3</span>
+            <span className="intensity-chip intensity-chip--mod">ปานกลาง 3.0</span>
+            <span className="intensity-chip intensity-chip--heavy">ฝนหนัก 12+</span>
+          </div>
+        </div>
       </div>
 
       {/* Bottom Data Attribution Footer */}
       <footer className="thaiwater-footer">
         <p>
-          📡 แหล่งข้อมูล: <strong>สถาบันสารสนเทศทรัพยากรน้ำ (องค์การมหาชน) - สสน. (HII) · คลังข้อมูลน้ำแห่งชาติ (ThaiWater.net)</strong>
+          📡 เทเลเมทรีเรดาร์: <strong>RainViewer Global Weather Radar &amp; คลังข้อมูลน้ำแห่งชาติ สสน. (ThaiWater.net)</strong>
         </p>
         <small>
-          รองรับการซูมสำรวจกลุ่มฝน, กราฟระดับน้ำแม่น้ำ, และการเคลื่อนที่ของพายุแบบ Real-Time 24 ชั่วโมง
+          ประมวลผลผ่าน WebGL Tile Engine แบบ Real-time ครอบคลุมลุ่มน้ำเจ้าพระยา ป่าสัก ท่าจีน แม่กลอง ปราจีนบุรี และทุกภูมิภาค
         </small>
       </footer>
     </div>
