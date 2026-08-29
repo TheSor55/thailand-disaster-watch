@@ -68,7 +68,6 @@ const providerHealth = [
   },
 ];
 
-const situationModules = ['Flood', 'Rain', 'River', 'Dam', 'Alerts', 'CCTV'] as const;
 
 function titleForNavigation(state: NavigationState) {
   if (state.viewLevel === 'region') return `${state.region.nameEn} Situation`;
@@ -318,9 +317,6 @@ export function App() {
     }, 300);
   }, [showToast]);
 
-  const handleExportPdf = useCallback(() => {
-    if (typeof window !== 'undefined') window.print();
-  }, []);
 
   const handleBcmReport = useCallback(() => {
     setAppView('mysites');
@@ -823,6 +819,14 @@ export function App() {
                     title="เปิดหน้ารายงานแผนฉุกเฉิน BCM"
                   >
                     <span>🛡 แผนฉุกเฉิน BCM Action Plan</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopySummary}
+                    className="share-button"
+                    title="คัดลอกข้อความสรุปสถานการณ์ส่งต่อไลน์/ผู้บริหาร"
+                  >
+                    <span>📋 คัดลอกสรุปส่งต่อ (LINE)</span>
                   </button>
                 </div>
               </section>

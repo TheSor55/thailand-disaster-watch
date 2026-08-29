@@ -6,7 +6,6 @@ interface DamSituationCardProps {
   onOpenChaoPhrayaFlow?: () => void;
 }
 
-const THAIWATER_DIRECT_URL = 'https://twa.thaiwater.net/th/map/basic/large-dam/overall/0?p=modal&c=102.91695%2C15.57230%2C5.000z';
 const HII_FLOW_URL = 'https://tiwrm.hii.or.th/DATA/REPORT/php/chart/chaopraya/small/chaopraya.php';
 
 export function DamSituationCard({ dams, provinceNameTh, onOpenChaoPhrayaFlow }: DamSituationCardProps) {

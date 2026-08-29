@@ -16,9 +16,7 @@ import {
   type ProvinceDefinition,
 } from '../../config/regions';
 import {
-  VERIFIED_LOCATION_PRESETS,
   validateCoordinates,
-  type LocationPreset,
   type WeatherSituationRequest,
 } from '../../services/weatherSituation';
 import {
@@ -98,7 +96,6 @@ export function LocationSelector({
   });
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRegionFilter, setSelectedRegionFilter] = useState<string>('ALL');
 
   const [customLat, setCustomLat] = useState(String(location.latitude));
   const [customLon, setCustomLon] = useState(String(location.longitude));
@@ -114,11 +111,9 @@ export function LocationSelector({
         !searchQuery ||
         p.nameTh.includes(searchQuery) ||
         p.nameEn.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchRegion =
-        selectedRegionFilter === 'ALL' || p.regionId === selectedRegionFilter;
-      return matchQuery && matchRegion;
+      return matchQuery;
     });
-  }, [searchQuery, selectedRegionFilter]);
+  }, [searchQuery]);
 
   const handleSelectProvince = (prov: ProvinceDefinition) => {
     setSelectedIso(prov.isoCode);
@@ -130,20 +125,6 @@ export function LocationSelector({
       latitude: prov.latitude,
       longitude: prov.longitude,
       label: `${prov.nameTh} (${prov.nameEn})`,
-    });
-  };
-
-  const handleSelectPreset = (preset: LocationPreset) => {
-    const prov = PROVINCES.find((p) => p.nameTh === preset.nameTh || preset.nameTh.includes(p.nameTh));
-    if (prov) setSelectedIso(prov.isoCode);
-    setCustomLat(String(preset.latitude));
-    setCustomLon(String(preset.longitude));
-    setCustomLabel(`${preset.nameTh} (${preset.nameEn})`);
-    setValidationError(null);
-    onLocationChange({
-      latitude: preset.latitude,
-      longitude: preset.longitude,
-      label: `${preset.nameTh} (${preset.nameEn})`,
     });
   };
 
