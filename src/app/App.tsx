@@ -835,7 +835,11 @@ export function App() {
           <div className="full-content-column" aria-label="สภาพอากาศ">
             <ModuleErrorBoundary moduleName="Weather Situation">
               <Suspense fallback={<div className="page-loading" role="status">กำลังโหลดหน้าสภาพอากาศ…</div>}>
-                <WeatherSituationPage onBack={() => setAppView('gis')} />
+                <WeatherSituationPage
+                  onBack={() => setAppView('gis')}
+                  onNavigateToMySites={() => setAppView('mysites')}
+                  onNavigateToRadar={() => setAppView('thaiwater')}
+                />
               </Suspense>
             </ModuleErrorBoundary>
           </div>

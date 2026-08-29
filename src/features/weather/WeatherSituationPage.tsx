@@ -107,9 +107,15 @@ function getSituationData(state: WeatherSituationLoadState): WeatherSituation | 
 
 interface WeatherSituationPageProps {
   onBack?: () => void;
+  onNavigateToMySites?: () => void;
+  onNavigateToRadar?: () => void;
 }
 
-export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {}) {
+export function WeatherSituationPage({
+  onBack,
+  onNavigateToMySites,
+  onNavigateToRadar,
+}: WeatherSituationPageProps = {}) {
   const [request, setRequest] = useState<WeatherSituationRequest>(getInitialRequest);
   const [loadState, setLoadState] = useState<WeatherSituationLoadState>({ status: 'IDLE' });
   const [radarState, setRadarState] = useState<RadarLoadState>({ status: 'IDLE' });
@@ -339,10 +345,15 @@ export function WeatherSituationPage({ onBack }: WeatherSituationPageProps = {})
 
       {/* Main Weather & Radar Intelligence Cards Grid */}
       <div className="weather-cards-grid">
-        {/* Section A: Observed Weather (TMD) — Strict Observed Data Only */}
+        {/* Section A: Observed Weather (TMD & Radar) */}
         <ObservedWeatherCard
           observed={situation?.observed ?? null}
           loading={isLoading}
+          latitude={request.latitude}
+          longitude={request.longitude}
+          locationLabel={request.label}
+          onNavigateToRadar={onNavigateToRadar ?? onBack}
+          onNavigateToMySites={onNavigateToMySites}
         />
 
         {/* Section B: Radar Intelligence Card (RainViewer) — Remote-Sensed Observation */}
