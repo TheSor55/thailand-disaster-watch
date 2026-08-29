@@ -15,7 +15,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ObservedWeatherCard } from '../../components/weather/ObservedWeatherCard';
-import { ForecastWeatherCard } from '../../components/weather/ForecastWeatherCard';
 import { SourcePanel } from '../../components/weather/SourcePanel';
 import { AgreementPanel } from '../../components/weather/AgreementPanel';
 import { ClassificationGuide } from '../../components/weather/ClassificationGuide';
@@ -26,7 +25,6 @@ import { ModeBadge } from '../../components/weather/ModeBadge';
 import { ModeSelector } from '../../components/weather/ModeSelector';
 import { LocationSelector } from '../../components/weather/LocationSelector';
 import { WeatherExplainer } from '../../components/weather/WeatherExplainer';
-import { RadarIntelligenceCard } from '../../components/weather/RadarIntelligenceCard';
 import { TimeAlignmentMatrix } from '../../components/weather/TimeAlignmentMatrix';
 import { SourceComparisonCard } from '../../components/weather/SourceComparisonCard';
 import {
@@ -343,9 +341,9 @@ export function WeatherSituationPage({
         </div>
       )}
 
-      {/* Main Weather & Radar Intelligence Cards Grid */}
-      <div className="weather-cards-grid">
-        {/* Section A: Observed Weather (TMD & Radar) */}
+      {/* Main Weather & Radar Intelligence Card */}
+      <div className="weather-cards-grid" style={{ gridTemplateColumns: '1fr' }}>
+        {/* Section A: Observed Weather (TMD & Live Regional Radar) */}
         <ObservedWeatherCard
           observed={situation?.observed ?? null}
           loading={isLoading}
@@ -354,26 +352,6 @@ export function WeatherSituationPage({
           locationLabel={request.label}
           onNavigateToRadar={onNavigateToRadar ?? onBack}
           onNavigateToMySites={onNavigateToMySites}
-        />
-
-        {/* Section B: Radar Intelligence Card (RainViewer) — Remote-Sensed Observation */}
-        <RadarIntelligenceCard
-          radarState={radarState}
-          onNavigateToMap={onBack}
-        />
-
-        {/* Section C: +1 Hour Forecast (Open-Meteo) — Probabilistic Model Forecast */}
-        <ForecastWeatherCard
-          forecast={situation?.forecast ?? null}
-          horizon="1h"
-          loading={isLoading}
-        />
-
-        {/* Section D: +3 Hours Forecast (Open-Meteo) — Probabilistic Model Forecast */}
-        <ForecastWeatherCard
-          forecast={situation?.forecast ?? null}
-          horizon="3h"
-          loading={isLoading}
         />
       </div>
 

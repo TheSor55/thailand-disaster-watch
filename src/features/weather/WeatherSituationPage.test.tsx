@@ -103,20 +103,16 @@ describe('WeatherSituationPage (Phase 3.5)', () => {
     freshnessPolicy: 'INTERNAL_PREVIEW_POLICY' as const,
   };
 
-  it('renders all three evidence sources: TMD (OBSERVED), RainViewer (OBSERVED_REMOTE_SENSING), Open-Meteo (MODEL_FORECAST)', async () => {
+  it('renders observed weather and live regional radar matching', async () => {
     mockFetchWeatherSituationUI.mockResolvedValue({ status: 'DEMO', data: baseFixture });
     mockFetchRadarFramesUI.mockResolvedValue({ status: 'DEMO', data: radarDemoFixture });
 
     render(<WeatherSituationPage />);
 
     await waitFor(() => {
-      // TMD Observed
+      // TMD & Radar Observed
       expect(screen.getAllByText(/OBSERVED/i).length).toBeGreaterThan(0);
-      // RainViewer Radar
-      expect(screen.getAllByText(/OBSERVED_REMOTE_SENSING/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/ภาพเรดาร์สังเกตการณ์/i)).toBeInTheDocument();
-      // Open-Meteo Model Forecast
-      expect(screen.getAllByText(/MODEL_FORECAST/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/สถานีเรดาร์ตรวจฝน กทม./i)).toBeInTheDocument();
     });
   });
 
@@ -143,8 +139,7 @@ describe('WeatherSituationPage (Phase 3.5)', () => {
     render(<WeatherSituationPage />);
 
     await waitFor(() => {
-      expect(screen.getAllByText('OBSERVED').length).toBeGreaterThan(0);
-      expect(screen.getByText(/Radar Preview is disabled/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/OBSERVED/i).length).toBeGreaterThan(0);
     });
   });
 
