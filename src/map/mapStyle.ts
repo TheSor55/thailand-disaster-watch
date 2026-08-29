@@ -22,9 +22,8 @@ export function createMapStyle(): StyleSpecification {
       satellite: {
         type: 'raster',
         tiles: [
-          'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
           'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-          'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+          'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         ],
         tileSize: 256,
         attribution: SATELLITE_ATTRIBUTION,
