@@ -39,6 +39,13 @@ export function LayerControl({
         >
           Dark
         </button>
+        <button
+          type="button"
+          className={basemapMode === 'satellite' ? 'is-active' : ''}
+          onClick={() => onBasemapChange('satellite')}
+        >
+          🛰️ ดาวเทียม
+        </button>
       </div>
 
       <h3>Administrative</h3>
@@ -53,43 +60,39 @@ export function LayerControl({
           onChange={(event) => onProvinceVisibilityChange(event.target.checked)}
         />
       </label>
-      <div className="layer-row">
-        <span>
-          <i className="layer-swatch layer-swatch--region" />
-          เน้นพื้นที่ภาค (Region highlight)
-        </span>
-        <span style={{ color: '#38bdf8', fontWeight: 600 }}>Auto</span>
+
+      {/* Disaster & Weather Observations — Unused/Redundant Layer Block (Hidden as requested) */}
+      <div className="disaster-observations-section" style={{ display: 'none' }} aria-hidden="true">
+        <h3>Disaster &amp; Weather Observations</h3>
+        <label className="layer-row">
+          <span>
+            <i className="layer-swatch layer-swatch--radar" />
+            🌤 เรดาร์ตรวจอากาศ (Radar Observation)
+            <small>RainViewer · OBSERVED_REMOTE_SENSING · Controlled Preview</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={showRadar}
+            onChange={(event) => onRadarVisibilityChange?.(event.target.checked)}
+            aria-label="เปิด/ปิด เลเยอร์เรดาร์ตรวจอากาศ"
+          />
+        </label>
+
+        {/* GISTDA Satellite Flood Layer */}
+        <label className="layer-row">
+          <span>
+            <i className="layer-swatch layer-swatch--flood" />
+            🛰️ ภาพถ่ายดาวเทียมน้ำท่วมขัง (GISTDA Flood Inundation)
+            <small>GISTDA Sentinel-1 SAR · OBSERVED · Controlled Pilot</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={showFlood}
+            onChange={(event) => onFloodVisibilityChange?.(event.target.checked)}
+            aria-label="เปิด/ปิด เลเยอร์ภาพถ่ายดาวเทียมน้ำท่วมขัง"
+          />
+        </label>
       </div>
-
-      <h3>Disaster &amp; Weather Observations</h3>
-      <label className="layer-row">
-        <span>
-          <i className="layer-swatch layer-swatch--radar" />
-          🌤 เรดาร์ตรวจอากาศ (Radar Observation)
-          <small>RainViewer · OBSERVED_REMOTE_SENSING · Controlled Preview</small>
-        </span>
-        <input
-          type="checkbox"
-          checked={showRadar}
-          onChange={(event) => onRadarVisibilityChange?.(event.target.checked)}
-          aria-label="เปิด/ปิด เลเยอร์เรดาร์ตรวจอากาศ"
-        />
-      </label>
-
-      {/* GISTDA Satellite Flood Layer */}
-      <label className="layer-row">
-        <span>
-          <i className="layer-swatch layer-swatch--flood" />
-          🛰️ ภาพถ่ายดาวเทียมน้ำท่วมขัง (GISTDA Flood Inundation)
-          <small>GISTDA Sentinel-1 SAR · OBSERVED · Controlled Pilot</small>
-        </span>
-        <input
-          type="checkbox"
-          checked={showFlood}
-          onChange={(event) => onFloodVisibilityChange?.(event.target.checked)}
-          aria-label="เปิด/ปิด เลเยอร์ภาพถ่ายดาวเทียมน้ำท่วมขัง"
-        />
-      </label>
     </div>
   );
 }

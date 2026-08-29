@@ -141,13 +141,13 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
                   justifyContent: 'center',
                   gap: '6px',
                   width: '100%',
-                  maxWidth: '340px',
+                  maxWidth: '380px',
                   padding: '9px 16px',
                   background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                   color: '#ffffff',
                   borderRadius: '7px',
                   textDecoration: 'none',
-                  fontSize: '0.8rem',
+                  fontSize: '0.78rem',
                   fontWeight: 700,
                   boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
                   border: '1px solid #38bdf8',
@@ -155,7 +155,7 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
                 }}
               >
                 <span>🎥</span>
-                <span>เปิดดูกล้องสดส่งตรงจากเซิร์ฟเวอร์เทศบาล ↗</span>
+                <span>เปิดดูกล้องสด {station.nameTh} (สสน. ThaiWater) ↗</span>
               </a>
             </div>
 
@@ -169,7 +169,7 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
           {/* Telemetry Statistics Card Grid */}
           <div className="cctv-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
             <div className="cctv-stat-card" style={{ padding: '8px 10px', minHeight: 'auto' }}>
-              <small style={{ fontSize: '0.64rem' }}>{isCoastal ? 'ระดับน้ำทะเล / น้ำขึ้น' : 'ระดับน้ำโทรมาตรปัจจุบัน'}</small>
+              <small style={{ fontSize: '0.64rem' }}>{isCoastal ? 'ระดับน้ำทะเล / น้ำขึ้น' : 'ระดับผิวน้ำทะเลปานกลาง (ผิวดิน)'}</small>
               <div className="cctv-stat-val" style={{ margin: '3px 0' }}>
                 <strong style={{ fontSize: '1.25rem' }}>{station.waterLevelMsl.toFixed(2)}</strong>
                 <span style={{ fontSize: '0.7rem' }}>{isCoastal ? 'ม.' : 'ม.รทก.'}</span>
@@ -183,7 +183,7 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
                 />
               </div>
               <p className="cctv-threshold-hint" style={{ fontSize: '0.62rem', margin: 0 }}>
-                {isCoastal ? 'เกณฑ์เฝ้าระวัง:' : 'ระดับตลิ่งเฝ้าระวัง:'} <strong>{station.bankLevelMsl.toFixed(2)}</strong> {isCoastal ? 'ม.' : 'ม.รทก.'}
+                {isCoastal ? 'เกณฑ์เฝ้าระวัง:' : 'ระดับความสูงสันเขื่อน/ตลิ่ง:'} <strong>{station.bankLevelMsl.toFixed(2)}</strong> {isCoastal ? 'ม.' : 'ม.รทก.'}
               </p>
             </div>
 
@@ -218,6 +218,11 @@ export function CctvModal({ station, onClose }: CctvModalProps) {
             <a href={station.liveStreamUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc', textDecoration: 'underline' }}>
               {station.liveStreamUrl}
             </a>
+          </div>
+
+          {/* Hydrology Explanation Note */}
+          <div style={{ background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '6px', padding: '6px 10px', fontSize: '0.65rem', color: '#e2e8f0', lineHeight: 1.4 }}>
+            💡 <strong style={{ color: '#38bdf8' }}>คำอธิบายหน่วย ม.รทก.:</strong> ค่า <strong>{station.waterLevelMsl.toFixed(2)} ม.รทก.</strong> คือระดับความสูงผิวน้ำอ่างเก็บน้ำจากระดับน้ำทะเลปานกลาง (Mean Sea Level) มิใช่ความลึกของน้ำใต้น้ำ
           </div>
         </div>
 

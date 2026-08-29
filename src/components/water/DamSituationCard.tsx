@@ -6,8 +6,8 @@ interface DamSituationCardProps {
   onOpenChaoPhrayaFlow?: () => void;
 }
 
+const THAIWATER_DIRECT_URL = 'https://twa.thaiwater.net/th/map/basic/large-dam/overall/0?p=modal&c=102.91695%2C15.57230%2C5.000z';
 const HII_FLOW_URL = 'https://tiwrm.hii.or.th/DATA/REPORT/php/chart/chaopraya/small/chaopraya.php';
-const HII_DAM_REPORT_URL = 'https://www.thaiwater.net/water/dam';
 
 export function DamSituationCard({ dams, provinceNameTh, onOpenChaoPhrayaFlow }: DamSituationCardProps) {
   if (dams.length === 0) {
@@ -32,87 +32,97 @@ export function DamSituationCard({ dams, provinceNameTh, onOpenChaoPhrayaFlow }:
     );
   }
 
+  const now = new Date();
+  const thaiDateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+  const thaiTimeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
   return (
     <div className="water-card" aria-label="สถานการณ์น้ำในเขื่อนหลัก">
       <div className="water-card__header">
         <div>
-          <span className="eyebrow">OBSERVED · RESERVOIR TELEMETRY</span>
-          <h4>🏞 เขื่อนหลักในพื้นที่ / ลุ่มน้ำใกล้เคียง</h4>
+          <span className="eyebrow">OBSERVED TELEMETRY · สสน. HII &amp; RID</span>
+          <h4>🏞 อ่างเก็บน้ำขนาดใหญ่ (ข้อมูล สสน. HII)</h4>
         </div>
-        <button
-          type="button"
-          className="btn-cctv-inspect"
-          onClick={onOpenChaoPhrayaFlow}
-          style={{ width: 'auto', padding: '4px 10px', fontSize: '0.65rem' }}
-          title="เปิดผังน้ำลุ่มน้ำเจ้าพระยา สสน./HII"
-        >
-          🌊 ผังน้ำเจ้าพระยา (HII)
-        </button>
+        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 600,
+              color: '#38bdf8',
+              background: 'rgba(56, 189, 248, 0.12)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: '6px',
+              padding: '3px 8px',
+            }}
+          >
+            📅 {thaiDateStr} | {thaiTimeStr} น.
+          </span>
+          <button
+            type="button"
+            className="btn-cctv-inspect"
+            onClick={onOpenChaoPhrayaFlow}
+            style={{ width: 'auto', padding: '4px 8px', fontSize: '0.62rem' }}
+            title="เปิดผังน้ำลุ่มน้ำเจ้าพระยา สสน./HII"
+          >
+            🌊 ผังน้ำ (HII)
+          </button>
+        </div>
       </div>
 
-      <div className="dam-list">
-        {dams.map((dam) => {
-          const percentColor =
-            dam.storagePercent > 80
-              ? '#ef4444'
-              : dam.storagePercent > 50
-              ? '#10b981'
-              : '#f59e0b';
+      <div className="dam-table-container">
+        <table className="dam-telemetry-table">
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'left', minWidth: '135px' }}>อ่างเก็บน้ำ</th>
+              <th style={{ textAlign: 'right' }}>น้ำกักเก็บ (ล้าน ลบ.ม.)</th>
+              <th style={{ textAlign: 'center' }}>% ความจุ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dams.map((dam) => {
+              const bgBadge =
+                dam.storagePercent > 80
+                  ? '#ef4444'
+                  : dam.storagePercent >= 70
+                  ? '#2563eb'
+                  : dam.storagePercent >= 50
+                  ? '#10b981'
+                  : '#f59e0b';
 
-          return (
-            <div key={dam.damId} className="dam-item">
-              <div className="dam-item__top">
-                <strong className="dam-name">{dam.nameTh}</strong>
-                <span className="dam-percent" style={{ color: percentColor }}>
-                  {dam.storagePercent}%
-                </span>
-              </div>
-
-              {/* Progress bar */}
-              <div className="dam-progress-track" role="progressbar" aria-valuenow={dam.storagePercent} aria-valuemin={0} aria-valuemax={100}>
-                <div
-                  className="dam-progress-fill"
-                  style={{
-                    width: `${Math.min(100, dam.storagePercent)}%`,
-                    backgroundColor: percentColor,
-                  }}
-                />
-              </div>
-
-              <div className="dam-stats-grid">
-                <div>
-                  <small>ความจุอ่าง:</small>
-                  <span>{dam.capacityMcm.toLocaleString()} ล้าน ลบ.ม.</span>
-                </div>
-                <div>
-                  <small>น้ำปัจจุบัน:</small>
-                  <strong>{dam.currentStorageMcm.toLocaleString()} ล้าน ลบ.ม.</strong>
-                </div>
-                <div>
-                  <small>น้ำไหลเข้า:</small>
-                  <span>+{dam.inflowMcm} ล้าน ลบ.ม./วัน</span>
-                </div>
-                <div>
-                  <small>น้ำระบาย:</small>
-                  <span>-{dam.outflowMcm} ล้าน ลบ.ม./วัน</span>
-                </div>
-              </div>
-
-              <div className="dam-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                <small className="source-attr">แหล่งข้อมูล: {dam.attribution}</small>
-                <a
-                  href={HII_DAM_REPORT_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ fontSize: '0.62rem', color: '#38bdf8', fontWeight: 600, textDecoration: 'underline' }}
-                  title="ตรวจสอบรายงานสถานการณ์น้ำในเขื่อนใหญ่ กรมชลประทานและ สสน. (HII)"
-                >
-                  ตรวจค่าสด HII/RID ↗
-                </a>
-              </div>
-            </div>
-          );
-        })}
+              return (
+                <tr key={dam.damId}>
+                  <td style={{ textAlign: 'left' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '0.85rem' }}>📍</span>
+                      <div>
+                        <strong style={{ display: 'block', color: '#f8fafc', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>{dam.nameTh}</strong>
+                        <small style={{ color: '#94a3b8', fontSize: '0.65rem' }}>{dam.province}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#f8fafc', fontSize: '0.8rem' }}>
+                    {dam.currentStorageMcm.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        color: '#ffffff',
+                        backgroundColor: bgBadge,
+                      }}
+                    >
+                      {dam.storagePercent}%
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
       <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>

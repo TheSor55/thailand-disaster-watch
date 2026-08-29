@@ -5,6 +5,8 @@ interface RiverStationCardProps {
   provinceNameTh: string;
 }
 
+const THAIWATER_RIVER_URL = 'https://twa.thaiwater.net/th/map/basic/water-level-discharge/overall/0?p=modal&c=102.91695%2C15.57230%2C5.000z';
+
 export function RiverStationCard({ stations, provinceNameTh }: RiverStationCardProps) {
   if (stations.length === 0) {
     return (
@@ -21,8 +23,20 @@ export function RiverStationCard({ stations, provinceNameTh }: RiverStationCardP
   return (
     <div className="water-card" aria-label="สถานีตรวจวัดระดับน้ำแม่น้ำสายหลัก">
       <div className="water-card__header">
-        <span className="eyebrow">OBSERVED · RIVER TELEMETRY</span>
-        <h4>🌊 ระดับน้ำแม่น้ำสายหลัก</h4>
+        <div>
+          <span className="eyebrow">OBSERVED · RIVER TELEMETRY</span>
+          <h4>🌊 ระดับน้ำและปริมาณน้ำท่า (สสน. HII)</h4>
+        </div>
+        <a
+          href={THAIWATER_RIVER_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-cctv-inspect"
+          style={{ width: 'auto', padding: '4px 8px', fontSize: '0.62rem', textDecoration: 'none' }}
+          title="เปิดรายงานระดับน้ำท่าและระดับน้ำสายหลัก Real-time จาก สสน. (ThaiWater.net)"
+        >
+          🌊 แผนที่น้ำท่า สสน. ↗
+        </a>
       </div>
 
       <div className="river-list">
@@ -67,13 +81,13 @@ export function RiverStationCard({ stations, provinceNameTh }: RiverStationCardP
               <div className="river-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                 <small className="source-attr">แหล่งข้อมูล: {st.attribution}</small>
                 <a
-                  href="https://tiwrm.hii.or.th/"
+                  href={THAIWATER_RIVER_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ fontSize: '0.62rem', color: '#38bdf8', fontWeight: 600, textDecoration: 'underline' }}
-                  title="ตรวจสอบระดับน้ำโทรมาตรสดจาก สสน. (HII)"
+                  title="ตรวจสอบระดับน้ำท่าและน้ำสายหลักสดจาก สสน. (ThaiWater.net)"
                 >
-                  ตรวจค่าสด HII ↗
+                  ตรวจค่าสด สสน. ↗
                 </a>
               </div>
             </div>

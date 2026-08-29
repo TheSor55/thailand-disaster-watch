@@ -3,6 +3,9 @@ import type { StyleSpecification } from 'maplibre-gl';
 export const OSM_ATTRIBUTION =
   '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>';
 
+export const SATELLITE_ATTRIBUTION =
+  'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+
 export const PROVINCE_SOURCE_ID = 'thailand-provinces';
 
 export function createMapStyle(): StyleSpecification {
@@ -14,6 +17,17 @@ export function createMapStyle(): StyleSpecification {
         tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
         tileSize: 256,
         attribution: OSM_ATTRIBUTION,
+        maxzoom: 19,
+      },
+      satellite: {
+        type: 'raster',
+        tiles: [
+          'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+        ],
+        tileSize: 256,
+        attribution: SATELLITE_ATTRIBUTION,
         maxzoom: 19,
       },
       [PROVINCE_SOURCE_ID]: {
@@ -40,6 +54,15 @@ export function createMapStyle(): StyleSpecification {
           'raster-contrast': 0.18,
           'raster-brightness-min': 0.12,
           'raster-brightness-max': 0.68,
+        },
+      },
+      {
+        id: 'satellite-basemap',
+        type: 'raster',
+        source: 'satellite',
+        layout: { visibility: 'none' },
+        paint: {
+          'raster-opacity': 0.95,
         },
       },
       {

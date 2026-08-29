@@ -13,7 +13,7 @@ import { featuresForIsoCodes, boundsForFeatures, type BoundaryFeatureCollection 
 import { createMapStyle, PROVINCE_SOURCE_ID } from './mapStyle';
 import { GISTDA_FLOOD_GEOJSON } from '../domain/flood';
 
-export type BasemapMode = 'standard' | 'dark';
+export type BasemapMode = 'standard' | 'dark' | 'satellite';
 
 interface ThailandMapProps {
   basemapMode: BasemapMode;
@@ -230,15 +230,33 @@ export function ThailandMap({
 
     try {
       const isDark = basemapMode === 'dark';
+      const isSatellite = basemapMode === 'satellite';
+
       if (map.getLayer('background')) {
-        map.setPaintProperty('background', 'background-color', isDark ? '#0a1120' : '#f8fafc');
+        map.setPaintProperty('background', 'background-color', isDark ? '#0a1120' : isSatellite ? '#020617' : '#f8fafc');
       }
+
       if (map.getLayer('osm-basemap')) {
-        map.setPaintProperty('osm-basemap', 'raster-opacity', isDark ? 0.85 : 0.95);
-        map.setPaintProperty('osm-basemap', 'raster-saturation', isDark ? -0.18 : 0);
-        map.setPaintProperty('osm-basemap', 'raster-contrast', isDark ? 0.14 : 0);
-        map.setPaintProperty('osm-basemap', 'raster-brightness-min', isDark ? 0.22 : 0.5);
-        map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.88 : 1);
+        map.setLayoutProperty('osm-basemap', 'visibility', isSatellite ? 'none' : 'visible');
+        if (!isSatellite) {
+          map.setPaintProperty('osm-basemap', 'raster-opacity', isDark ? 0.85 : 0.95);
+          map.setPaintProperty('osm-basemap', 'raster-saturation', isDark ? -0.18 : 0);
+          map.setPaintProperty('osm-basemap', 'raster-contrast', isDark ? 0.14 : 0);
+          map.setPaintProperty('osm-basemap', 'raster-brightness-min', isDark ? 0.22 : 0.5);
+          map.setPaintProperty('osm-basemap', 'raster-brightness-max', isDark ? 0.88 : 1);
+        }
+      }
+
+      if (map.getLayer('satellite-basemap')) {
+        map.setLayoutProperty('satellite-basemap', 'visibility', isSatellite ? 'visible' : 'none');
+      }
+
+      if (map.getLayer('province-boundary')) {
+        map.setPaintProperty('province-boundary', 'line-color', isSatellite ? '#38bdf8' : '#7dd3fc');
+      }
+
+      if (map.getLayer('province-fill')) {
+        map.setPaintProperty('province-fill', 'fill-opacity', isSatellite ? 0.02 : 0.1);
       }
     } catch {
       /* safe ignore */
@@ -422,7 +440,7 @@ export function ThailandMap({
       <div ref={containerRef} className="map-canvas" />
       <MapStatusMessages mapReady={mapReady} mapUnavailable={mapUnavailable} boundaryUnavailable={boundaryUnavailable} />
       <div className="map-license-note">
-        Boundary: geoBoundaries THA ADM1 · 77 provinces · not an official disaster jurisdiction
+        ขอบเขต 77 จังหวัด (geoBoundaries THA ADM1)
       </div>
     </section>
   );

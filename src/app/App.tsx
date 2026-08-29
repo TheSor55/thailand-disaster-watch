@@ -432,7 +432,7 @@ export function App() {
 
         <div className="header-status-row">
           <div className="meta-pill meta-pill--dev">
-            <span>v1.3.0 · PROD</span>
+            <span>v1.4.0 · PROD</span>
           </div>
           <p className="caption">ระบบสนับสนุนการตัดสินใจเฝ้าระวังภัยพิบัติแห่งชาติ · ศูนย์ปฏิบัติการน้ำและภูมิอากาศ</p>
         </div>
@@ -547,13 +547,17 @@ export function App() {
               </button>
               <button
                 type="button"
-                className={`module-nav-item${isThaiWaterView ? ' is-active' : ''}`}
-                onClick={() => setAppView('thaiwater')}
-                aria-pressed={isThaiWaterView}
+                className={`module-nav-item${isGisView && showRadar ? ' is-active' : ''}`}
+                onClick={() => {
+                  setAppView('gis');
+                  setShowRadar(true);
+                }}
+                aria-pressed={isGisView && showRadar}
+                title="เปิดแผนที่เรดาร์ตรวจอากาศสังเกตการณ์สด"
               >
                 <span className="icon">🌧️</span>
-                <span>เรดาร์สด สสน.</span>
-                <span className="tag" style={{ background: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', borderColor: '#0284c7' }}>THAIWATER</span>
+                <span>เรดาร์ตรวจอากาศ</span>
+                <span className="tag" style={{ background: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', borderColor: '#0284c7' }}>LIVE RADAR</span>
               </button>
               <button
                 type="button"
@@ -574,18 +578,6 @@ export function App() {
                 <span className="icon">ℹ</span>
                 <span>เกี่ยวกับระบบ</span>
               </button>
-            </div>
-
-            {/* Author / Creator & License Branding Box */}
-            <div className="author-branding-box">
-              <div className="author-branding-inner">
-                <span className="author-badge-icon">🎖️</span>
-                <div className="author-badge-text">
-                  <span className="author-badge-label">ผู้จัดทำและลิขสิทธิ์การออกแบบ</span>
-                  <strong className="author-name">คุณสรวิศ สุวรรณรงค์</strong>
-                  <small className="author-sub">Sorawit Suwannarong</small>
-                </div>
-              </div>
             </div>
           </section>
 
@@ -671,6 +663,18 @@ export function App() {
             showFlood={showFlood}
             onFloodVisibilityChange={setShowFlood}
           />
+
+          {/* Author / Creator & License Branding Box (Moved to bottom of left rail) */}
+          <div className="author-branding-box">
+            <div className="author-branding-inner">
+              <span className="author-badge-icon">🎖️</span>
+              <div className="author-badge-text">
+                <span className="author-badge-label">ผู้จัดทำและลิขสิทธิ์การออกแบบ</span>
+                <strong className="author-name">คุณสรวิศ สุวรรณรงค์</strong>
+                <small className="author-sub">Sorawit Suwannarong</small>
+              </div>
+            </div>
+          </div>
           </aside>
         )}
 
@@ -683,14 +687,6 @@ export function App() {
                   <h2>{titleForNavigation(navigation)}</h2>
                 </div>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <button
-                    className="btn-ghost"
-                    type="button"
-                    onClick={() => setWindyModalOpen(true)}
-                    title="เปิดแผนที่กระแสลมและพายุ Windy Interactive"
-                  >
-                    🌀 Windy Overlay
-                  </button>
                   {navigation.viewLevel !== 'national' && (
                     <button
                       className="btn-ghost"
@@ -735,25 +731,6 @@ export function App() {
                   />
                 )}
               </div>
-
-              <div className="module-strip" aria-label="Disaster modules status">
-                {situationModules.map((module) => {
-                  const isReady = module === 'Dam' || module === 'River' || module === 'CCTV';
-                  const isPilot = module === 'Flood';
-                  const statusClass = isReady ? 'status-dot--active' : isPilot ? 'status-dot--pilot' : '';
-                  const statusText = isReady ? 'TELEMETRY READY' : isPilot ? 'SATELLITE PILOT' : 'No live data';
-
-                  return (
-                    <article key={module} className="module-pill">
-                      <span className={`status-dot ${statusClass}`} aria-hidden="true" />
-                      <div>
-                        <small>{module}</small>
-                        <span>{statusText}</span>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
             </section>
 
             <ModuleErrorBoundary moduleName="Situation panels">
@@ -794,11 +771,7 @@ export function App() {
                 <DataProvenance record={provenanceRecord} />
               </section>
 
-              {/* Official Situation Alerts */}
-              <SituationAlertCard
-                alerts={displayedAlerts}
-                provinceNameTh={currentAreaName}
-              />
+              {/* Official Situation Alerts (Removed unused block as requested by user) */}
 
               {/* Dam Telemetry */}
               <DamSituationCard
@@ -845,27 +818,11 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    onClick={handleExportPdf}
-                    className="share-button btn-pdf-active"
-                    title="ส่งออกรายงาน PDF สรุปสถานการณ์"
-                  >
-                    <span>📄 รายงาน PDF สรุปสถานการณ์</span>
-                  </button>
-                  <button
-                    type="button"
                     onClick={handleBcmReport}
                     className="share-button btn-bcm-active"
                     title="เปิดหน้ารายงานแผนฉุกเฉิน BCM"
                   >
                     <span>🛡 แผนฉุกเฉิน BCM Action Plan</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCopySummary}
-                    className="share-button btn-copy-active"
-                    title="คัดลอกข้อความสรุปสถานการณ์ลง Clipboard"
-                  >
-                    <span>✍ คัดลอกข้อความสรุป (Copy Text)</span>
                   </button>
                 </div>
               </section>
