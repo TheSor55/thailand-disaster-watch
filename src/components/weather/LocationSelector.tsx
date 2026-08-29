@@ -332,7 +332,7 @@ export function LocationSelector({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             disabled={disabled}
-            aria-label="ค้นหาจังหวัด"
+            aria-label="ค้นหาชื่อจังหวัด"
           />
           {searchQuery && (
             <button
