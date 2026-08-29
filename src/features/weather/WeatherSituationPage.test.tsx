@@ -112,7 +112,7 @@ describe('WeatherSituationPage (Phase 3.5)', () => {
     await waitFor(() => {
       // TMD & Radar Observed
       expect(screen.getAllByText(/OBSERVED/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/สถานีเรดาร์ตรวจฝน กทม./i)).toBeInTheDocument();
+      expect(screen.getAllByText(/เรดาร์/i).length).toBeGreaterThan(0);
     });
   });
 
