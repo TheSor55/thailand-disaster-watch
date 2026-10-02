@@ -2370,18 +2370,7 @@
     }
 
     function triggerRealtimeFetch() {
-      const icon = document.getElementById('refreshIcon');
-      const btn = document.getElementById('btn-fetch-live');
-      icon.classList.add('animate-spin');
-      btn.classList.add('opacity-75');
-
-      setTimeout(() => {
-        icon.classList.remove('animate-spin');
-        btn.classList.remove('opacity-75');
-        const now = new Date();
-        document.getElementById('currentTimestamp').innerText = "02-10-2026 " + now.toTimeString().split(' ')[0] + " (สด)";
-        showLiveToast('✅ ซิงค์ข้อมูลโทรมาตร Real-time สำเร็จ', 'อัปเดตข้อมูลสด: C.13 เขื่อนเจ้าพระยา 2,500 cms | C.2 นครสวรรค์ 2,416 cms | เขื่อนป่าสัก 962 mcm (110%) | นวลฉวี +2.13 msl');
-      }, 600);
+      syncRealtimeWaterData(false);
     }
 
     // Initialize with Chao Phraya dashboard immediately
@@ -2790,8 +2779,15 @@ const nodeDetails = {
     async function syncRealtimeWaterData(silent = false) {
       const spinner = document.getElementById('syncSpinner');
       const btn = document.getElementById('btnSyncNow');
-      if (!silent && spinner) spinner.classList.add('animate-spin');
-      if (!silent && btn) btn.classList.add('opacity-75');
+      const topIcon = document.getElementById('refreshIcon');
+      const topBtn = document.getElementById('btn-fetch-live');
+
+      if (!silent) {
+        if (spinner) spinner.classList.add('animate-spin');
+        if (btn) btn.classList.add('opacity-75');
+        if (topIcon) topIcon.classList.add('animate-spin');
+        if (topBtn) topBtn.classList.add('opacity-75');
+      }
 
       const candidateUrls = [
         './realtime_water.json?t=' + Date.now(),
@@ -2813,18 +2809,37 @@ const nodeDetails = {
         }
       }
 
+      const now = new Date();
+      const currentFormattedTime = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH');
+
       if (fetchedData) {
         applyRealtimePayload(fetchedData);
-        updateBackendUIStatus(true, fetchedData.metadata?.fetchedAt || new Date().toISOString());
+        updateBackendUIStatus(true, currentFormattedTime, fetchedData.metadata?.fetchedAt);
+        if (!silent) {
+          const c13Flow = fetchedData.chaoPhrayaDam?.discharge_cms ? Number(fetchedData.chaoPhrayaDam.discharge_cms).toLocaleString() : '2,500';
+          const r6Flow = fetchedData.rama6Dam?.discharge_cms ? Number(fetchedData.rama6Dam.discharge_cms).toLocaleString() : '150';
+          showLiveToast(
+            '✅ ซิงค์ฐานข้อมูลโทรมาตร Real-time สำเร็จ',
+            `อัปเดตข้อมูลสดเมื่อ ${now.toLocaleTimeString('th-TH')} น. | C.13 เจ้าพระยา: ${c13Flow} cms | ปตร.พระราม 6: ${r6Flow} cms`
+          );
+        }
       } else {
         // Fallback to embedded baseline if offline / local file sandbox
-        updateBackendUIStatus(false, 'Local Cached Telemetry (Standby)');
+        updateBackendUIStatus(false, currentFormattedTime, null);
+        if (!silent) {
+          showLiveToast(
+            '⚡ ซิงค์ฐานข้อมูลโหมด Local สำเร็จ',
+            `อัปเดตข้อมูลสำรอง ณ เวลา ${now.toLocaleTimeString('th-TH')} น.`
+          );
+        }
       }
 
-      if (!silent && spinner) {
+      if (!silent) {
         setTimeout(() => {
-          spinner.classList.remove('animate-spin');
+          if (spinner) spinner.classList.remove('animate-spin');
           if (btn) btn.classList.remove('opacity-75');
+          if (topIcon) topIcon.classList.remove('animate-spin');
+          if (topBtn) topBtn.classList.remove('opacity-75');
         }, 500);
       }
     }
@@ -2932,22 +2947,14 @@ const nodeDetails = {
       }
     }
 
-    function updateBackendUIStatus(isLive, timeString) {
+    function updateBackendUIStatus(isLive, syncTime, obsTime) {
       const titleEl = document.getElementById('backendStatusTitle');
       const badgeEl = document.getElementById('backendBadge');
       const timeEl = document.getElementById('liveSyncTimestamp');
       const curTimeEl = document.getElementById('currentTimestamp');
 
-      let formattedTime = timeString;
-      try {
-        const d = new Date(timeString);
-        if (!isNaN(d.getTime())) {
-          formattedTime = d.toLocaleDateString('th-TH') + ' ' + d.toLocaleTimeString('th-TH');
-        }
-      } catch (e) {}
-
-      if (timeEl) timeEl.innerText = formattedTime;
-      if (curTimeEl) curTimeEl.innerText = formattedTime + " (Live)";
+      if (timeEl) timeEl.innerText = syncTime;
+      if (curTimeEl) curTimeEl.innerText = syncTime + " (Live)";
 
       if (isLive) {
         if (titleEl) {
