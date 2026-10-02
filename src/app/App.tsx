@@ -41,7 +41,6 @@ import { CctvPanel } from '../components/cctv/CctvPanel';
 import { WindyView } from '../components/windy/WindyView';
 import { WindyEmbedModal } from '../components/windy/WindyEmbedModal';
 import { SeismoWatchView } from '../components/seismo/SeismoWatchView';
-import { ChaoPhrayaFlowView } from '../components/chaopraya/ChaoPhrayaFlowView';
 import { ThaiWaterRadarView } from '../components/thaiwater/ThaiWaterRadarView';
 
 const ThailandMap = lazy(() =>
@@ -92,12 +91,12 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [windyModalOpen, setWindyModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'chaopraya' | 'mysites' | 'thaiwater' | 'about'>('gis');
+  const [appView, setAppView] = useState<'gis' | 'weather' | 'windy' | 'seismo' | 'water_watch' | 'mysites' | 'thaiwater' | 'about'>('gis');
   const isGisView = appView === 'gis';
   const isWeatherView = appView === 'weather';
   const isWindyView = appView === 'windy';
   const isSeismoView = appView === 'seismo';
-  const isChaoPhrayaView = appView === 'chaopraya';
+  const isWaterWatchView = appView === 'water_watch';
   const isMySitesView = appView === 'mysites';
   const isThaiWaterView = appView === 'thaiwater';
   const isAboutView = appView === 'about';
@@ -174,10 +173,10 @@ export function App() {
         { label: 'แผ่นดินไหว (SeismoWatch)', path: '/seismo', current: true },
       ];
     }
-    if (appView === 'chaopraya') {
+    if (appView === 'water_watch') {
       return [
         { label: 'แผนที่ GIS', path: '/', current: false },
-        { label: 'ผังน้ำลุ่มน้ำเจ้าพระยา (HII Flow)', path: '/chaopraya', current: true },
+        { label: 'ผังน้ำ & โทรมาตร CCTV สด (Real-Time)', path: '/water_level_cctv_alert_app.html', current: true },
       ];
     }
     if (appView === 'mysites') {
@@ -428,7 +427,7 @@ export function App() {
 
         <div className="header-status-row">
           <div className="meta-pill meta-pill--dev">
-            <span>v1.4.0 · PROD</span>
+            <span>v1.5.0 · PROD</span>
           </div>
           <p className="caption">ระบบสนับสนุนการตัดสินใจเฝ้าระวังภัยพิบัติแห่งชาติ · ศูนย์ปฏิบัติการน้ำและภูมิอากาศ</p>
         </div>
@@ -465,6 +464,8 @@ export function App() {
               onClick={() => {
                 if (item.path === '/weather') {
                   setAppView('weather');
+                } else if (item.path === '/water_level_cctv_alert_app.html') {
+                  setAppView('water_watch');
                 } else if (item.path === '/mysites') {
                   setAppView('mysites');
                 } else if (item.path === '/about') {
@@ -533,13 +534,14 @@ export function App() {
               </button>
               <button
                 type="button"
-                className={`module-nav-item${isChaoPhrayaView ? ' is-active' : ''}`}
-                onClick={() => setAppView('chaopraya')}
-                aria-pressed={isChaoPhrayaView}
+                className={`module-nav-item${isWaterWatchView ? ' is-active' : ''}`}
+                onClick={() => setAppView('water_watch')}
+                aria-pressed={isWaterWatchView}
+                title="เปิดศูนย์ข้อมูลผังน้ำ ระดับน้ำ และกล้อง CCTV สด Real-Time (5 แท็บ)"
               >
                 <span className="icon">🌊</span>
-                <span>ผังน้ำเจ้าพระยา</span>
-                <span className="tag" style={{ background: 'rgba(2, 132, 199, 0.25)', color: '#38bdf8', borderColor: '#0284c7' }}>LIVE HII</span>
+                <span>ผังน้ำ &amp; CCTV สด</span>
+                <span className="tag" style={{ background: 'rgba(6, 182, 212, 0.25)', color: '#22d3ee', borderColor: '#0891b2' }}>LIVE 5-TAB</span>
               </button>
               <button
                 type="button"
@@ -773,7 +775,7 @@ export function App() {
               <DamSituationCard
                 dams={displayedDams}
                 provinceNameTh={currentAreaName}
-                onOpenChaoPhrayaFlow={() => setAppView('chaopraya')}
+                onOpenChaoPhrayaFlow={() => setAppView('water_watch')}
               />
 
               {/* River Telemetry */}
@@ -879,11 +881,43 @@ export function App() {
           </div>
         )}
 
-        {isChaoPhrayaView && (
-          <div className="full-content-column" aria-label="ผังน้ำลุ่มน้ำเจ้าพระยา">
-            <ModuleErrorBoundary moduleName="Chao Phraya Flow Diagram">
-              <div className="chaopraya-page-wrapper" style={{ minHeight: 'calc(100vh - 140px)', padding: '10px 14px' }}>
-                <ChaoPhrayaFlowView onBack={() => setAppView('gis')} />
+
+        {isWaterWatchView && (
+          <div className="full-content-column" aria-label="ศูนย์โทรมาตรน้ำและกล้อง CCTV สด Real-Time">
+            <ModuleErrorBoundary moduleName="Real-Time Water & CCTV Telemetry">
+              <div className="water-watch-page-wrapper" style={{ minHeight: 'calc(100vh - 130px)', padding: '8px 12px', display: 'flex', flexDirection: 'column' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <button
+                    type="button"
+                    className="btn-command-back"
+                    onClick={() => setAppView('gis')}
+                    aria-label="กลับสู่แผนที่ GIS"
+                  >
+                    <span className="btn-back-icon">←</span>
+                    <span>กลับสู่แผนที่ GIS</span>
+                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#38bdf8', fontFamily: 'monospace' }}>
+                      ● REAL-TIME FLOOD &amp; CCTV COMMAND VIEW
+                    </span>
+                    <a
+                      href="/water_level_cctv_alert_app.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-pro-action btn-pro-action--primary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '12px', textDecoration: 'none' }}
+                      title="เปิดในแท็บใหม่แบบเต็มหน้าจอ"
+                    >
+                      <span>🌐 เปิดเต็มจอ (New Tab)</span>
+                      <span>↗</span>
+                    </a>
+                  </div>
+                </header>
+                <iframe
+                  src="/water_level_cctv_alert_app.html"
+                  title="Thailand Disaster Watch Real-Time Water & CCTV Telemetry"
+                  style={{ width: '100%', minHeight: 'calc(100vh - 200px)', border: '1px solid rgba(51, 65, 85, 0.6)', borderRadius: '16px', background: '#020617' }}
+                />
               </div>
             </ModuleErrorBoundary>
           </div>

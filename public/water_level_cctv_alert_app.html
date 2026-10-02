@@ -1,0 +1,3251 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chao Phraya & Suburban Canals Real-time WaterWatch AI</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Sarabun", sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Animated River Flows */
+    @keyframes flow-fast { 0% { stroke-dashoffset: 40; } 100% { stroke-dashoffset: 0; } }
+    @keyframes flow-med { 0% { stroke-dashoffset: 30; } 100% { stroke-dashoffset: 0; } }
+    .flow-chaopraya { stroke-dasharray: 8 8; animation: flow-fast 0.85s linear infinite; }
+    .flow-pasak { stroke-dasharray: 6 6; animation: flow-med 1.3s linear infinite; }
+    .flow-canal { stroke-dasharray: 5 5; animation: flow-med 1.8s linear infinite; }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.25); }
+      50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.6); }
+    }
+    .glow-cyan { animation: pulse-glow 3s infinite ease-in-out; }
+
+    /* Glassmorphism & High-Tech Panels */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px -12px rgba(2, 132, 199, 0.25);
+    }
+
+    /* Risk Borders */
+    .station-card {
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .station-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .station-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+    
+    .station-card.is-critical {
+      border-color: rgba(244, 63, 94, 0.4);
+      background: linear-gradient(180deg, rgba(30, 27, 75, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+    .station-card.is-critical::before {
+      background: linear-gradient(90deg, #f43f5e, #fb7185);
+    }
+    
+    .station-card.is-warning {
+      border-color: rgba(245, 158, 11, 0.35);
+      background: linear-gradient(180deg, rgba(41, 37, 36, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+    .station-card.is-warning::before {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+    
+    .station-card.is-normal {
+      border-color: rgba(16, 185, 129, 0.25);
+      background: linear-gradient(180deg, rgba(19, 78, 74, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+    .station-card.is-normal::before {
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    /* Custom Modern Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.8); }
+
+    /* Toast Notification */
+    #liveToast {
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(-20px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #liveToast.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased font-sans p-3 md:p-6">
+
+  <!-- Header Section: Mission-Critical Command Center -->
+  <header class="max-w-7xl mx-auto mb-4 bg-slate-900/95 border border-slate-800/90 rounded-2xl p-4 md:p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+    <!-- Ambient Header Glow Accent -->
+    <div class="absolute -top-24 -left-24 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+      
+      <!-- Logo, System Badges & Title -->
+      <div class="flex items-start md:items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-sky-600/15 to-indigo-600/20 border border-cyan-500/40 flex items-center justify-center shrink-0 shadow-lg shadow-cyan-950/40">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+              Thailand Disaster Watch
+              <span class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-mono font-semibold border border-slate-700">v1.5.0</span>
+            </h1>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold tracking-wide flex items-center gap-1.5 shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+              HYDRAULIC SITUATION ROOM
+            </span>
+          </div>
+          <p class="text-slate-400 text-xs md:text-sm mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>ศูนย์ข้อมูลตัดสินใจสถานการณ์น้ำลุ่มเจ้าพระยา &amp; ปริมณฑล (โทรมาตร IoT สด สสน. HII • SCADA ปตร.จุฬาลงกรณ์ • กทม. DDS)</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Telemetry Status Ticker & Sync Action -->
+      <div class="flex flex-wrap items-center gap-3 shrink-0">
+        <!-- Live Ticker Chips -->
+        <div class="hidden sm:flex items-center gap-2 bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 text-xs">
+          <span class="flex items-center gap-1 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span> 3 วิกฤต
+          </span>
+          <span class="text-slate-600">|</span>
+          <span class="flex items-center gap-1 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> 6 เฝ้าระวัง
+          </span>
+          <span class="text-slate-600">|</span>
+          <span class="flex items-center gap-1 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> 23 ปกติ
+          </span>
+        </div>
+
+        <div class="bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 text-xs flex items-center gap-2">
+          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">โทรมาตรสด:</span>
+          <span id="currentTimestamp" class="font-mono text-cyan-300 font-bold">02-10-2026 09:40:00</span>
+        </div>
+
+        <button onclick="triggerRealtimeFetch()" id="btn-fetch-live" class="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white text-xs px-4 py-2.5 rounded-xl font-bold transition shadow-lg shadow-cyan-950/40 active:scale-95 border border-cyan-400/30">
+          <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          ดึงข้อมูลสด (Live Sync)
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Segmented Control Navigation Tabs Bar -->
+    <nav class="flex flex-wrap items-center gap-2 mt-4 pt-3.5 border-t border-slate-800/80" aria-label="เมนูหลักระบบเฝ้าระวัง">
+      <button onclick="switchTab('chaopraya-dashboard')" id="tab-btn-chaopraya-dashboard" class="tab-btn active bg-cyan-600 text-white text-xs md:text-sm px-4 py-2 rounded-xl font-bold shadow-lg shadow-cyan-950/40 flex items-center gap-2 border border-cyan-400/40 transition">
+        <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+        ★ แดชบอร์ดระดับน้ำเจ้าพระยา RealTime
+      </button>
+
+      <button onclick="switchTab('canal-dashboard')" id="tab-btn-canal-dashboard" class="tab-btn bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs md:text-sm px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 border border-slate-700/50 transition">
+        <span>🏙️</span> คลองปริมณฑล &amp; ฝั่งตะวันตก
+      </button>
+
+      <button onclick="switchTab('cctv')" id="tab-btn-cctv" class="tab-btn bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs md:text-sm px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 border border-slate-700/50 transition">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        กล้อง CCTV สด &amp; ภาพหน้างาน
+      </button>
+
+      <button onclick="switchTab('schematic')" id="tab-btn-schematic" class="tab-btn bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs md:text-sm px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 border border-slate-700/50 transition">
+        <span>🗺️</span> ผังโฟลว์มหาลุ่มน้ำเหนือ-เจ้าพระยา (HII Flow)
+      </button>
+
+      <button onclick="switchTab('pathum')" id="tab-btn-pathum" class="tab-btn bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs md:text-sm px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 border border-slate-700/50 transition">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span> ปทุมธานี (คลอง 1-10 &amp; โฟลว์ป่าสัก)
+      </button>
+
+      <!-- Back to Main GIS Platform Link -->
+      <a href="/" class="ml-auto flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-cyan-300 hover:text-white text-xs font-semibold border border-cyan-500/30 transition shadow-lg" title="กลับสู่หน้าจอแผนที่หลัก GIS แพลตฟอร์ม (disaster.futuregreennet.com)">
+        <span>🗺️</span> กลับสู่แผนที่หลัก GIS ↗
+      </a>
+    </nav>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- GLOBAL PRODUCTION BACKEND SERVICE STATUS BAR                              -->
+  <!-- ========================================================================= -->
+  <aside class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3" aria-label="สถานะการเชื่อมต่อเซิร์ฟเวอร์">
+    <div class="bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-900 border border-emerald-500/40 rounded-2xl p-3 px-4 shadow-xl flex flex-wrap items-center justify-between gap-3 text-xs">
+      
+      <!-- Left: Connection Status -->
+      <div class="flex items-center gap-3">
+        <span class="flex h-3.5 w-3.5 relative" id="statusPulseDot">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+        </span>
+        <div>
+          <div class="flex items-center gap-2">
+            <strong id="backendStatusTitle" class="text-emerald-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              ● PRODUCTION BACKEND CONNECTED
+            </strong>
+            <span id="backendBadge" class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[10px] text-emerald-300 border border-emerald-500/30 font-medium">
+              Data Ingestion Worker Live
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-300 mt-0.5">
+            สตรีมข้อมูลโทรมาตรอัตโนมัติ: <span class="text-sky-300 font-medium">สสน. (HII ThaiWater)</span> • เครื่องสูบน้ำ: <span class="text-sky-300 font-medium">ปตร.จุฬาลงกรณ์ SCADA</span> • เซนเซอร์คลอง: <span class="text-sky-300 font-medium">กทม. DDS &amp; ท้องถิ่นปทุมธานี</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Real-Time Timestamp & Sync Action -->
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="text-right">
+          <span class="text-[10px] text-slate-400 block">ซิงค์ฐานข้อมูลสดล่าสุด:</span>
+          <strong id="liveSyncTimestamp" class="text-cyan-300 font-mono text-xs">กำลังตรวจจับ...</strong>
+        </div>
+        <button onclick="triggerManualSync()" id="btnSyncNow" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-lg active:scale-95">
+          <span id="syncSpinner" class="inline-block transition-transform">🔄</span> ซิงค์สด (Sync Now)
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 1: CHAO PHRAYA REAL-TIME WATER LEVEL DASHBOARD (FEATURED PRIMARY)     -->
+  <!-- ========================================================================= -->
+  <section id="tab-chaopraya-dashboard" class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- Hero Strategic Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 border border-cyan-500/30 rounded-2xl p-5 shadow-xl">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="text-xs uppercase font-bold text-cyan-300 tracking-wider">Chao Phraya River Real-time Telemetry Dashboard</span>
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white mt-1">แดชบอร์ดระดับน้ำและอัตราการไหลแม่น้ำเจ้าพระยา (Real-Time)</h2>
+          <p class="text-xs text-slate-300 mt-1">
+            แก้ปัญหากล้อง CCTV ภาพค้าง/ภาพไม่เดิน ด้วยระบบ <strong>"เซนเซอร์โทรมาตรวัดระดับน้ำ 24 ชั่วโมง"</strong> สไตล์ KMITL OPRE ครอบคลุมตั้งแต่ท้ายเขื่อนเจ้าพระยา ➔ อยุธยา ➔ ปทุมธานี ➔ นนทบุรี ➔ ปากน้ำ
+          </p>
+        </div>
+
+        <!-- KPI Status Counters for Chao Phraya -->
+        <div class="grid grid-cols-3 gap-2.5 text-center text-xs shrink-0">
+          <div class="bg-rose-950/50 border border-rose-500/40 px-3.5 py-2.5 rounded-xl">
+            <span class="text-slate-400 block text-[10px]">ล้นตลิ่ง/วิกฤต</span>
+            <span class="font-bold text-rose-400 text-xl">3 จุด</span>
+            <span class="text-[9px] text-rose-300/80">โผงเผง, บางบาล, ป่าสัก</span>
+          </div>
+          <div class="bg-amber-950/50 border border-amber-500/40 px-3.5 py-2.5 rounded-xl">
+            <span class="text-slate-400 block text-[10px]">เฝ้าระวังตลิ่ง</span>
+            <span class="font-bold text-amber-400 text-xl">4 จุด</span>
+            <span class="text-[9px] text-amber-300/80">ท้ายเขื่อน, นวลฉวี, ปทุมฯ</span>
+          </div>
+          <div class="bg-emerald-950/50 border border-emerald-500/40 px-3.5 py-2.5 rounded-xl">
+            <span class="text-slate-400 block text-[10px]">ปกติ/ในเกณฑ์</span>
+            <span class="font-bold text-emerald-400 text-xl">2 จุด</span>
+            <span class="text-[9px] text-emerald-300/80">ท่าน้ำนนท์, ป้อมพระจุลฯ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Guidance & CCTV Hybrid Note -->
+      <div class="mt-4 pt-3.5 border-t border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-slate-300">
+        <div class="flex items-center gap-2">
+          <span class="text-cyan-400 font-bold">💡 โครงสร้าง Hybrid:</span>
+          <span>ใช้ตัวเลขเซนเซอร์ตัดสินใจแจ้งเตือน + กดปุ่ม <strong>[📷 ดูกล้อง CCTV สด]</strong> บนการ์ดเพื่อเปิดดูภาพหน้างานจริง</span>
+        </div>
+        <div class="flex items-center gap-3 text-[11px]">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-0.5 bg-cyan-400"></span> กราฟระดับน้ำสด</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-0.5 bg-amber-400 border-b border-dashed border-amber-400"></span> เส้นเฝ้าระวัง</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-0.5 bg-rose-500 border-b border-dashed border-rose-500"></span> เส้นวิกฤต/ระดับตลิ่ง</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chao Phraya Strategic Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="chaopraya-cards-container">
+      <!-- Rendered via JS -->
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 2: CANAL DASHBOARD (คลองปริมณฑล) + WEST ZONE (บางบอน & ท่าจีน)         -->
+  <!-- ========================================================================= -->
+  <section id="tab-canal-dashboard" class="max-w-7xl mx-auto space-y-6 hidden">
+    
+    <!-- Canal Header Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+      <div class="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="text-xs uppercase font-bold text-cyan-300 tracking-wider">Suburban Canals Real-time Telemetry Dashboard</span>
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white mt-1">แดชบอร์ดระดับน้ำคลองปริมณฑล &amp; ฝั่งตะวันตก (Real-Time)</h2>
+          <p class="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
+            โครงข่ายสถานีโทรมาตรตรวจวัดระดับน้ำและประตูระบายน้ำ: <strong>ฝั่งตะวันตก (เขตบางบอน &amp; ลุ่มน้ำแม่น้ำท่าจีน)</strong>, <strong>ปทุมธานี (คลอง 1-6)</strong>, <strong>ฝั่งตะวันออก (ลาดกระบัง)</strong> และ <strong>นนทบุรี</strong>
+          </p>
+        </div>
+
+        <!-- Zone Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0" id="canal-filter-buttons">
+          <button onclick="filterCanalZone('all')" id="filter-btn-all" class="canal-filter-btn px-3.5 py-1.5 bg-cyan-600 text-white rounded-xl text-xs font-semibold shadow-lg shadow-cyan-950/40 border border-cyan-400/40 transition">
+            ทั้งหมด (<span id="count-all">20</span>)
+          </button>
+          <button onclick="filterCanalZone('west')" id="filter-btn-west" class="canal-filter-btn px-3.5 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium border border-slate-700/80 transition">
+            🌟 ฝั่งตะวันตก: บางบอน &amp; ท่าจีน (<span id="count-west">8</span>)
+          </button>
+          <button onclick="filterCanalZone('pathum')" id="filter-btn-pathum" class="canal-filter-btn px-3.5 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium border border-slate-700/80 transition">
+            ปทุมธานี: คลอง 1-6 (<span id="count-pathum">7</span>)
+          </button>
+          <button onclick="filterCanalZone('east')" id="filter-btn-east" class="canal-filter-btn px-3.5 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium border border-slate-700/80 transition">
+            ฝั่งตะวันออก: ลาดกระบัง (<span id="count-east">3</span>)
+          </button>
+          <button onclick="filterCanalZone('nont')" id="filter-btn-nont" class="canal-filter-btn px-3.5 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium border border-slate-700/80 transition">
+            นนทบุรี (<span id="count-nont">2</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- West Zone Focus Info Bar -->
+      <div class="mt-4 pt-3.5 border-t border-slate-800/90 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs relative z-10">
+        <div class="bg-slate-950/70 p-3.5 rounded-xl border border-cyan-500/25 flex items-start gap-3 backdrop-blur-sm">
+          <span class="text-cyan-400 text-lg shrink-0">🏞️</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <strong class="text-cyan-300 font-semibold">แม่น้ำท่าจีน (ฝั่งตะวันตก):</strong>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">WEST BASIN</span>
+            </div>
+            <p class="text-slate-400 text-[11px] mt-1 leading-relaxed">
+              รับน้ำแบ่งจากเจ้าพระยาผ่าน ปตร.พลเทพ เข้าสุพรรณบุรี (ปตร.โพธิ์พระยา T.1) ไหลผ่านนครปฐม (T.14 นครชัยศรี, T.15 สามพราน) สู่สมุทรสาคร (T.12/ปตร.มหาชัย)
+            </p>
+          </div>
+        </div>
+        <div class="bg-slate-950/70 p-3.5 rounded-xl border border-amber-500/25 flex items-start gap-3 backdrop-blur-sm">
+          <span class="text-amber-400 text-lg shrink-0">🏙️</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <strong class="text-amber-300 font-semibold">เขตบางบอน (กทม. ฝั่งตะวันตก):</strong>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">BKK DRAINAGE</span>
+            </div>
+            <p class="text-slate-400 text-[11px] mt-1 leading-relaxed">
+              ระบบระบายน้ำหลักคลองบางบอน เชื่อมต่อ ปตร.คลองราชมนตรี, คลองหนองใหญ่ และคลองมหาชัย-สนามชัย เพื่อระบายออกสู่อ่าวไทย
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canal Cards Container -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="canal-cards-container">
+      <!-- Rendered via JS -->
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 3: CCTV REAL STREAMS & SNAPSHOT FIX EXPLANATION                       -->
+  <!-- ========================================================================= -->
+  <section id="tab-cctv" class="max-w-7xl mx-auto space-y-6 hidden">
+
+    <!-- Why Image doesn't update & How to fix it Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-900 border border-cyan-500/30 rounded-2xl p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+      <div class="absolute -top-24 -left-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3 relative z-10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-xs uppercase font-bold text-cyan-300 tracking-wider font-mono">CCTV Optical Verification &amp; Ingestion Pipeline</span>
+          </div>
+          <h3 class="text-lg md:text-xl font-bold text-white mt-1 flex items-center gap-2">
+            ศูนย์ตรวจสอบภาพสดกล้อง CCTV หน้างาน (Optical Ground-Truth)
+          </h3>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono font-medium">3 จุดยุทธศาสตร์ปริมณฑล</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300 mt-3 relative z-10">
+        <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <strong class="text-amber-400 font-semibold">1. ข้อจำกัดของกล้องสตรีมสดเทศบาลต้นทาง:</strong>
+          </div>
+          <p class="leading-relaxed text-slate-300 text-[11px]">
+            กล้องเทศบาลต้นทาง (เช่น IP Cam <code>101.109.253.60:8999</code> หรือ <code>cctv-nont.firsttech.co.th</code>) ส่งสัญญาณด้วยโปรโตคอล <strong>RTSP / HTTP MJPEG</strong> ซึ่งเบราว์เซอร์มาตรฐานจะบล็อกหากนำมา Embed บนเว็บ HTTPS (Mixed Content Security Block)
+          </p>
+        </div>
+        <div class="bg-slate-950/80 p-4 rounded-xl border border-emerald-500/30 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <strong class="text-emerald-400 font-semibold">2. สถาปัตยกรรม Production Snapshot Pipeline:</strong>
+          </div>
+          <p class="leading-relaxed text-slate-300 text-[11px]">
+            ระบบจริงใช้ <strong>Backend Ingestion Worker</strong> (Node.js + FFmpeg) แคปเจอร์สแนปช็อตภาพจาก RTSP Stream ทุก <strong>1–2 นาที</strong> บันทึกเป็น WebP/JPEG แล้วกระจายผ่าน CDN พร้อม Timestamp เพื่อให้ผู้บริหารและประชาชนเห็นสภาพน้ำจริง 24 ชม.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Direct Open Links to Original Sources -->
+      <div class="mt-4 pt-3.5 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs relative z-10">
+        <span class="text-slate-400 flex items-center gap-1.5">
+          <span class="text-cyan-400">🌐</span> สตรีมสดต้นทางเทศบาล (เปิดแท็บใหม่เพื่อดูภาพสดต่อเนื่องแบบไม่ผ่าน Proxy):
+        </span>
+        <div class="flex flex-wrap gap-2">
+          <a href="http://101.109.253.60:8999" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 flex items-center gap-1.5 transition font-mono text-[11px]">
+            🔗 สตรีมสด เทศบาลเมืองปทุมธานี ↗
+          </a>
+          <a href="https://www.thaiclouderp.com/video/pakkret_water_report.html" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 flex items-center gap-1.5 transition font-mono text-[11px]">
+            🔗 สตรีมสด เทศบาลนครปากเกร็ด ↗
+          </a>
+          <a href="https://cctv-nont.firsttech.co.th" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 flex items-center gap-1.5 transition font-mono text-[11px]">
+            🔗 สตรีมสด ท่าน้ำนนทบุรี ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Camera Cards with Verified Snapshots & Command Center Overlays -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Camera 1: Pathum Thani -->
+      <div class="station-card bg-slate-900 border border-amber-500/30 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between is-warning">
+        <div>
+          <!-- Camera Header -->
+          <div class="p-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/40">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-cyan-300">CAM-PT01</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> LIVE STREAM
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-100 text-sm mt-1">เทศบาลเมืองปทุมธานี</h3>
+              <p class="text-[11px] text-slate-400">แม่น้ำเจ้าพระยา (ปากคลองบางหลวง/ปทุมธานี)</p>
+            </div>
+            <span class="px-2.5 py-1 text-xs rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold shrink-0">เฝ้าระวัง 🟡</span>
+          </div>
+
+          <!-- Video Snapshot Viewport with HUD Overlay -->
+          <div class="relative bg-black aspect-[4/3] overflow-hidden group cursor-pointer" onclick="openCCTVModal('เทศบาลเมืองปทุมธานี', 'ปากคลองบางหลวง / เจ้าพระยา จ.ปทุมธานี', './pathum_cctv.png', '+2.45 msl (ต่ำกว่าปี 65 เพียง 15 ซม.)', 'http://101.109.253.60:8999')">
+            <img src="./pathum_cctv.png" alt="กล้องเทศบาลเมืองปทุมธานี" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            
+            <!-- HUD Top Bar -->
+            <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+              <span class="bg-black/70 px-2 py-0.5 rounded text-emerald-400 border border-emerald-500/30">REC ● 1080p @ 25fps</span>
+              <span class="bg-black/70 px-2 py-0.5 rounded text-slate-300 border border-slate-700">101.109.253.60:8999</span>
+            </div>
+
+            <!-- Hover Prompt -->
+            <div class="absolute inset-0 bg-cyan-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="px-3.5 py-1.5 rounded-xl bg-slate-900/90 text-cyan-300 text-xs font-semibold border border-cyan-400/50 shadow-2xl flex items-center gap-1.5 backdrop-blur-md">
+                🔍 คลิกเพื่อดูภาพขยายใหญ่ (Modal)
+              </span>
+            </div>
+
+            <!-- HUD Bottom Gradient Telemetry -->
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex flex-col justify-end p-3 pointer-events-none">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-amber-300 font-semibold font-mono">ระดับน้ำสด: +2.45 ม. รทก.</span>
+                <span class="text-[10px] text-slate-300 font-mono">LAT: 14.02° N</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-0.5">ต่ำกว่าระดับน้ำท่วมปี 65 เพียง 15 ซม. (จุดเสี่ยงตลิ่งต่ำ)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Card Controls Footer -->
+        <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
+          <button onclick="openCCTVModal('เทศบาลเมืองปทุมธานี', 'ปากคลองบางหลวง / เจ้าพระยา จ.ปทุมธานี', './pathum_cctv.png', '+2.45 msl (ต่ำกว่าปี 65 เพียง 15 ซม.)', 'http://101.109.253.60:8999')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl font-medium border border-cyan-500/30 transition flex items-center gap-1 text-[11px]">
+            🔍 ขยายดูชัด
+          </button>
+          <a href="http://101.109.253.60:8999" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-medium transition shadow-lg shadow-cyan-950/40 flex items-center gap-1 text-[11px]">
+            สตรีมสดต้นทาง ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Camera 2: Pak Kret -->
+      <div class="station-card bg-slate-900 border border-amber-500/30 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between is-warning">
+        <div>
+          <!-- Camera Header -->
+          <div class="p-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/40">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-cyan-300">CAM-PK02</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> LIVE STREAM
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-100 text-sm mt-1">เทศบาลนครปากเกร็ด</h3>
+              <p class="text-[11px] text-slate-400">เกาะเกร็ด-ปากเกร็ด (มีแถบเกณฑ์สีน้ำท่วม)</p>
+            </div>
+            <span class="px-2.5 py-1 text-xs rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold shrink-0">แตะแถบเตือน 🟡</span>
+          </div>
+
+          <!-- Video Snapshot Viewport with HUD Overlay -->
+          <div class="relative bg-black aspect-[4/3] overflow-hidden group cursor-pointer" onclick="openCCTVModal('เทศบาลนครปากเกร็ด', 'เกาะเกร็ด-ปากเกร็ด จ.นนทบุรี', './pakkret_cctv.png', '+2.15 msl (ท่วมแถบเตือนสีเหลือง)', 'https://www.thaiclouderp.com/video/pakkret_water_report.html')">
+            <img src="./pakkret_cctv.png" alt="กล้องเทศบาลนครปากเกร็ด" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            
+            <!-- HUD Top Bar -->
+            <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+              <span class="bg-black/70 px-2 py-0.5 rounded text-emerald-400 border border-emerald-500/30">REC ● 1080p @ 30fps</span>
+              <span class="bg-black/70 px-2 py-0.5 rounded text-slate-300 border border-slate-700">thaiclouderp/pkk</span>
+            </div>
+
+            <!-- Hover Prompt -->
+            <div class="absolute inset-0 bg-cyan-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="px-3.5 py-1.5 rounded-xl bg-slate-900/90 text-cyan-300 text-xs font-semibold border border-cyan-400/50 shadow-2xl flex items-center gap-1.5 backdrop-blur-md">
+                🔍 คลิกเพื่อดูภาพขยายใหญ่ (Modal)
+              </span>
+            </div>
+
+            <!-- HUD Bottom Gradient Telemetry -->
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex flex-col justify-end p-3 pointer-events-none">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-amber-300 font-semibold font-mono">ระดับน้ำสด: +2.15 ม. รทก.</span>
+                <span class="text-[10px] text-slate-300 font-mono">LAT: 13.91° N</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-0.5">ท่วมแตะแถบสีเหลือง (เริ่มเข้าเกณฑ์เฝ้าระวังบ้านริมน้ำ)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Card Controls Footer -->
+        <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
+          <button onclick="openCCTVModal('เทศบาลนครปากเกร็ด', 'เกาะเกร็ด-ปากเกร็ด จ.นนทบุรี', './pakkret_cctv.png', '+2.15 msl (ท่วมแถบเตือนสีเหลือง)', 'https://www.thaiclouderp.com/video/pakkret_water_report.html')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl font-medium border border-cyan-500/30 transition flex items-center gap-1 text-[11px]">
+            🔍 ขยายดูชัด
+          </button>
+          <a href="https://www.thaiclouderp.com/video/pakkret_water_report.html" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-medium transition shadow-lg shadow-cyan-950/40 flex items-center gap-1 text-[11px]">
+            สตรีมสดต้นทาง ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Camera 3: Nonthaburi Pier -->
+      <div class="station-card bg-slate-900 border border-emerald-500/30 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between is-normal">
+        <div>
+          <!-- Camera Header -->
+          <div class="p-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/40">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-cyan-300">CAM-NB03</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> LIVE STREAM
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-100 text-sm mt-1">ท่าน้ำนนทบุรี</h3>
+              <p class="text-[11px] text-slate-400">ประตูระบายน้ำท่าน้ำนนท์ (FirstTech Gateway)</p>
+            </div>
+            <span class="px-2.5 py-1 text-xs rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold shrink-0">ปกติ 🟢</span>
+          </div>
+
+          <!-- Video Snapshot Viewport with HUD Overlay -->
+          <div class="relative bg-black aspect-[4/3] overflow-hidden group cursor-pointer" onclick="openCCTVModal('ท่าน้ำนนทบุรี', 'ประตูระบายน้ำท่าน้ำนนท์ จ.นนทบุรี', './nont_cctv.jpg', '+1.95 msl (ห่างสันเขื่อน 85 ซม.)', 'https://cctv-nont.firsttech.co.th')">
+            <img src="./nont_cctv.jpg" alt="กล้องเทศบาลนครนนทบุรี" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            
+            <!-- HUD Top Bar -->
+            <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+              <span class="bg-black/70 px-2 py-0.5 rounded text-emerald-400 border border-emerald-500/30">REC ● 1080p @ 25fps</span>
+              <span class="bg-black/70 px-2 py-0.5 rounded text-slate-300 border border-slate-700">cctv-nont.firsttech</span>
+            </div>
+
+            <!-- Hover Prompt -->
+            <div class="absolute inset-0 bg-cyan-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="px-3.5 py-1.5 rounded-xl bg-slate-900/90 text-cyan-300 text-xs font-semibold border border-cyan-400/50 shadow-2xl flex items-center gap-1.5 backdrop-blur-md">
+                🔍 คลิกเพื่อดูภาพขยายใหญ่ (Modal)
+              </span>
+            </div>
+
+            <!-- HUD Bottom Gradient Telemetry -->
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex flex-col justify-end p-3 pointer-events-none">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-emerald-300 font-semibold font-mono">ระดับน้ำสด: +1.95 ม. รทก.</span>
+                <span class="text-[10px] text-slate-300 font-mono">LAT: 13.84° N</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-0.5">ห่างจากสันเขื่อนป้องกันน้ำท่วม +2.80 msl ถึง 85 ซม.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Card Controls Footer -->
+        <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
+          <button onclick="openCCTVModal('ท่าน้ำนนทบุรี', 'ประตูระบายน้ำท่าน้ำนนท์ จ.นนทบุรี', './nont_cctv.jpg', '+1.95 msl (ห่างสันเขื่อน 85 ซม.)', 'https://cctv-nont.firsttech.co.th')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl font-medium border border-cyan-500/30 transition flex items-center gap-1 text-[11px]">
+            🔍 ขยายดูชัด
+          </button>
+          <a href="https://cctv-nont.firsttech.co.th" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-medium transition shadow-lg shadow-cyan-950/40 flex items-center gap-1 text-[11px]">
+            สตรีมสดต้นทาง ↗
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+    <!-- ========================================================================= -->
+  <!-- TAB 4: SCHEMATIC (เส้นทางน้ำเหนือ 4 สายหลัก ➔ ลุ่มน้ำเจ้าพระยา ➔ อ่าวไทย) -->
+  <!-- ========================================================================= -->
+  <section id="tab-schematic" class="max-w-7xl mx-auto space-y-6 hidden">
+
+    <!-- Top Key Metrics Row: 4 Macro River Zones (Live HII Telemetry) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- 1. Northern Inflow (Ping-Wang-Yom-Nan) to Nakhon Sawan C.2 -->
+      <div class="bg-slate-900 border border-sky-500/40 p-4 rounded-2xl bg-sky-950/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-sky-300 font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+            ปากน้ำโพ นครสวรรค์ (C.2)
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-semibold border border-sky-500/30">รวม 4 สายเหนือ</span>
+        </div>
+        <div class="mt-2 text-2xl font-bold font-mono text-cyan-300" id="macro-metric-c2">2,416.00 <span class="text-xs text-slate-400 font-normal">/ 3,590 cms</span></div>
+        <div class="flex items-center justify-between text-[11px] text-slate-300 mt-1">
+          <span>ระดับน้ำ: <strong class="text-white">23.40 msl</strong> (ตลิ่ง 26.20)</span>
+          <span class="text-amber-400 font-semibold">▲ แนวโน้มเพิ่มขึ้น</span>
+        </div>
+      </div>
+
+      <!-- 2. Chao Phraya Dam (C.13 Chainat) -->
+      <div class="bg-slate-900 border border-amber-500/40 p-4 rounded-2xl bg-amber-950/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-amber-300 font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            ท้ายเขื่อนเจ้าพระยา (C.13)
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30">ระบายสูง (Live)</span>
+        </div>
+        <div class="mt-2 text-2xl font-bold font-mono text-amber-400" id="macro-metric-c13">2,500.00 <span class="text-xs text-slate-400 font-normal">/ 2,840 cms</span></div>
+        <div class="flex items-center justify-between text-[11px] text-slate-300 mt-1">
+          <span>ระดับน้ำ: <strong class="text-white">15.93 msl</strong> (ตลิ่ง 16.34)</span>
+          <span class="text-rose-400 font-semibold">เฝ้าระวังเข้มข้น</span>
+        </div>
+      </div>
+
+      <!-- 3. Pa Sak River & Dam (East) -->
+      <div class="bg-slate-900 border border-rose-500/40 p-4 rounded-2xl bg-rose-950/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-rose-300 font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+            เขื่อนป่าสักชลสิทธิ์ (ลพบุรี)
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-semibold border border-rose-500/30">เกินความจุ 110%!</span>
+        </div>
+        <div class="mt-2 text-2xl font-bold font-mono text-rose-400" id="macro-metric-pasak">962.07 <span class="text-xs text-slate-400 font-normal">ล้าน ลบ.ม.</span></div>
+        <div class="flex items-center justify-between text-[11px] text-slate-300 mt-1">
+          <span>ระบายออก: <strong class="text-white">34.57 ล้าน/วัน</strong></span>
+          <span class="text-indigo-300">พระราม 6: 546 cms</span>
+        </div>
+      </div>
+
+      <!-- 4. Lower Basin: Pathum Thani - Nonthaburi - Bangkok -->
+      <div class="bg-slate-900 border border-emerald-500/40 p-4 rounded-2xl bg-emerald-950/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-emerald-300 font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            สะพานนวลฉวี (ปทุมธานี CPY014)
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">ปริมณฑลตอนบน</span>
+        </div>
+        <div class="mt-2 text-2xl font-bold font-mono text-emerald-400" id="macro-metric-nualchawi">+2.13 <span class="text-xs text-slate-400 font-normal">/ 2.50 msl</span></div>
+        <div class="flex items-center justify-between text-[11px] text-slate-300 mt-1">
+          <span>ห่างสันเขื่อน: <strong class="text-white">37 ซม.</strong></span>
+          <span class="text-cyan-300">ปากเกร็ด: +2.15 msl</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Main Schematic SVG Canvas: Complete Northern Inflow to Chao Phraya & Gulf of Thailand -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-xs uppercase font-bold text-cyan-300 tracking-wider">Macro Northern Basin Real-Time Topology</span>
+          </div>
+          <h2 class="text-lg md:text-xl font-bold text-white mt-0.5">
+            ผังโฟลว์เส้นทางน้ำเหนือ (ปิง-วัง-ยม-น่าน) ➔ แม่น้ำเจ้าพระยา ➔ อ่าวไทย
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">
+            บูรณาการโครงข่ายลุ่มน้ำจากภูเขาภาคเหนือ ผ่านเขื่อนภูมิพล, เขื่อนกิ่วลม, เขื่อนสิริกิติ์ สู่จุดรวมน้ำปากน้ำโพ (C.2) แยกฝั่งตะวันตก (ท่าจีน) และฝั่งตะวันออก (ป่าสัก-พระราม 6) พร้อมอัตราการไหลและระดับน้ำ Real-time
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> ปกติ</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> เฝ้าระวัง</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> ล้นตลิ่ง/วิกฤต</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> คลิกลูกศร/โหนดดูรายละเอียด</span>
+        </div>
+      </div>
+
+      <!-- SVG Map Canvas -->
+      <div class="bg-slate-950 rounded-xl border border-slate-800/80 p-4 overflow-x-auto">
+        <svg viewBox="0 0 1440 1420" class="w-full min-w-[1120px] h-auto text-xs font-sans">
+          
+          <!-- ========================================================================= -->
+          <!-- 1. BACKGROUND MOUNTAIN SILHOUETTE (NORTHERN HIGHLANDS)                    -->
+          <!-- ========================================================================= -->
+          <path d="M 0,90 Q 180,20 360,90 Q 540,10 720,90 Q 900,15 1080,90 Q 1260,20 1440,90 L 1440,0 L 0,0 Z" fill="#0f172a" opacity="0.6"/>
+          
+          <!-- Top Region Banner Capsule -->
+          <g transform="translate(720, 36)">
+            <rect x="-180" y="-18" width="360" height="36" rx="18" fill="#1e293b" stroke="#38bdf8" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="5" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">🏔️ เส้นทางน้ำเหนือ (ต้นน้ำ 4 สายหลัก)</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 2. FOUR NORTHERN RIVERS (PING, WANG, YOM, NAN) ➔ CONFLUENCE AT C.2        -->
+          <!-- ========================================================================= -->
+
+          <!-- 2.1 PING RIVER (Left Trunk, starts at x=220, y=70) -->
+          <path d="M 220,70 L 220,240 L 290,320 L 480,410 L 620,440" 
+                fill="none" stroke="#082f49" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 220,70 L 220,240 L 290,320 L 480,410 L 620,440" 
+                fill="none" stroke="#0284c7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 220,70 L 220,240 L 290,320 L 480,410 L 620,440" 
+                fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" class="flow-canal"/>
+
+          <!-- 2.2 WANG RIVER (Merges into Ping from x=380, y=70) -->
+          <path d="M 380,70 L 380,180 L 320,250 L 290,320" 
+                fill="none" stroke="#042f2e" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 380,70 L 380,180 L 320,250 L 290,320" 
+                fill="none" stroke="#0d9488" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 380,70 L 380,180 L 320,250 L 290,320" 
+                fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" class="flow-canal"/>
+
+          <!-- 2.3 YOM RIVER (Central-Right Trunk, starts at x=820, y=70 -> merges into Nan at x=900, y=340) -->
+          <path d="M 820,70 L 820,230 L 880,310 L 920,360" 
+                fill="none" stroke="#082f49" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 820,70 L 820,230 L 880,310 L 920,360" 
+                fill="none" stroke="#0284c7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 820,70 L 820,230 L 880,310 L 920,360" 
+                fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" class="flow-canal"/>
+
+          <!-- 2.4 NAN RIVER (Right Trunk, starts at x=1020, y=70 -> joins Yom at x=920, y=360 -> C.2 at x=620, y=440) -->
+          <path d="M 1020,70 L 1020,230 L 960,310 L 920,360 L 760,420 L 620,440" 
+                fill="none" stroke="#082f49" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 1020,70 L 1020,230 L 960,310 L 920,360 L 760,420 L 620,440" 
+                fill="none" stroke="#0284c7" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 1020,70 L 1020,230 L 960,310 L 920,360 L 760,420 L 620,440" 
+                fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" class="flow-canal"/>
+
+          <!-- 2.5 SAKAE KRANG RIVER (From x=120, y=440 into C.2/Chainat) -->
+          <path d="M 120,440 L 280,440 L 460,480 L 620,500" 
+                fill="none" stroke="#042f2e" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 120,440 L 280,440 L 460,480 L 620,500" 
+                fill="none" stroke="#0d9488" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 120,440 L 280,440 L 460,480 L 620,500" 
+                fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" class="flow-canal"/>
+
+
+          <!-- ========================================================================= -->
+          <!-- 3. MAIN CHAO PHRAYA BASIN (C.2 ➔ C.13 ➔ BANG SAI ➔ GULF OF THAILAND)      -->
+          <!-- ========================================================================= -->
+
+          <!-- MAIN TRUNK: CHAO PHRAYA RIVER (Vertical center at x=620, y=440 to y=1180) -->
+          <path d="M 620,440 L 620,1180" 
+                fill="none" stroke="#082f49" stroke-width="56" stroke-linecap="round"/>
+          <path d="M 620,440 L 620,1180" 
+                fill="none" stroke="#0284c7" stroke-width="38" stroke-linecap="round"/>
+          <path d="M 620,440 L 620,1180" 
+                fill="none" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round" class="flow-chaopraya"/>
+
+          <!-- WEST BIFURCATION: THA CHIN RIVER (Branches out at C.13 x=620, y=550 -> x=220 down to y=1180) -->
+          <path d="M 620,550 L 420,590 L 220,620 L 220,1180" 
+                fill="none" stroke="#042f2e" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 620,550 L 420,590 L 220,620 L 220,1180" 
+                fill="none" stroke="#0d9488" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 620,550 L 420,590 L 220,620 L 220,1180" 
+                fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" class="flow-canal"/>
+
+          <!-- EAST TRIBUTARY: PA SAK RIVER (Starts at x=1220, y=520 -> Pa Sak Dam -> Rama 6 -> joins at x=620, y=910) -->
+          <path d="M 1220,520 L 1220,700 L 1140,790 L 980,850 L 620,910" 
+                fill="none" stroke="#0c4a6e" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+          <path d="M 1220,520 L 1220,700 L 1140,790 L 980,850 L 620,910" 
+                fill="none" stroke="#0284c7" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 1220,520 L 1220,700 L 1140,790 L 980,850 L 620,910" 
+                fill="none" stroke="#818cf8" stroke-width="3.5" stroke-linecap="round" class="flow-pasak"/>
+
+          <!-- KHLONG RANGSIT CONNECTING TRUNK (Pathum Thani to Chulalongkorn gate x=620, y=980) -->
+          <path d="M 1180,980 L 620,980" 
+                fill="none" stroke="#0284c7" stroke-width="20" stroke-linecap="round" opacity="0.85"/>
+          <path d="M 1180,980 L 620,980" 
+                fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" class="flow-canal"/>
+
+
+          <!-- ========================================================================= -->
+          <!-- 4. NORTHERN RIVER TITLE BADGES & PROVINCES TRAVERSED                     -->
+          <!-- ========================================================================= -->
+
+          <!-- 4.1 PING RIVER BADGE -->
+          <g transform="translate(220, 85)" class="cursor-pointer" onclick="selectMacroNode('ping')">
+            <rect x="-85" y="-18" width="170" height="36" rx="8" fill="#082f49" stroke="#38bdf8" stroke-width="1.8"/>
+            <text x="0" y="-3" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">🌊 แม่น้ำปิง (Ping River)</text>
+            <text x="0" y="11" fill="#7dd3fc" font-size="9" text-anchor="middle">เชียงใหม่ • ลำพูน • ตาก</text>
+          </g>
+
+          <!-- 4.2 WANG RIVER BADGE -->
+          <g transform="translate(380, 85)" class="cursor-pointer" onclick="selectMacroNode('wang')">
+            <rect x="-80" y="-18" width="160" height="36" rx="8" fill="#042f2e" stroke="#2dd4bf" stroke-width="1.8"/>
+            <text x="0" y="-3" fill="#2dd4bf" font-size="11" font-weight="bold" text-anchor="middle">🌊 แม่น้ำวัง (Wang River)</text>
+            <text x="0" y="11" fill="#99f6e4" font-size="9" text-anchor="middle">เชียงราย • ลำปาง</text>
+          </g>
+
+          <!-- 4.3 YOM RIVER BADGE -->
+          <g transform="translate(820, 85)" class="cursor-pointer" onclick="selectMacroNode('yom')">
+            <rect x="-85" y="-18" width="170" height="36" rx="8" fill="#082f49" stroke="#38bdf8" stroke-width="1.8"/>
+            <text x="0" y="-3" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">🌊 แม่น้ำยม (Yom River)</text>
+            <text x="0" y="11" fill="#7dd3fc" font-size="9" text-anchor="middle">พะเยา • แพร่ • สุโขทัย • พิจิตร</text>
+          </g>
+
+          <!-- 4.4 NAN RIVER BADGE -->
+          <g transform="translate(1020, 85)" class="cursor-pointer" onclick="selectMacroNode('nan')">
+            <rect x="-85" y="-18" width="170" height="36" rx="8" fill="#082f49" stroke="#38bdf8" stroke-width="1.8"/>
+            <text x="0" y="-3" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">🌊 แม่น้ำน่าน (Nan River)</text>
+            <text x="0" y="11" fill="#7dd3fc" font-size="9" text-anchor="middle">น่าน • อุตรดิตถ์ • พิษณุโลก</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 5. UPSTREAM DAMS WITH REAL-TIME TELEMETRY (BHUMIBOL, KIEW LOM, SIRIKIT)   -->
+          <!-- ========================================================================= -->
+
+          <!-- 5.1 BHUMIBOL DAM (แม่น้ำปิง - จ.ตาก) at x=220, y=175 -->
+          <g transform="translate(220, 175)" class="cursor-pointer" onclick="selectMacroNode('bhumibol')">
+            <rect x="-95" y="-28" width="190" height="56" rx="10" fill="#0f172a" stroke="#0284c7" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-10" fill="#ffffff" font-weight="bold" font-size="11" text-anchor="middle">🏞️ เขื่อนภูมิพล (จ.ตาก)</text>
+            <text x="0" y="6" fill="#38bdf8" font-family="monospace" font-weight="bold" font-size="11" text-anchor="middle">8,973.54 ล้าน ลบ.ม. (67%)</text>
+            <text x="0" y="20" fill="#a7f3d0" font-size="9" text-anchor="middle">ระบาย 0 cms (ปกติ/ปิดระบายช่วยหน่วงน้ำ)</text>
+          </g>
+
+          <!-- 5.2 KIEW LOM DAM (แม่น้ำวัง - จ.ลำปาง) at x=380, y=145 -->
+          <g transform="translate(380, 145)" class="cursor-pointer" onclick="selectMacroNode('kiewlom')">
+            <rect x="-80" y="-24" width="160" height="48" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-7" fill="#ffffff" font-weight="bold" font-size="10" text-anchor="middle">🏞️ เขื่อนกิ่วลม (จ.ลำปาง)</text>
+            <text x="0" y="8" fill="#f59e0b" font-family="monospace" font-weight="bold" font-size="10" text-anchor="middle">97.95 ล้าน (92% เฝ้าระวัง)</text>
+          </g>
+
+          <!-- 5.3 SIRIKIT DAM (แม่น้ำน่าน - จ.อุตรดิตถ์) at x=1020, y=175 -->
+          <g transform="translate(1020, 175)" class="cursor-pointer" onclick="selectMacroNode('sirikit')">
+            <rect x="-95" y="-28" width="190" height="56" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-10" fill="#ffffff" font-weight="bold" font-size="11" text-anchor="middle">🏞️ เขื่อนสิริกิติ์ (จ.อุตรดิตถ์)</text>
+            <text x="0" y="6" fill="#fcd34d" font-family="monospace" font-weight="bold" font-size="11" text-anchor="middle">7,657.30 ล้าน ลบ.ม. (81%)</text>
+            <text x="0" y="20" fill="#fef08a" font-size="9" text-anchor="middle">ระบาย 7.01 ล้าน/วัน (เฝ้าระวัง)</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 6. NORTHERN RIVER FLOW MONITORING STATIONS (LIVE HII CMS)                 -->
+          <!-- ========================================================================= -->
+
+          <!-- 6.1 Ping at P.17 Nakhon Sawan (x=270, y=320) -->
+          <g transform="translate(270, 320)" class="cursor-pointer" onclick="selectMacroNode('p17')">
+            <rect x="-65" y="-18" width="130" height="36" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="0" y="-3" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">P.17 ปิง (ท่างิ้ว)</text>
+            <text x="0" y="11" fill="#38bdf8" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle">968.00 cms</text>
+          </g>
+
+          <!-- 6.2 Wang at W.4A Wang Man (x=380, y=240) -->
+          <g transform="translate(380, 240)" class="cursor-pointer" onclick="selectMacroNode('w4a')">
+            <rect x="-65" y="-18" width="130" height="36" rx="6" fill="#0f172a" stroke="#2dd4bf" stroke-width="1.5"/>
+            <text x="0" y="-3" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">W.4A วัง (วังหมัน)</text>
+            <text x="0" y="11" fill="#2dd4bf" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle">179.30 cms</text>
+          </g>
+
+          <!-- 6.3 Yom at Y.17 Sam Ngam (x=830, y=260) -->
+          <g transform="translate(830, 260)" class="cursor-pointer" onclick="selectMacroNode('y17')">
+            <rect x="-70" y="-20" width="140" height="40" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">Y.17 ยม (พิจิตร)</text>
+            <text x="0" y="12" fill="#fcd34d" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle">250.50 cms (หลาก)</text>
+          </g>
+
+          <!-- 6.4 Nan at N.67 Chum Saeng (x=930, y=340) -->
+          <g transform="translate(930, 340)" class="cursor-pointer" onclick="selectMacroNode('n67')">
+            <rect x="-70" y="-20" width="140" height="40" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">N.67 น่าน (ชุมแสง)</text>
+            <text x="0" y="12" fill="#fcd34d" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle">1,098.00 cms</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 7. MACRO CONFLUENCE: PAK NAM PHO NAKHON SAWAN (C.2) & SAKAE KRANG          -->
+          <!-- ========================================================================= -->
+
+          <!-- 7.1 C.2 Confluence Node at x=620, y=440 -->
+          <g transform="translate(620, 440)" class="cursor-pointer" onclick="selectMacroNode('c2')">
+            <rect x="-115" y="-30" width="230" height="60" rx="12" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2.5" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.6))"/>
+            <text x="0" y="-12" fill="#ffffff" font-weight="bold" font-size="12" text-anchor="middle">⚡ จุดรวมน้ำปากน้ำโพ นครสวรรค์ (C.2)</text>
+            <text x="0" y="6" fill="#38bdf8" font-family="monospace" font-weight="bold" font-size="13" text-anchor="middle">2,416.00 cms</text>
+            <text x="0" y="21" fill="#bae6fd" font-size="9.5" text-anchor="middle">ระดับน้ำ 23.40 msl (ตลิ่ง 26.20 • เฝ้าระวัง ▲)</text>
+          </g>
+
+          <!-- 7.2 Sakae Krang River Node at x=230, y=440 -->
+          <g transform="translate(230, 440)" class="cursor-pointer" onclick="selectMacroNode('sakaekrang')">
+            <rect x="-75" y="-20" width="150" height="40" rx="8" fill="#042f2e" stroke="#2dd4bf" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-weight="bold" font-size="10" text-anchor="middle">แม่น้ำสะแกกรัง (CT.2A)</text>
+            <text x="0" y="12" fill="#2dd4bf" font-family="monospace" font-size="9.5" text-anchor="middle">อุทัยธานี: 127.00 cms</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 8. STRATEGIC REGULATOR: CHAO PHRAYA DAM (C.13 CHAINAT)                   -->
+          <!-- ========================================================================= -->
+
+          <g transform="translate(620, 545)" class="cursor-pointer" onclick="selectMacroNode('c13')">
+            <rect x="-125" y="-32" width="250" height="64" rx="12" fill="#1e1b4b" stroke="#f59e0b" stroke-width="3" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.6))"/>
+            <text x="0" y="-13" fill="#ffffff" font-weight="bold" font-size="13" text-anchor="middle">⚡ เขื่อนเจ้าพระยา (C.13 จ.ชัยนาท)</text>
+            <text x="0" y="7" fill="#f59e0b" font-family="monospace" font-weight="bold" font-size="15" text-anchor="middle">ระบาย 2,500.00 cms</text>
+            <text x="0" y="23" fill="#fde68a" font-size="10" text-anchor="middle">ระดับน้ำ 15.93 msl (ระดับตลิ่ง 16.34 msl • เตือนภัย)</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 9. WEST DIVERSIFIED TRUNK: THA CHIN RIVER (ชัยนาท ➔ สุพรรณฯ ➔ นครปฐม ➔ มหาชัย) -->
+          <!-- ========================================================================= -->
+
+          <!-- 9.1 Polthep Sluice Gate at x=340, y=585 -->
+          <g transform="translate(340, 585)" class="cursor-pointer" onclick="selectMacroNode('polthep')">
+            <rect x="-70" y="-18" width="140" height="36" rx="6" fill="#042f2e" stroke="#2dd4bf" stroke-width="1.5"/>
+            <text x="0" y="-3" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">ปตร.พลเทพ (ต้นน้ำท่าจีน)</text>
+            <text x="0" y="11" fill="#2dd4bf" font-family="monospace" font-size="9" text-anchor="middle">ตัดยอดน้ำ 110.00 cms</text>
+          </g>
+
+          <!-- 9.2 Pho Phraya T.1 (Suphan Buri) at x=220, y=700 -->
+          <g transform="translate(220, 700)" class="cursor-pointer" onclick="selectMacroNode('phophraya')">
+            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">ปตร.โพธิ์พระยา T.1 (สุพรรณฯ)</text>
+            <text x="0" y="12" fill="#fcd34d" font-family="monospace" font-size="10" text-anchor="middle">ระดับน้ำ +5.85 msl (เฝ้าระวัง)</text>
+          </g>
+
+          <!-- 9.3 Nakhon Chai Si T.14 at x=220, y=860 -->
+          <g transform="translate(220, 860)" class="cursor-pointer" onclick="selectMacroNode('nakhonchaisi')">
+            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">T.14 นครชัยศรี (นครปฐม)</text>
+            <text x="0" y="12" fill="#fcd34d" font-family="monospace" font-size="10" text-anchor="middle">+1.88 msl (แตะเกณฑ์เตือน)</text>
+          </g>
+
+          <!-- 9.4 Bang Bon / Ratchamontri at x=220, y=1000 -->
+          <g transform="translate(220, 1000)" class="cursor-pointer" onclick="selectMacroNode('bangbon')">
+            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">เขตบางบอน กทม. (ราชมนตรี)</text>
+            <text x="0" y="12" fill="#34d399" font-family="monospace" font-size="10" text-anchor="middle">+0.48 msl (สูบเร่งระบาย ✅)</text>
+          </g>
+
+          <!-- 9.5 Mahachai T.12 (Samut Sakhon Exit) at x=220, y=1140 -->
+          <g transform="translate(220, 1140)" class="cursor-pointer" onclick="selectMacroNode('mahachai')">
+            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#042f2e" stroke="#2dd4bf" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">ปตร.มหาชัย T.12 (สมุทรสาคร)</text>
+            <text x="0" y="12" fill="#2dd4bf" font-family="monospace" font-size="10" text-anchor="middle">+1.40 msl ➔ อ่าวไทย</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 10. EAST TRUNK: PA SAK RIVER (เขื่อนป่าสักชลสิทธิ์ ➔ พระราม 6 ➔ อยุธยา)     -->
+          <!-- ========================================================================= -->
+
+          <!-- 10.1 Pa Sak Dam Node at x=1220, y=570 -->
+          <g transform="translate(1220, 570)" class="cursor-pointer" onclick="selectMacroNode('pasak')">
+            <rect x="-95" y="-30" width="190" height="60" rx="10" fill="#1e293b" stroke="#f43f5e" stroke-width="2.5" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.6))"/>
+            <text x="0" y="-12" fill="#ffffff" font-weight="bold" font-size="11" text-anchor="middle">🌊 เขื่อนป่าสักชลสิทธิ์ (ลพบุรี)</text>
+            <text x="0" y="6" fill="#f43f5e" font-family="monospace" font-weight="bold" font-size="13" text-anchor="middle">962.07 ล้าน (110% วิกฤต)</text>
+            <text x="0" y="21" fill="#fca5a5" font-size="9.5" text-anchor="middle">ระบายออก 34.57 ล้าน ลบ.ม./วัน</text>
+          </g>
+
+          <!-- 10.2 Rama 6 Dam (S.26 Ayutthaya) at x=1180, y=740 -->
+          <g transform="translate(1180, 740)" class="cursor-pointer" onclick="selectMacroNode('rama6')">
+            <rect x="-90" y="-26" width="180" height="52" rx="10" fill="#1e1b4b" stroke="#818cf8" stroke-width="2"/>
+            <text x="0" y="-8" fill="#ffffff" font-weight="bold" font-size="11" text-anchor="middle">⚡ เขื่อนพระราม 6 (S26 อยุธยา)</text>
+            <text x="0" y="10" fill="#38bdf8" font-family="monospace" font-weight="bold" font-size="12" text-anchor="middle">ระบาย 546 cms (6.48 msl)</text>
+            <text x="0" y="23" fill="#c7d2fe" font-size="8.5" text-anchor="middle">ผันน้ำเข้าคลองระพีพัฒน์ &amp; อยุธยา</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 11. CENTRAL CHAO PHRAYA STATIONS (สิงห์บุรี ➔ อ่างทอง ➔ อยุธยา ➔ ปทุมฯ ➔ นนท์) -->
+          <!-- ========================================================================= -->
+
+          <!-- 11.1 Sing Buri C.3 at x=620, y=650 -->
+          <g transform="translate(620, 650)" class="cursor-pointer" onclick="selectMacroNode('singburi')">
+            <rect x="-85" y="-20" width="170" height="40" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">สิงห์บุรี (C.3 บางพุทรา)</text>
+            <text x="0" y="12" fill="#38bdf8" font-family="monospace" font-size="10" text-anchor="middle">2,505.00 cms</text>
+          </g>
+
+          <!-- 11.2 Ang Thong C.7A & Phong Pheng at x=620, y=740 -->
+          <g transform="translate(620, 740)" class="cursor-pointer" onclick="selectMacroNode('angthong')">
+            <rect x="-95" y="-24" width="190" height="48" rx="8" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2"/>
+            <text x="0" y="-7" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">อ่างทอง (C.7A) &amp; คลองโผงเผง</text>
+            <text x="0" y="9" fill="#f87171" font-family="monospace" font-size="10" text-anchor="middle">2,384 cms | โผงเผง 6.52 msl 🔴</text>
+          </g>
+
+          <!-- 11.3 Ayutthaya C.35 & Bang Ban at x=620, y=830 -->
+          <g transform="translate(620, 830)" class="cursor-pointer" onclick="selectMacroNode('ayutthaya')">
+            <rect x="-95" y="-24" width="190" height="48" rx="8" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2"/>
+            <text x="0" y="-7" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">อยุธยา (C.35) &amp; คลองบางบาล</text>
+            <text x="0" y="9" fill="#f87171" font-family="monospace" font-size="10" text-anchor="middle">1,421 cms | บางบาล 7.22 msl 🔴</text>
+          </g>
+
+          <!-- 11.4 Bang Sai Confluence C.29A at x=620, y=910 -->
+          <g transform="translate(620, 910)" class="cursor-pointer" onclick="selectMacroNode('bangsai')">
+            <rect x="-105" y="-24" width="210" height="48" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="0" y="-7" fill="#ffffff" font-size="10.5" font-weight="bold" text-anchor="middle">สถานีบางไทร (C.29A จุดรวมน้ำ)</text>
+            <text x="0" y="10" fill="#38bdf8" font-family="monospace" font-weight="bold" font-size="11" text-anchor="middle">1,940.00 cms (+0.17 msl)</text>
+          </g>
+
+          <!-- 11.5 Pathum Thani (Nual Chawi & Chulalongkorn) at x=620, y=990 -->
+          <g transform="translate(620, 990)" class="cursor-pointer" onclick="selectMacroNode('pathum')">
+            <rect x="-115" y="-26" width="230" height="52" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+            <text x="0" y="-8" fill="#ffffff" font-size="10.5" font-weight="bold" text-anchor="middle">ปทุมธานี (สะพานนวลฉวี CPY014)</text>
+            <text x="0" y="9" fill="#fcd34d" font-family="monospace" font-weight="bold" font-size="11" text-anchor="middle">+2.13 msl (ห่างตลิ่ง 37 ซม.)</text>
+            <text x="0" y="21" fill="#7dd3fc" font-size="8.5" text-anchor="middle">ปตร.จุฬาลงกรณ์ สูบ 12/12 เครื่อง</text>
+          </g>
+
+          <!-- 11.6 Nonthaburi (Pak Kret & Pier) at x=620, y=1070 -->
+          <g transform="translate(620, 1070)" class="cursor-pointer" onclick="selectMacroNode('nonthaburi')">
+            <rect x="-100" y="-24" width="200" height="48" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8"/>
+            <text x="0" y="-7" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">นนทบุรี (ปากเกร็ด &amp; ท่าน้ำนนท์)</text>
+            <text x="0" y="9" fill="#38bdf8" font-family="monospace" font-size="10" text-anchor="middle">ปากเกร็ด +2.15 | ท่าน้ำนนท์ +1.95 msl</text>
+          </g>
+
+          <!-- 11.7 Bangkok & Samut Prakan at x=620, y=1140 -->
+          <g transform="translate(620, 1140)" class="cursor-pointer" onclick="selectMacroNode('bangkok')">
+            <rect x="-100" y="-22" width="200" height="44" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="1.8"/>
+            <text x="0" y="-4" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">กรุงเทพมหานคร &amp; สมุทรปราการ</text>
+            <text x="0" y="11" fill="#34d399" font-size="9" text-anchor="middle">ประตูระบายน้ำคลองลัดโพธิ์ผลักดันน้ำ ✅</text>
+          </g>
+
+          <!-- 11.8 Gulf of Thailand Exit Capsule at x=620, y=1200 -->
+          <g transform="translate(620, 1205)">
+            <rect x="-100" y="-16" width="200" height="32" rx="16" fill="#0284c7" stroke="#38bdf8" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="5" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">🌊 อ่าวไทย (Gulf of Thailand)</text>
+          </g>
+
+
+          <!-- ========================================================================= -->
+          <!-- 12. BOTTOM ELEVATION GRADIENT PROFILE (MATCHING USER'S INFOGRAPHIC)        -->
+          <!-- ========================================================================= -->
+
+          <g transform="translate(70, 1260)">
+            <!-- Profile Container Box -->
+            <rect x="0" y="0" width="1300" height="135" rx="12" fill="#020617" stroke="#334155" stroke-width="1.5"/>
+            
+            <!-- Section Title -->
+            <text x="25" y="28" fill="#e2e8f0" font-size="12" font-weight="bold">📈 แผนภูมิระดับความสูงจากต้นน้ำสู่ปลายน้ำ (Basin Elevation Profile &amp; Flow Lag-Time):</text>
+            
+            <!-- Slope Mountain Gradient Path -->
+            <path d="M 40,110 L 40,45 Q 180,48 340,75 Q 600,100 850,105 L 1260,108 L 1260,110 Z" fill="#78350f" opacity="0.6"/>
+            <path d="M 40,45 Q 180,48 340,75 Q 600,100 850,105 L 1260,108" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="40" y1="110" x2="1260" y2="110" stroke="#475569" stroke-width="1.5"/>
+
+            <!-- Altitude Labels -->
+            <text x="25" y="50" fill="#f59e0b" font-family="monospace" font-size="10" font-weight="bold">800 ม.</text>
+            <text x="25" y="80" fill="#f59e0b" font-family="monospace" font-size="10">400 ม.</text>
+            <text x="25" y="112" fill="#94a3b8" font-family="monospace" font-size="10">0 ม.</text>
+
+            <!-- 3 Zone Columns -->
+            <!-- Zone 1: North -->
+            <text x="180" y="65" fill="#fcd34d" font-weight="bold" font-size="11" text-anchor="middle">ภาคเหนือ (ต้นน้ำสูง 800 - 400 ม.)</text>
+            <text x="180" y="85" fill="#cbd5e1" font-size="9.5" text-anchor="middle">เชียงใหม่, ลำปาง, แพร่, น่าน ➔ นครสวรรค์ (⏱️ 3-5 วัน)</text>
+
+            <!-- Zone 2: Central Plains -->
+            <text x="680" y="80" fill="#38bdf8" font-weight="bold" font-size="11" text-anchor="middle">ภาคกลาง (ที่ราบลุ่ม 40 - 2 ม.)</text>
+            <text x="680" y="98" fill="#cbd5e1" font-size="9.5" text-anchor="middle">ชัยนาท, สิงห์บุรี, อ่างทอง, อยุธยา, ปทุมธานี (⏱️ 1.5-2 วัน)</text>
+
+            <!-- Zone 3: Gulf of Thailand -->
+            <text x="1150" y="90" fill="#34d399" font-weight="bold" font-size="11" text-anchor="middle">อ่าวไทย (ปลายน้ำ 0 ม.รทก.)</text>
+            <text x="1150" y="105" fill="#cbd5e1" font-size="9.5" text-anchor="middle">กทม., สมุทรปราการ (อิทธิพลน้ำทะเลหนุน)</text>
+          </g>
+
+        </svg>
+      </div>
+
+      <!-- Macro Interactive Node Inspection Card -->
+      <div id="macroDetailCard" class="mt-4 p-4 bg-slate-800/90 border border-sky-500/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <span class="text-[11px] text-sky-400 font-semibold uppercase tracking-wider">● รายละเอียดข้อมูลสถานี/สายน้ำ Real-Time (คลิกเลือกดูได้ทุกจุด):</span>
+          <h3 id="macroItemTitle" class="text-sm font-bold text-white mt-0.5">⚡ จุดรวมน้ำปากน้ำโพ นครสวรรค์ (สถานี C.2 ค่ายจิรประวัติ)</h3>
+          <p id="macroItemDesc" class="text-xs text-slate-300 mt-1">
+            จุดยุทธศาสตร์รวมมวลน้ำ 4 สายหลักภาคเหนือ (ปิง-วัง-ยม-น่าน) อัตราการไหลสด 2,416.00 cms จากความจุลำน้ำ 3,590 cms ระดับน้ำ 23.40 ม.รทก. (ตลิ่ง 26.20 ม.รทก.) เป็นตัวแปรหลักในการคำนวณมวลน้ำหลากที่จะไหลลงสู่เขื่อนเจ้าพระยาในอีก 1-2 วัน
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="macroItemBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            เฝ้าระวัง • น้ำเพิ่มขึ้น ▲
+          </span>
+          <button onclick="switchTab('chaopraya-dashboard')" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-medium transition">
+            ดูสถานีเจ้าพระยาทั้งหมด ↗
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 5: PATHUM THANI DEDICATED HYDRAULIC NETWORK & KHLONG 1 TO 10 FLOW     -->
+  <!-- ========================================================================= -->
+  <section id="tab-pathum" class="max-w-7xl mx-auto space-y-6 hidden">
+
+    <!-- Hero Flow Header Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-sky-950/40 to-slate-900 border border-sky-500/30 rounded-2xl p-5 shadow-xl">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+            <span class="text-xs uppercase font-bold text-amber-300 tracking-wider">Pathum Thani Basin Hydraulic Flow System</span>
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white mt-1">โครงข่ายโฟลว์น้ำปทุมธานี (เขื่อนป่าสัก ➔ พระราม 6 ➔ คลอง 1-10 ➔ แม่น้ำเจ้าพระยา)</h2>
+          <p class="text-xs text-slate-300 mt-1">
+            ผังติดตามการไหลและการบริหารจัดการน้ำทุ่งรังสิต เชื่อมโยงจากแม่น้ำป่าสัก ผ่านคลองระพีพัฒน์ เข้าสู่ประตูระบายน้ำคลองซอย 1 ถึง 10 จนถึงสถานีสูบน้ำ ปตร.จุฬาลงกรณ์ ระบายออกสู่แม่น้ำเจ้าพระยา
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <div class="bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 text-xs text-center">
+            <span class="text-slate-400 block text-[10px]">ปตร.จุฬาลงกรณ์</span>
+            <span class="text-cyan-300 font-bold font-mono">สูบ 12/12 เครื่อง</span>
+          </div>
+          <div class="bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 text-xs text-center">
+            <span class="text-slate-400 block text-[10px]">ความต่างระดับน้ำ</span>
+            <span class="text-amber-300 font-bold font-mono">Δ 1.63 ม.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5-Stage Step Flow Progress Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-4 pt-3.5 border-t border-slate-800 text-xs">
+        
+        <!-- Stage 1: Pa Sak Dam -->
+        <div class="bg-slate-950/70 p-3 rounded-xl border border-rose-500/30">
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <span class="font-bold text-rose-400">STEP 1 • ต้นน้ำ</span>
+            <span class="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300">109% จุเกิน</span>
+          </div>
+          <strong class="block text-white text-xs mt-1">เขื่อนป่าสักชลสิทธิ์</strong>
+          <span class="text-rose-400 font-mono font-bold text-sm block">950.54 ล้าน ลบ.ม.</span>
+          <span class="text-[10px] text-slate-400">ระบายลงแม่น้ำป่าสัก 500+ cms</span>
+        </div>
+
+        <!-- Stage 2: Rama 6 & Phra Narai -->
+        <div class="bg-slate-950/70 p-3 rounded-xl border border-indigo-500/30">
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <span class="font-bold text-indigo-400">STEP 2 • ทด/ผันน้ำ</span>
+            <span class="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300">ปกติ</span>
+          </div>
+          <strong class="block text-white text-xs mt-1">เขื่อนพระราม 6 (S26)</strong>
+          <span class="text-cyan-300 font-mono font-bold text-sm block">ระบาย 546.00 cms</span>
+          <span class="text-[10px] text-slate-400">ผันเข้าคลองระพีพัฒน์ (ปตร.พระนารายณ์)</span>
+        </div>
+
+        <!-- Stage 3: Khlong Raphiphat -->
+        <div class="bg-slate-950/70 p-3 rounded-xl border border-sky-500/30">
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <span class="font-bold text-sky-400">STEP 3 • จ่ายน้ำหลาก</span>
+            <span class="px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300">รับน้ำหลาก</span>
+          </div>
+          <strong class="block text-white text-xs mt-1">คลองระพีพัฒน์แยกตก</strong>
+          <span class="text-sky-300 font-mono font-bold text-sm block">+1.82 msl</span>
+          <span class="text-[10px] text-slate-400">กระจายน้ำเข้า ปตร.หัวคลอง 1-10</span>
+        </div>
+
+        <!-- Stage 4: Khlong 1 to 10 -->
+        <div class="bg-slate-950/70 p-3 rounded-xl border border-emerald-500/30">
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <span class="font-bold text-emerald-400">STEP 4 • คลองซอย 1-10</span>
+            <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300">ปกติ 10 คลอง</span>
+          </div>
+          <strong class="block text-white text-xs mt-1">ทุ่งรังสิต จ.ปทุมธานี</strong>
+          <span class="text-emerald-400 font-mono font-bold text-sm block">+0.85 ถึง +1.24 msl</span>
+          <span class="text-[10px] text-slate-400">ไหลลงสู่คลองรังสิตประยูรศักดิ์</span>
+        </div>
+
+        <!-- Stage 5: Chulalongkorn to Chao Phraya -->
+        <div class="bg-slate-950/70 p-3 rounded-xl border border-amber-500/30">
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <span class="font-bold text-amber-400">STEP 5 • ออกเจ้าพระยา</span>
+            <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300">สูบเร่งระบาย</span>
+          </div>
+          <strong class="block text-white text-xs mt-1">ปตร.จุฬาลงกรณ์ (ATG10)</strong>
+          <span class="text-amber-400 font-mono font-bold text-sm block">คลอง +0.82 / แม่น้ำ +2.45</span>
+          <span class="text-[10px] text-slate-400">เดินเครื่องสูบ 12/12 ออกเจ้าพระยา</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DEDICATED INTERACTIVE SCHEMATIC: PA SAK ➔ RAMA 6 ➔ KHLONG 1 TO 10 ➔ CHAO PHRAYA -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
+            ผังโฟลว์การไหลละเอียด: เขื่อนป่าสักชลสิทธิ์ ➔ คลอง 1 ถึง 10 ➔ แม่น้ำเจ้าพระยา
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">คลิกที่ประตูระบายน้ำ (ปตร.) หรือคลองแต่ละหมายเลข เพื่อเปิดดูข้อมูลโทรมาตรระดับน้ำสด</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> ปกติในคลอง</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> เฝ้าระวัง</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> ปตร.ปิดบาน/สูบออก</span>
+        </div>
+      </div>
+
+            <!-- SVG Map Canvas (Pathum Thani Specific Network) -->
+      <div class="bg-slate-950 rounded-xl border border-slate-800/80 p-4 overflow-x-auto">
+        <svg viewBox="0 0 1320 640" class="w-full min-w-[1120px] h-auto text-xs font-sans">
+          
+          <!-- 1. WATER TRUNKS & BASINS -->
+
+          <!-- LEFT: CHAO PHRAYA RIVER TRUNK (Vertical at x = 90) -->
+          <path d="M 90,45 L 90,580" fill="none" stroke="#082f49" stroke-width="44" stroke-linecap="round"/>
+          <path d="M 90,45 L 90,580" fill="none" stroke="#0284c7" stroke-width="26" stroke-linecap="round"/>
+          <path d="M 90,45 L 90,580" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" class="flow-chaopraya"/>
+          
+          <!-- Chao Phraya Top Header Pill -->
+          <g transform="translate(90, 28)">
+            <rect x="-80" y="-14" width="160" height="28" rx="14" fill="#082f49" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="0" y="4" fill="#38bdf8" font-size="11.5" font-weight="bold" text-anchor="middle">แม่น้ำเจ้าพระยา (+2.45 msl)</text>
+          </g>
+
+          <!-- Chao Phraya Bottom Exit Label -->
+          <g transform="translate(90, 612)">
+            <rect x="-65" y="-12" width="130" height="24" rx="12" fill="#032b45" stroke="#0ea5e9" stroke-width="1"/>
+            <text x="0" y="4" fill="#7dd3fc" font-size="10.5" font-weight="bold" text-anchor="middle">➔ ไหลลงสู่อ่าวไทย</text>
+          </g>
+
+          <!-- TOP RIGHT: PA SAK RIVER FLOW (Vertical Stack into Rama 6 and Phra Narai) -->
+          <!-- Water line Pa Sak to Rama 6 -->
+          <path d="M 1200,67 L 1200,90" fill="none" stroke="#0284c7" stroke-width="16" stroke-linecap="round"/>
+          <path d="M 1200,67 L 1200,90" fill="none" stroke="#67e8f9" stroke-width="3" class="flow-pasak"/>
+          <!-- Water line Rama 6 to Phra Narai -->
+          <path d="M 1200,134 L 1200,153" fill="none" stroke="#0284c7" stroke-width="16" stroke-linecap="round"/>
+          <path d="M 1200,134 L 1200,153" fill="none" stroke="#67e8f9" stroke-width="3" class="flow-pasak"/>
+
+          <!-- KHLONG RAPHIPHAT YAEK TOK (Horizontal trunk at y = 175) -->
+          <!-- Runs from Phra Narai at x = 1115 to Khlong 1 at x = 195 -->
+          <path d="M 1115,175 L 195,175" fill="none" stroke="#0284c7" stroke-width="18" stroke-linecap="round"/>
+          <path d="M 1115,175 L 195,175" fill="none" stroke="#67e8f9" stroke-width="3" class="flow-canal"/>
+
+          <!-- Khlong Raphiphat Dedicated Header Banner (Positioned above at y = 85 with 0% overlap) -->
+          <g transform="translate(620, 85)">
+            <rect x="-260" y="-17" width="520" height="34" rx="17" fill="#082f49" stroke="#0ea5e9" stroke-width="1.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.4))"/>
+            <text x="0" y="5" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">🌊 คลองระพีพัฒน์แยกตก (รับน้ำจากป่าสัก ➔ จ่ายเข้า ปตร. คลอง 1 ถึง 10)</text>
+          </g>
+
+          <!-- BOTTOM HORIZONTAL CANAL: KHLONG RANGSIT PRAYURASAKDI (at y = 470) -->
+          <path d="M 1115,470 L 90,470" fill="none" stroke="#0284c7" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 1115,470 L 90,470" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" class="flow-canal"/>
+          <!-- Water connection to Phra Thammaracha gate -->
+          <path d="M 1120,470 L 1185,470" stroke="#0284c7" stroke-width="14" stroke-linecap="round"/>
+
+          <!-- Khlong Rangsit Dedicated Title Banner (Positioned at y = 515) -->
+          <g transform="translate(620, 515)">
+            <rect x="-240" y="-14" width="480" height="28" rx="14" fill="#082f49" stroke="#0284c7" stroke-width="1.2"/>
+            <text x="0" y="4" fill="#38bdf8" font-size="11.5" font-weight="bold" text-anchor="middle">🌊 คลองรังสิตประยูรศักดิ์ (+0.82 msl) ➔ ไหลมุ่งหน้า ปตร.จุฬาลงกรณ์</text>
+          </g>
+
+
+          <!-- 2. UPSTREAM DAMS & HEAD REGULATORS (Stacked Cleanly on East Side) -->
+
+          <!-- 1. Pa Sak Dam Node at (1200, 45) -->
+          <g transform="translate(1200, 45)" class="cursor-pointer" onclick="selectPathumNode('pasak')">
+            <rect x="-72" y="-22" width="144" height="44" rx="8" fill="#1e293b" stroke="#f43f5e" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-4" fill="#ffffff" font-weight="bold" font-size="10" text-anchor="middle">เขื่อนป่าสักชลสิทธิ์</text>
+            <text x="0" y="12" fill="#f43f5e" font-weight="bold" font-size="9" text-anchor="middle">109% (ระบาย 500+ cms)</text>
+          </g>
+
+          <!-- 2. Rama 6 Dam Node at (1200, 112) -->
+          <g transform="translate(1200, 112)" class="cursor-pointer" onclick="selectPathumNode('rama6')">
+            <rect x="-75" y="-22" width="150" height="44" rx="8" fill="#1e1b4b" stroke="#818cf8" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-4" fill="#ffffff" font-weight="bold" font-size="10" text-anchor="middle">เขื่อนพระราม 6 (S26)</text>
+            <text x="0" y="12" fill="#38bdf8" font-weight="bold" font-size="9" text-anchor="middle">ระบาย 546 cms (6.48 msl)</text>
+          </g>
+
+          <!-- 3. Phra Narai Sluice Gate at (1185, 175) -->
+          <g transform="translate(1185, 175)" class="cursor-pointer" onclick="selectPathumNode('narai')">
+            <rect x="-70" y="-22" width="140" height="44" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="2" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-4" fill="#ffffff" font-weight="bold" font-size="10" text-anchor="middle">ปตร.พระนารายณ์</text>
+            <text x="0" y="12" fill="#7dd3fc" font-size="9" text-anchor="middle">ผันน้ำเข้าคลองระพีพัฒน์</text>
+          </g>
+
+
+          <!-- 3. SLUICE GATES ON KHLONG RAPHIPHAT (at y = 175, x = 195 to 1050) -->
+          <!-- Spacing: 95px between gates. All labels have dedicated cards with 0% overlap -->
+
+          <!-- Khlong 1 Gate: ปตร.พระอินทราชา (ATG09) -->
+          <g transform="translate(195, 175)" class="cursor-pointer" onclick="selectPathumCanal(1)">
+            <rect x="-46" y="-42" width="92" height="32" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="0" y="-26" fill="#fcd34d" font-weight="bold" font-size="8.5" text-anchor="middle">ปตร.พระอินทราชา</text>
+            <text x="0" y="-14" fill="#fef08a" font-family="monospace" font-size="8" text-anchor="middle">+1.82 msl</text>
+            <line x1="0" y1="-10" x2="0" y2="0" stroke="#f59e0b" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+            <circle cx="0" cy="0" r="3" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 2 Gate -->
+          <g transform="translate(290, 175)" class="cursor-pointer" onclick="selectPathumCanal(2)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 2</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 3 Gate -->
+          <g transform="translate(385, 175)" class="cursor-pointer" onclick="selectPathumCanal(3)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 3</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 4 Gate -->
+          <g transform="translate(480, 175)" class="cursor-pointer" onclick="selectPathumCanal(4)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 4</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 5 Gate -->
+          <g transform="translate(575, 175)" class="cursor-pointer" onclick="selectPathumCanal(5)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 5</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 6 Gate -->
+          <g transform="translate(670, 175)" class="cursor-pointer" onclick="selectPathumCanal(6)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 6</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 7 Gate -->
+          <g transform="translate(765, 175)" class="cursor-pointer" onclick="selectPathumCanal(7)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 7</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 8 Gate: ปตร.พระศรีศิลป์ (ATG07) -->
+          <g transform="translate(860, 175)" class="cursor-pointer" onclick="selectPathumCanal(8)">
+            <rect x="-44" y="-42" width="88" height="32" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="0" y="-26" fill="#fcd34d" font-weight="bold" font-size="8.5" text-anchor="middle">ปตร.พระศรีศิลป์</text>
+            <text x="0" y="-14" fill="#fef08a" font-family="monospace" font-size="8" text-anchor="middle">+3.12 msl</text>
+            <line x1="0" y1="-10" x2="0" y2="0" stroke="#f59e0b" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+            <circle cx="0" cy="0" r="3" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 9 Gate -->
+          <g transform="translate(955, 175)" class="cursor-pointer" onclick="selectPathumCanal(9)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 9</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+          <!-- Khlong 10 Gate -->
+          <g transform="translate(1050, 175)" class="cursor-pointer" onclick="selectPathumCanal(10)">
+            <rect x="-32" y="-36" width="64" height="24" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="-20" fill="#bae6fd" font-size="8.5" font-weight="bold" text-anchor="middle">ปตร.คลอง 10</text>
+            <line x1="0" y1="-12" x2="0" y2="0" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="0" r="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+          </g>
+
+
+          <!-- 4. 10 VERTICAL CANAL WATER LINES & SOLID READABLE BADGES -->
+          
+          <!-- Khlong 1 Water Line & Card -->
+          <line x1="195" y1="175" x2="195" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="195" y1="175" x2="195" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(195, 320)" class="cursor-pointer" onclick="selectPathumCanal(1)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">1</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 1</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+0.85 msl</text>
+          </g>
+
+          <!-- Khlong 2 Water Line & Card -->
+          <line x1="290" y1="175" x2="290" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="290" y1="175" x2="290" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(290, 320)" class="cursor-pointer" onclick="selectPathumCanal(2)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">2</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 2</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+0.88 msl</text>
+          </g>
+
+          <!-- Khlong 3 Water Line & Card -->
+          <line x1="385" y1="175" x2="385" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="385" y1="175" x2="385" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(385, 320)" class="cursor-pointer" onclick="selectPathumCanal(3)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">3</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 3</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+0.92 msl</text>
+          </g>
+
+          <!-- Khlong 4 Water Line & Card -->
+          <line x1="480" y1="175" x2="480" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="480" y1="175" x2="480" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(480, 320)" class="cursor-pointer" onclick="selectPathumCanal(4)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">4</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 4</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+0.95 msl</text>
+          </g>
+
+          <!-- Khlong 5 Water Line & Card -->
+          <line x1="575" y1="175" x2="575" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="575" y1="175" x2="575" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(575, 320)" class="cursor-pointer" onclick="selectPathumCanal(5)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">5</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 5</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+0.98 msl</text>
+          </g>
+
+          <!-- Khlong 6 Water Line & Card -->
+          <line x1="670" y1="175" x2="670" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="670" y1="175" x2="670" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(670, 320)" class="cursor-pointer" onclick="selectPathumCanal(6)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">6</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 6</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+1.02 msl</text>
+          </g>
+
+          <!-- Khlong 7 Water Line & Card -->
+          <line x1="765" y1="175" x2="765" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="765" y1="175" x2="765" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(765, 320)" class="cursor-pointer" onclick="selectPathumCanal(7)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">7</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 7</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+1.06 msl</text>
+          </g>
+
+          <!-- Khlong 8 Water Line & Card -->
+          <line x1="860" y1="175" x2="860" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="860" y1="175" x2="860" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(860, 320)" class="cursor-pointer" onclick="selectPathumCanal(8)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">8</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 8</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+1.12 msl</text>
+          </g>
+
+          <!-- Khlong 9 Water Line & Card -->
+          <line x1="955" y1="175" x2="955" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="955" y1="175" x2="955" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(955, 320)" class="cursor-pointer" onclick="selectPathumCanal(9)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">9</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 9</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+1.18 msl</text>
+          </g>
+
+          <!-- Khlong 10 Water Line & Card -->
+          <line x1="1050" y1="175" x2="1050" y2="470" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/>
+          <line x1="1050" y1="175" x2="1050" y2="470" stroke="#67e8f9" stroke-width="2.5" class="flow-canal"/>
+          <g transform="translate(1050, 320)" class="cursor-pointer" onclick="selectPathumCanal(10)">
+            <rect x="-38" y="-35" width="76" height="70" rx="10" fill="#090d16" stroke="#10b981" stroke-width="1.8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <circle cx="0" cy="-14" r="13" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+            <text x="0" y="-9.5" fill="#a7f3d0" font-weight="bold" font-size="11" text-anchor="middle">10</text>
+            <text x="0" y="10" fill="#f8fafc" font-weight="bold" font-size="10.5" text-anchor="middle">คลอง 10</text>
+            <text x="0" y="25" fill="#34d399" font-family="monospace" font-weight="bold" font-size="9.5" text-anchor="middle">+1.24 msl</text>
+          </g>
+
+
+          <!-- 5. CRITICAL DISCHARGE EXIT: CHULALONGKORN SLUICE GATE & PUMPING STATION -->
+
+          <!-- Discharge Node at Chao Phraya Exit (90, 470) -->
+          <g transform="translate(90, 470)">
+            <circle cx="0" cy="0" r="16" fill="#1e1b4b" stroke="#f43f5e" stroke-width="3" class="pulse-badge"/>
+            <circle cx="0" cy="0" r="6" fill="#ffffff"/>
+          </g>
+
+          <!-- Chulalongkorn Pumping Station Control Box at (240, 560) -->
+          <g transform="translate(240, 560)" class="cursor-pointer" onclick="selectPathumNode('chula')">
+            <rect x="-105" y="-26" width="210" height="52" rx="10" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2.2" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.6))"/>
+            <text x="0" y="-5" fill="#ffffff" font-weight="bold" font-size="11" text-anchor="middle">⚡ ปตร.จุฬาลงกรณ์ (ATG10)</text>
+            <text x="0" y="14" fill="#fca5a5" font-weight="bold" font-size="10" text-anchor="middle">ในคลอง +0.82 msl | สูบ 12/12 ⚙️</text>
+            <!-- Leader Line to Chao Phraya Exit -->
+            <path d="M -105,-8 L -140,-75" fill="none" stroke="#f43f5e" stroke-width="2" stroke-dasharray="3 3"/>
+          </g>
+
+          <!-- East Sluice Gate: Phra Thammaracha (ATG08) at (1185, 470) -->
+          <g transform="translate(1185, 470)" class="cursor-pointer" onclick="selectPathumNode('tham')">
+            <rect x="-68" y="-22" width="136" height="44" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.5))"/>
+            <text x="0" y="-4" fill="#ffffff" font-weight="bold" font-size="9.5" text-anchor="middle">ปตร.พระธรรมราชา (ATG08)</text>
+            <text x="0" y="12" fill="#7dd3fc" font-size="8.5" text-anchor="middle">ท้ายคลองรังสิต +1.49 msl</text>
+          </g>
+
+        </svg>
+      </div>
+
+      <!-- Pathum Thani Interactive Inspection Card -->
+      <div id="pathumDetailCard" class="mt-4 p-4 bg-slate-800/90 border border-sky-500/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <span class="text-[11px] text-sky-400 font-semibold uppercase tracking-wider">● สถานะโทรมาตร Real-time ประจำจุด:</span>
+          <h3 id="pathumItemTitle" class="text-sm font-bold text-white mt-0.5">⚡ สถานีสูบน้ำและประตูระบายน้ำจุฬาลงกรณ์ (ปตร.จุฬาลงกรณ์ ATG10)</h3>
+          <p id="pathumItemDesc" class="text-xs text-slate-300 mt-1">
+            จุดควบคุมการระบายน้ำยุทธศาสตร์ ป้องกันน้ำท่วมพื้นที่ชั้นในปทุมธานีและรังสิต ระดับน้ำในคลองรังสิต +0.82 ม.รทก. ต่ำกว่าแม่น้ำเจ้าพระยา (+2.45 ม.รทก.) ถึง 1.63 เมตร จึงต้องปิดบานประตูน้ำสนิท และเดินเครื่องสูบน้ำขนาดใหญ่ 12/12 เครื่อง เพื่อเร่งสูบน้ำข้ามคันกั้นระบายออกสู่แม่น้ำเจ้าพระยา
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="pathumItemBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            เดินเครื่องสูบ 12/12 • น้ำในคลองปกติ
+          </span>
+          <button onclick="switchTab('canal-dashboard')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition">
+            ดูคลองปริมณฑลทั้งหมด ↗
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 10 REAL-TIME CANAL CARDS GRID (KHLONG 1 TO 10 PATHUM THANI) -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>📊</span> ข้อมูลระดับน้ำ Real-time คลองซอย 1 ถึง 10 จังหวัดปทุมธานี
+        </h3>
+        <span class="text-xs text-slate-400">เซนเซอร์โทรมาตร IoT กรมชลประทาน &amp; ท้องถิ่นปทุมธานี</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3.5" id="pathum-10-canals-container">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT LOGIC & DATA STORAGE                                           -->
+  <!-- ========================================================================= -->
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-cyan-600', 'text-white', 'shadow-lg');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      const activeBtn = document.getElementById('tab-btn-' + tab);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'bg-cyan-600', 'text-white', 'shadow-lg');
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+      }
+
+      ['chaopraya-dashboard', 'canal-dashboard', 'cctv', 'schematic', 'pathum'].forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.classList.add('hidden');
+      });
+
+      const target = document.getElementById('tab-' + tab);
+      if (target) {
+        target.classList.remove('hidden');
+        if (tab === 'chaopraya-dashboard') renderChaoPhrayaCards();
+        if (tab === 'canal-dashboard') filterCanalZone(currentCanalZoneFilter);
+        if (tab === 'pathum') renderPathum10Canals();
+      }
+    }
+
+    // =========================================================================
+    // 1. CHAO PHRAYA STRATEGIC STATIONS (Real-time Telemetry + Dual Thresholds)
+    // =========================================================================
+    const chaoPhrayaStations = [
+      {
+        id: "C.13 ท้ายเขื่อนเจ้าพระยา",
+        name: "จุดระบายน้ำหลักลุ่มน้ำเจ้าพระยา",
+        loc: "อ.สรรพยา จ.ชัยนาท",
+        valStr: "2,500.00 cms",
+        unit: "ลบ.ม./วินาที",
+        levelMsl: 15.930,
+        warningLevel: 2000.0,
+        criticalLevel: 2840.0,
+        status: "warning",
+        trend: "+50 cms (ระบายเพิ่ม) ▲",
+        updated: "02-10-2026 07:00",
+        history: [1950, 2000, 2100, 2200, 2300, 2350, 2400, 2450, 2500, 2500],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th/DATA/REPORT/php/chart/chaopraya/small/chaopraya.php"
+      },
+      {
+        id: "CPY008 อ่างทอง",
+        name: "สถานีวัดระดับน้ำแม่น้ำเจ้าพระยา",
+        loc: "อ.เมือง จ.อ่างทอง",
+        valStr: "+8.470 msl",
+        unit: "ม.รทก.",
+        levelMsl: 8.470,
+        warningLevel: 8.000,
+        criticalLevel: 8.780,
+        status: "warning",
+        trend: "+0.04 ม./ชม. ▲",
+        updated: "02-10-2026 07:10",
+        history: [7.80, 7.95, 8.10, 8.22, 8.30, 8.35, 8.40, 8.44, 8.46, 8.47],
+        hasCCTV: false
+      },
+      {
+        id: "CPY009 คลองบางหลวง/โผงเผง",
+        name: "จุดตรวจวัดน้ำล้นตลิ่งชุมชนโผงเผง",
+        loc: "อ.ป่าโมก จ.อ่างทอง",
+        valStr: "+6.500 msl",
+        unit: "ม.รทก. (ท่วม +2.19 ม.)",
+        levelMsl: 6.500,
+        warningLevel: 4.000,
+        criticalLevel: 4.310,
+        status: "critical",
+        trend: "ล้นตลิ่งวิกฤต 🔴",
+        updated: "02-10-2026 07:10",
+        history: [5.10, 5.35, 5.60, 5.85, 6.05, 6.20, 6.30, 6.40, 6.48, 6.50],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th"
+      },
+      {
+        id: "CPY010 คลองบางบาล",
+        name: "จุดตรวจวัดน้ำล้นตลิ่งบางบาล",
+        loc: "อ.บางบาล จ.พระนครศรีอยุธยา",
+        valStr: "+7.190 msl",
+        unit: "ม.รทก. (ท่วม +1.35 ม.)",
+        levelMsl: 7.190,
+        warningLevel: 5.500,
+        criticalLevel: 5.840,
+        status: "critical",
+        trend: "ล้นตลิ่งวิกฤต 🔴",
+        updated: "02-10-2026 07:10",
+        history: [6.10, 6.30, 6.50, 6.70, 6.85, 6.95, 7.05, 7.12, 7.16, 7.19],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th"
+      },
+      {
+        id: "S26 เขื่อนพระราม 6",
+        name: "เขื่อนทดน้ำแม่น้ำป่าสัก",
+        loc: "อ.ท่าเรือ จ.พระนครศรีอยุธยา",
+        valStr: "546.00 cms",
+        unit: "ลบ.ม./วินาที (6.48 msl)",
+        levelMsl: 6.480,
+        warningLevel: 450.0,
+        criticalLevel: 556.0,
+        status: "warning",
+        trend: "ทรงตัว ► (เกณฑ์ 556)",
+        updated: "02-10-2026 07:00",
+        history: [480, 500, 520, 530, 540, 545, 545, 546, 546, 546],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th"
+      },
+      {
+        id: "C.29A สถานีบางไทร",
+        name: "จุดรวมน้ำยุทธศาสตร์ก่อนเข้าปริมณฑล",
+        loc: "อ.บางไทร จ.พระนครศรีอยุธยา",
+        valStr: "1,940.00 cms",
+        unit: "ลบ.ม./วินาที (+0.17 msl)",
+        levelMsl: 0.170,
+        warningLevel: 2200.0,
+        criticalLevel: 2500.0,
+        status: "normal",
+        trend: "+30 cms/ชม. ▲",
+        updated: "02-10-2026 07:10",
+        history: [1750, 1780, 1820, 1860, 1890, 1910, 1920, 1930, 1940, 1940],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th"
+      },
+      {
+        id: "CPY014 สะพานนวลฉวี",
+        name: "จุดวัดเจ้าพระยาตอนล่าง ปทุมธานี/นนทบุรี",
+        loc: "สะพานนนทบุรี (นวลฉวี)",
+        valStr: "+2.170 msl",
+        unit: "ม.รทก. (ห่างตลิ่ง 33 ซม.)",
+        levelMsl: 2.170,
+        warningLevel: 2.000,
+        criticalLevel: 2.500,
+        status: "warning",
+        trend: "+0.02 ม./ชม. ▲",
+        updated: "02-10-2026 02:50",
+        history: [1.85, 1.90, 1.96, 2.02, 2.08, 2.12, 2.15, 2.16, 2.17, 2.17],
+        hasCCTV: true,
+        cctvLink: "http://101.109.253.60:8999"
+      },
+      {
+        id: "เทศบาลนครปากเกร็ด",
+        name: "จุดตรวจวัดระดับน้ำเกาะเกร็ด-ปากเกร็ด",
+        loc: "อ.ปากเกร็ด จ.นนทบุรี",
+        valStr: "+2.150 msl",
+        unit: "ม.รทก. (ท่วมแถบเหลือง)",
+        levelMsl: 2.150,
+        warningLevel: 2.000,
+        criticalLevel: 2.600,
+        status: "warning",
+        trend: "แตะแถบเฝ้าระวัง 🟡",
+        updated: "02-10-2026 09:20",
+        history: [1.80, 1.85, 1.92, 2.00, 2.05, 2.10, 2.12, 2.14, 2.15, 2.15],
+        hasCCTV: true,
+        cctvLink: "https://www.thaiclouderp.com/video/pakkret_water_report.html"
+      },
+      {
+        id: "ท่าน้ำนนทบุรี",
+        name: "ประตูระบายน้ำปากคลองบางเขน/ท่าน้ำนนท์",
+        loc: "เทศบาลนครนนทบุรี",
+        valStr: "+1.950 msl",
+        unit: "ม.รทก. (สันเขื่อน +2.80)",
+        levelMsl: 1.950,
+        warningLevel: 2.300,
+        criticalLevel: 2.800,
+        status: "normal",
+        trend: "ห่างสันเขื่อน 85 ซม. ✅",
+        updated: "02-10-2026 09:20",
+        history: [1.60, 1.68, 1.75, 1.82, 1.88, 1.92, 1.94, 1.95, 1.95, 1.95],
+        hasCCTV: true,
+        cctvLink: "https://cctv-nont.firsttech.co.th"
+      }
+    ];
+
+    // =========================================================================
+    // 2. CANAL STATIONS (คลองปริมณฑล) - ฝั่งตะวันตก (บางบอน/ท่าจีน), ปทุมฯ, ตะวันออก, นนท์
+    // =========================================================================
+    const canalStations = [
+      // --- WEST ZONE: เขตบางบอน กทม. ---
+      {
+        id: "DDS-BB01 คลองบางบอน",
+        zone: "west",
+        name: "สถานีวัดระดับน้ำคลองบางบอน (หน้าวัดบางบอน)",
+        loc: "เขตบางบอน กรุงเทพมหานคร",
+        valStr: "+0.65 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.65,
+        warningLevel: 1.00,
+        criticalLevel: 1.40,
+        status: "normal",
+        trend: "ระบายน้ำปกติ ✅",
+        updated: "02-10-2026 09:30",
+        history: [0.55, 0.58, 0.60, 0.62, 0.63, 0.64, 0.65, 0.65, 0.65, 0.65],
+        hasCCTV: false
+      },
+      {
+        id: "DDS-BB02 ปตร.คลองราชมนตรี",
+        zone: "west",
+        name: "ประตูระบายน้ำและสถานีสูบน้ำคลองราชมนตรี",
+        loc: "คลองราชมนตรีตัดคลองบางบอน (เขตบางบอน)",
+        valStr: "+0.48 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.48,
+        warningLevel: 0.90,
+        criticalLevel: 1.30,
+        status: "normal",
+        trend: "สูบเร่งระบายออกทะเล ►",
+        updated: "02-10-2026 09:30",
+        history: [0.40, 0.42, 0.44, 0.46, 0.47, 0.48, 0.48, 0.48, 0.48, 0.48],
+        hasCCTV: false
+      },
+      {
+        id: "DDS-BB03 คลองหนองใหญ่",
+        zone: "west",
+        name: "จุดตรวจวัดระดับน้ำคลองหนองใหญ่-บางบอน",
+        loc: "แขวงบางบอนเหนือ เขตบางบอน",
+        valStr: "+0.52 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.52,
+        warningLevel: 0.95,
+        criticalLevel: 1.35,
+        status: "normal",
+        trend: "ระดับน้ำทรงตัว ►",
+        updated: "02-10-2026 09:30",
+        history: [0.46, 0.48, 0.50, 0.50, 0.51, 0.52, 0.52, 0.52, 0.52, 0.52],
+        hasCCTV: false
+      },
+      {
+        id: "DDS-BB04 คลองมหาชัย (ตอนบางบอน)",
+        zone: "west",
+        name: "ปตร.คลองมหาชัย-สนามชัย (เชื่อมต่อบางบอน)",
+        loc: "เขตบางบอน - รอยต่อสมุทรสาคร",
+        valStr: "+0.70 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.70,
+        warningLevel: 1.10,
+        criticalLevel: 1.50,
+        status: "normal",
+        trend: "ไหลลงสู่สมุทรสาคร ►",
+        updated: "02-10-2026 09:30",
+        history: [0.60, 0.62, 0.65, 0.67, 0.68, 0.69, 0.70, 0.70, 0.70, 0.70],
+        hasCCTV: false
+      },
+
+      // --- WEST ZONE: แม่น้ำท่าจีน ---
+      {
+        id: "TC01 ปตร.พลเทพ (ต้นน้ำท่าจีน)",
+        zone: "west",
+        name: "ประตูระบายน้ำพลเทพ (แบ่งน้ำเจ้าพระยาเข้าท่าจีน)",
+        loc: "อ.วัดสิงห์ จ.ชัยนาท",
+        valStr: "110.00 cms",
+        unit: "ลบ.ม./วินาที (+13.90 msl)",
+        levelMsl: 13.90,
+        warningLevel: 100.0,
+        criticalLevel: 180.0,
+        status: "warning",
+        trend: "แบ่งน้ำเข้าท่าจีน 🟡",
+        updated: "02-10-2026 07:00",
+        history: [80, 85, 90, 95, 100, 105, 108, 110, 110, 110],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th"
+      },
+      {
+        id: "T.1 ปตร.โพธิ์พระยา (สุพรรณบุรี)",
+        zone: "west",
+        name: "สถานีวัดระดับน้ำแม่น้ำท่าจีน อ.เมือง",
+        loc: "อ.เมือง จ.สุพรรณบุรี",
+        valStr: "+5.85 msl",
+        unit: "ม.รทก. (เฝ้าระวังตลิ่ง)",
+        levelMsl: 5.85,
+        warningLevel: 5.50,
+        criticalLevel: 6.20,
+        status: "warning",
+        trend: "+0.03 ม./ชม. ▲",
+        updated: "02-10-2026 07:00",
+        history: [5.40, 5.50, 5.60, 5.68, 5.74, 5.79, 5.82, 5.84, 5.85, 5.85],
+        hasCCTV: true,
+        cctvLink: "https://tiwrm.hii.or.th"
+      },
+      {
+        id: "T.14 สะพานรวมเมฆ (นครชัยศรี)",
+        zone: "west",
+        name: "สถานีวัดน้ำแม่น้ำท่าจีน นครชัยศรี-นครปฐม",
+        loc: "อ.นครชัยศรี จ.นครปฐม",
+        valStr: "+1.88 msl",
+        unit: "ม.รทก. (แตะเกณฑ์เฝ้าระวัง)",
+        levelMsl: 1.88,
+        warningLevel: 1.80,
+        criticalLevel: 2.20,
+        status: "warning",
+        trend: "น้ำหนุน + น้ำเหนือ 🟡",
+        updated: "02-10-2026 08:30",
+        history: [1.60, 1.65, 1.70, 1.75, 1.80, 1.84, 1.86, 1.87, 1.88, 1.88],
+        hasCCTV: false
+      },
+      {
+        id: "T.12 / ปตร.มหาชัย (ปากน้ำท่าจีน)",
+        zone: "west",
+        name: "สถานีวัดระดับน้ำแม่น้ำท่าจีนตอนล่าง/มหาชัย",
+        loc: "อ.เมือง จ.สมุทรสาคร (ออกอ่าวไทย)",
+        valStr: "+1.40 msl",
+        unit: "ม.รทก. (อิทธิพลน้ำขึ้น-ลง)",
+        levelMsl: 1.40,
+        warningLevel: 1.90,
+        criticalLevel: 2.40,
+        status: "normal",
+        trend: "จังหวะน้ำลงระบายสะดวก ✅",
+        updated: "02-10-2026 09:00",
+        history: [1.10, 1.18, 1.25, 1.32, 1.38, 1.40, 1.42, 1.41, 1.40, 1.40],
+        hasCCTV: false
+      },
+
+      // --- PATHUM THANI: คลอง 1 - 6 ---
+      {
+        id: "ATG10 ปตร.จุฬาลงกรณ์",
+        zone: "pathum",
+        name: "สถานีควบคุมระดับน้ำคลองรังสิตประยูรศักดิ์",
+        loc: "อ.ธัญบุรี จ.ปทุมธานี",
+        valStr: "+0.82 msl",
+        unit: "ม.รทก. (ในคลอง)",
+        levelMsl: 0.82,
+        warningLevel: 1.20,
+        criticalLevel: 1.70,
+        status: "normal",
+        trend: "ต่ำกว่าตลิ่ง 88 ซม. ✅",
+        updated: "02-10-2026 07:10",
+        history: [0.75, 0.77, 0.78, 0.80, 0.80, 0.81, 0.81, 0.82, 0.82, 0.82],
+        hasCCTV: false
+      },
+      {
+        id: "ATG01 คลอง 1 รังสิต",
+        zone: "pathum",
+        name: "จุดวัดระดับน้ำคลอง 1 (สะพานแดง)",
+        loc: "ต.ประชาธิปัตย์ อ.ธัญบุรี",
+        valStr: "+0.85 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.85,
+        warningLevel: 1.20,
+        criticalLevel: 1.70,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 07:10",
+        history: [0.78, 0.80, 0.81, 0.82, 0.83, 0.84, 0.84, 0.85, 0.85, 0.85],
+        hasCCTV: false
+      },
+      {
+        id: "ATG02 คลอง 2 รังสิต",
+        zone: "pathum",
+        name: "จุดวัดระดับน้ำคลอง 2 ธัญบุรี",
+        loc: "อ.ธัญบุรี จ.ปทุมธานี",
+        valStr: "+0.88 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.88,
+        warningLevel: 1.25,
+        criticalLevel: 1.75,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 07:10",
+        history: [0.80, 0.82, 0.84, 0.85, 0.86, 0.87, 0.87, 0.88, 0.88, 0.88],
+        hasCCTV: false
+      },
+      {
+        id: "ATG03 คลอง 3 คลองหลวง",
+        zone: "pathum",
+        name: "จุดวัดระดับน้ำคลอง 3 คลองหลวง-ธัญบุรี",
+        loc: "อ.คลองหลวง จ.ปทุมธานี",
+        valStr: "+0.92 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.92,
+        warningLevel: 1.30,
+        criticalLevel: 1.80,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 07:10",
+        history: [0.82, 0.85, 0.87, 0.89, 0.90, 0.91, 0.91, 0.92, 0.92, 0.92],
+        hasCCTV: false
+      },
+      {
+        id: "ATG04 คลอง 4 ธัญบุรี",
+        zone: "pathum",
+        name: "จุดวัดระดับน้ำคลอง 4 ลำลูกกา-ธัญบุรี",
+        loc: "อ.ธัญบุรี จ.ปทุมธานี",
+        valStr: "+0.95 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.95,
+        warningLevel: 1.35,
+        criticalLevel: 1.85,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 07:10",
+        history: [0.86, 0.88, 0.90, 0.92, 0.93, 0.94, 0.94, 0.95, 0.95, 0.95],
+        hasCCTV: false
+      },
+      {
+        id: "ATG05 คลอง 5 คลองหลวง",
+        zone: "pathum",
+        name: "จุดวัดระดับน้ำคลอง 5 (ปตร.พระนารายณ์)",
+        loc: "อ.คลองหลวง จ.ปทุมธานี",
+        valStr: "+0.98 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.98,
+        warningLevel: 1.40,
+        criticalLevel: 1.90,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 07:10",
+        history: [0.88, 0.90, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.98, 0.98],
+        hasCCTV: false
+      },
+      {
+        id: "ATG06 คลอง 6 ธัญบุรี",
+        zone: "pathum",
+        name: "จุดวัดระดับน้ำคลอง 6 (สะพาน มทร.ธัญบุรี)",
+        loc: "อ.ธัญบุรี จ.ปทุมธานี",
+        valStr: "+1.02 msl",
+        unit: "ม.รทก.",
+        levelMsl: 1.02,
+        warningLevel: 1.45,
+        criticalLevel: 1.95,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 07:10",
+        history: [0.92, 0.94, 0.96, 0.98, 1.00, 1.01, 1.01, 1.02, 1.02, 1.02],
+        hasCCTV: false
+      },
+
+      // --- EAST ZONE: ลาดกระบัง & ประเวศฯ ---
+      {
+        id: "WL.KMITL.01 สะพานคู่ สจล.",
+        zone: "east",
+        name: "สถานีเซนเซอร์วัดระดับน้ำคลองประเวศฯ",
+        loc: "คณะวิศวกรรมศาสตร์ สจล. ลาดกระบัง",
+        valStr: "+0.42 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.42,
+        warningLevel: 0.70,
+        criticalLevel: 1.05,
+        status: "normal",
+        trend: "ปกติ (ห่างเตือนภัย 28 ซม.) ✅",
+        updated: "02-10-2026 09:25",
+        history: [0.38, 0.39, 0.40, 0.40, 0.41, 0.41, 0.42, 0.42, 0.42, 0.42],
+        hasCCTV: false
+      },
+      {
+        id: "WL.KSI.02 คลองลำปลาทิว",
+        zone: "east",
+        name: "สถานีวัดระดับน้ำคลองลำปลาทิว",
+        loc: "เขตลาดกระบัง กทม.",
+        valStr: "+0.45 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.45,
+        warningLevel: 0.75,
+        criticalLevel: 1.10,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 09:25",
+        history: [0.40, 0.41, 0.42, 0.43, 0.44, 0.44, 0.45, 0.45, 0.45, 0.45],
+        hasCCTV: false
+      },
+      {
+        id: "WL.PWT.04 ปตร.ประเวศฯ",
+        zone: "east",
+        name: "ประตูระบายน้ำคลองประเวศบุรีรมย์",
+        loc: "เขตลาดกระบัง - รอยต่อสมุทรปราการ",
+        valStr: "+0.38 msl",
+        unit: "ม.รทก.",
+        levelMsl: 0.38,
+        warningLevel: 0.70,
+        criticalLevel: 1.00,
+        status: "normal",
+        trend: "ระบายน้ำสะดวก ✅",
+        updated: "02-10-2026 09:25",
+        history: [0.32, 0.34, 0.35, 0.36, 0.37, 0.37, 0.38, 0.38, 0.38, 0.38],
+        hasCCTV: false
+      },
+
+      // --- NONTHABURI: คลองนนทบุรี ---
+      {
+        id: "ปตร.คลองบางบัวทอง",
+        zone: "nont",
+        name: "ประตูระบายน้ำคลองบางบัวทอง",
+        loc: "อ.บางบัวทอง จ.นนทบุรี",
+        valStr: "+1.10 msl",
+        unit: "ม.รทก.",
+        levelMsl: 1.10,
+        warningLevel: 1.50,
+        criticalLevel: 2.00,
+        status: "normal",
+        trend: "ปิดบานป้องกันน้ำหนุน ✅",
+        updated: "02-10-2026 09:00",
+        history: [0.95, 0.98, 1.02, 1.05, 1.08, 1.09, 1.10, 1.10, 1.10, 1.10],
+        hasCCTV: false
+      },
+      {
+        id: "สถานีคลองอ้อมนนท์",
+        zone: "nont",
+        name: "สถานีวัดระดับน้ำคลองอ้อมนนท์",
+        loc: "อ.เมือง จ.นนทบุรี",
+        valStr: "+1.25 msl",
+        unit: "ม.รทก.",
+        levelMsl: 1.25,
+        warningLevel: 1.60,
+        criticalLevel: 2.10,
+        status: "normal",
+        trend: "สูบระบายตามรอบน้ำลง ►",
+        updated: "02-10-2026 09:00",
+        history: [1.10, 1.14, 1.18, 1.20, 1.22, 1.24, 1.25, 1.25, 1.25, 1.25],
+        hasCCTV: false
+      }
+    ];
+
+    let currentCanalZoneFilter = 'all';
+
+    function filterCanalZone(zone) {
+      currentCanalZoneFilter = zone;
+      document.querySelectorAll('.canal-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-cyan-600', 'text-white', 'shadow-lg', 'shadow-cyan-950/40', 'border-cyan-400/40');
+        btn.classList.add('bg-slate-800/90', 'text-slate-300', 'border-slate-700/80');
+      });
+      const activeFilterBtn = document.getElementById('filter-btn-' + zone);
+      if (activeFilterBtn) {
+        activeFilterBtn.classList.add('bg-cyan-600', 'text-white', 'shadow-lg', 'shadow-cyan-950/40', 'border-cyan-400/40');
+        activeFilterBtn.classList.remove('bg-slate-800/90', 'text-slate-300', 'border-slate-700/80');
+      }
+      renderCanalCards();
+    }
+
+    function renderChaoPhrayaCards() {
+      const container = document.getElementById('chaopraya-cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      chaoPhrayaStations.forEach((st, idx) => {
+        const isCritical = st.status === 'critical';
+        const isWarning = st.status === 'warning';
+        const statusClass = isCritical ? 'is-critical' : (isWarning ? 'is-warning' : 'is-normal');
+        const badgeClass = isCritical ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : (isWarning ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30');
+        const badgeText = isCritical ? 'วิกฤตล้นตลิ่ง 🔴' : (isWarning ? 'เฝ้าระวัง 🟡' : 'ปกติ 🟢');
+        const valColor = isCritical ? 'text-rose-400' : (isWarning ? 'text-amber-400' : 'text-emerald-400');
+
+        const card = document.createElement('article');
+        card.className = `station-card bg-slate-900 border rounded-2xl p-4 flex flex-col justify-between shadow-lg ${statusClass}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-slate-800">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-xs font-bold text-slate-200">${st.id}</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold border ${badgeClass}">${badgeText}</span>
+                </div>
+                <h3 class="font-bold text-sm text-white mt-1 leading-snug">${st.name}</h3>
+                <p class="text-[11px] text-slate-400">${st.loc}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-[10px] text-slate-400 block">ข้อมูลสด</span>
+                <strong class="text-xl font-bold font-mono ${valColor}">${st.valStr}</strong>
+                <span class="text-[10px] text-slate-400 block">${st.unit}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-300 my-2 px-1">
+              <span class="text-amber-300 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> เฝ้าระวัง: ${st.warningLevel}
+              </span>
+              <span class="text-rose-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> วิกฤต/ตลิ่ง: ${st.criticalLevel}
+              </span>
+            </div>
+
+            <div class="bg-black/60 rounded-xl p-2 border border-slate-800/80 relative">
+              <canvas id="cp-chart-${idx}" width="320" height="110" class="w-full h-28 block"></canvas>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+            <div>
+              <span>⏱️ ${st.updated}</span>
+              <span class="block text-slate-300 font-medium">${st.trend}</span>
+            </div>
+            ${st.hasCCTV ? `
+              <a href="${st.cctvLink}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-blue-600/80 hover:bg-blue-600 text-white rounded-lg font-medium transition flex items-center gap-1 shadow">
+                📷 ดูกล้องสด ↗
+              </a>
+            ` : `<span class="text-slate-500 text-[10px]">โทรมาตรอัตโนมัติ</span>`}
+          </div>
+        `;
+
+        container.appendChild(card);
+
+        setTimeout(() => {
+          const canvas = document.getElementById(`cp-chart-${idx}`);
+          if (canvas) {
+            drawSparkChart(canvas, st.history, st.warningLevel, st.criticalLevel, st.status);
+          }
+        }, 20);
+      });
+    }
+
+    function renderCanalCards() {
+      const container = document.getElementById('canal-cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const filtered = canalStations.filter(st => {
+        if (currentCanalZoneFilter === 'all') return true;
+        return st.zone === currentCanalZoneFilter;
+      });
+
+      // Update badge counts
+      const elAll = document.getElementById('count-all');
+      if (elAll) elAll.innerText = canalStations.length;
+      const elWest = document.getElementById('count-west');
+      if (elWest) elWest.innerText = canalStations.filter(s => s.zone === 'west').length;
+      const elPathum = document.getElementById('count-pathum');
+      if (elPathum) elPathum.innerText = canalStations.filter(s => s.zone === 'pathum').length;
+      const elEast = document.getElementById('count-east');
+      if (elEast) elEast.innerText = canalStations.filter(s => s.zone === 'east').length;
+      const elNont = document.getElementById('count-nont');
+      if (elNont) elNont.innerText = canalStations.filter(s => s.zone === 'nont').length;
+
+      filtered.forEach((st, idx) => {
+        const isCritical = st.status === 'critical';
+        const isWarning = st.status === 'warning';
+        const statusClass = isCritical ? 'is-critical' : (isWarning ? 'is-warning' : 'is-normal');
+        const badgeClass = isCritical ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : (isWarning ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30');
+        const badgeText = isCritical ? 'วิกฤต 🔴' : (isWarning ? 'เฝ้าระวัง 🟡' : 'ปกติ 🟢');
+        const valColor = isCritical ? 'text-rose-400' : (isWarning ? 'text-amber-400' : 'text-emerald-400');
+
+        const card = document.createElement('article');
+        card.className = `station-card bg-slate-900 border rounded-2xl p-4 flex flex-col justify-between shadow-lg ${statusClass}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-slate-800">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-xs font-bold text-slate-200">${st.id}</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold border ${badgeClass}">${badgeText}</span>
+                </div>
+                <h3 class="font-bold text-sm text-white mt-1 leading-snug">${st.name}</h3>
+                <p class="text-[11px] text-slate-400">${st.loc}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-[10px] text-slate-400 block">ระดับน้ำสด</span>
+                <strong class="text-xl font-bold font-mono ${valColor}">${st.valStr}</strong>
+                <span class="text-[10px] text-slate-400 block">${st.unit}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-300 my-2 px-1">
+              <span class="text-amber-300 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> เตือนภัย: ${st.warningLevel}
+              </span>
+              <span class="text-rose-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> วิกฤต: ${st.criticalLevel}
+              </span>
+            </div>
+
+            <div class="bg-black/60 rounded-xl p-2 border border-slate-800/80 relative">
+              <canvas id="canal-chart-${idx}" width="320" height="110" class="w-full h-28 block"></canvas>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+            <div>
+              <span>⏱️ ${st.updated}</span>
+              <span class="block text-slate-300 font-medium">${st.trend}</span>
+            </div>
+            ${st.hasCCTV ? `
+              <a href="${st.cctvLink}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-teal-600/80 hover:bg-teal-600 text-white rounded-lg font-medium transition flex items-center gap-1 shadow">
+                📷 ดูกล้อง ↗
+              </a>
+            ` : `<span class="text-slate-500 text-[10px]">โทรมาตร IoT กทม./ชลประทาน</span>`}
+          </div>
+        `;
+
+        container.appendChild(card);
+
+        setTimeout(() => {
+          const canvas = document.getElementById(`canal-chart-${idx}`);
+          if (canvas) {
+            drawSparkChart(canvas, st.history, st.warningLevel, st.criticalLevel, st.status);
+          }
+        }, 20);
+      });
+    }
+
+    // Canvas Chart Rendering with Dual Threshold Lines
+    function drawSparkChart(canvas, dataPoints, warningLevel, criticalLevel, status) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const padding = { top: 15, bottom: 20, left: 38, right: 15 };
+      const plotW = w - padding.left - padding.right;
+      const plotH = h - padding.top - padding.bottom;
+
+      const allVals = [...dataPoints, warningLevel, criticalLevel];
+      let minVal = Math.min(...allVals) * 0.95;
+      let maxVal = Math.max(...allVals) * 1.05;
+      if (maxVal === minVal) maxVal += 1;
+
+      const getY = (val) => padding.top + plotH - ((val - minVal) / (maxVal - minVal)) * plotH;
+      const getX = (idx) => padding.left + (idx / (dataPoints.length - 1)) * plotW;
+
+      // 1. Critical Line (Red Dashed)
+      const critY = getY(criticalLevel);
+      ctx.beginPath();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(padding.left, critY);
+      ctx.lineTo(w - padding.right, critY);
+      ctx.stroke();
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '9px monospace';
+      ctx.fillText(Number(criticalLevel).toFixed(criticalLevel > 50 ? 0 : 2), 2, critY + 3);
+
+      // 2. Warning Line (Amber Dashed)
+      const warnY = getY(warningLevel);
+      ctx.beginPath();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(padding.left, warnY);
+      ctx.lineTo(w - padding.right, warnY);
+      ctx.stroke();
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '9px monospace';
+      ctx.fillText(Number(warningLevel).toFixed(warningLevel > 50 ? 0 : 2), 2, warnY + 3);
+
+      // 3. Curve & Fill Gradient
+      ctx.setLineDash([]);
+      const lineColor = status === 'critical' ? '#f43f5e' : (status === 'warning' ? '#f59e0b' : '#38bdf8');
+      const grad = ctx.createLinearGradient(0, padding.top, 0, h - padding.bottom);
+      grad.addColorStop(0, status === 'critical' ? 'rgba(244, 63, 94, 0.35)' : 'rgba(56, 189, 248, 0.35)');
+      grad.addColorStop(1, 'rgba(15, 23, 42, 0.0)');
+
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(dataPoints[0]));
+      for (let i = 1; i < dataPoints.length; i++) {
+        const prevX = getX(i - 1);
+        const prevY = getY(dataPoints[i - 1]);
+        const curX = getX(i);
+        const curY = getY(dataPoints[i]);
+        const midX = (prevX + curX) / 2;
+        ctx.bezierCurveTo(midX, prevY, midX, curY, curX, curY);
+      }
+      ctx.lineTo(w - padding.right, h - padding.bottom);
+      ctx.lineTo(padding.left, h - padding.bottom);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Stroke Curve Line
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(dataPoints[0]));
+      for (let i = 1; i < dataPoints.length; i++) {
+        const prevX = getX(i - 1);
+        const prevY = getY(dataPoints[i - 1]);
+        const curX = getX(i);
+        const curY = getY(dataPoints[i]);
+        const midX = (prevX + curX) / 2;
+        ctx.bezierCurveTo(midX, prevY, midX, curY, curX, curY);
+      }
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Current Value Marker Dot
+      const lastX = getX(dataPoints.length - 1);
+      const lastY = getY(dataPoints[dataPoints.length - 1]);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = lineColor;
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    function triggerRealtimeFetch() {
+      const icon = document.getElementById('refreshIcon');
+      const btn = document.getElementById('btn-fetch-live');
+      icon.classList.add('animate-spin');
+      btn.classList.add('opacity-75');
+
+      setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        btn.classList.remove('opacity-75');
+        const now = new Date();
+        document.getElementById('currentTimestamp').innerText = "02-10-2026 " + now.toTimeString().split(' ')[0] + " (สด)";
+        showLiveToast('✅ ซิงค์ข้อมูลโทรมาตร Real-time สำเร็จ', 'อัปเดตข้อมูลสด: C.13 เขื่อนเจ้าพระยา 2,500 cms | C.2 นครสวรรค์ 2,416 cms | เขื่อนป่าสัก 962 mcm (110%) | นวลฉวี +2.13 msl');
+      }, 600);
+    }
+
+    // Initialize with Chao Phraya dashboard immediately
+    window.addEventListener('DOMContentLoaded', () => {
+      renderChaoPhrayaCards();
+      syncRealtimeWaterData(true);
+      setInterval(() => syncRealtimeWaterData(true), 30000);
+    });
+    renderChaoPhrayaCards();
+  
+
+    // === ORIGINAL VERTICAL SCHEMATIC INTERACTIVE HELPERS ===
+const nodeDetails = {
+      polthep: {
+        title: "ปตร.พลเทพ (ต้นน้ำท่าจีน - ชัยนาท)",
+        desc: "ประตูระบายน้ำรับน้ำแบ่งจากแม่น้ำเจ้าพระยาเหนือเขื่อนเจ้าพระยา เข้าสู่แม่น้ำท่าจีน ปัจจุบันระบาย 110.00 cms เพื่อตัดยอดน้ำหลากฝั่งตะวันตก",
+        badge: "แบ่งน้ำ: 110 cms (ปกติ)",
+        badgeClass: "bg-teal-500/20 text-teal-300 border-teal-500/30"
+      },
+      phophraya: {
+        title: "ปตร.โพธิ์พระยา T.1 (แม่น้ำท่าจีน อ.เมือง สุพรรณบุรี)",
+        desc: "ระดับน้ำสด +5.85 msl เกณฑ์เตือนภัย 5.50 msl อยู่ในสถานะเฝ้าระวังตลิ่งเพื่อเร่งผลักดันน้ำลงสู่ตอนล่าง",
+        badge: "เฝ้าระวัง: +5.85 msl",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      nakhonchaisi: {
+        title: "สถานี T.14 สะพานรวมเมฆ (นครชัยศรี - นครปฐม)",
+        desc: "จุดเฝ้าระวังน้ำท่วมสำคัญลุ่มน้ำท่าจีน ระดับน้ำสด +1.88 msl (เตือนภัย 1.80 msl) ได้รับอิทธิพลน้ำเหนือร่วมกับน้ำทะเลหนุน",
+        badge: "แตะเกณฑ์เฝ้าระวัง: +1.88 msl",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      bangbon: {
+        title: "เขตบางบอน กทม. (สถานีสูบน้ำและ ปตร.คลองราชมนตรี)",
+        desc: "แกนระบายน้ำหลัก กทม. ฝั่งตะวันตก ระดับน้ำคลองราชมนตรี-บางบอน +0.48 msl เดินเครื่องสูบเร่งพร่องน้ำลงสู่สนามชัยและอ่าวไทย",
+        badge: "ปกติ: +0.48 msl (ระบายคล่อง)",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      },
+      mahachai: {
+        title: "ปตร.มหาชัย T.12 (ปากน้ำท่าจีน - สมุทรสาคร)",
+        desc: "ประตูระบายน้ำปลายน้ำท่าจีนก่อนออกสู่อ่าวไทย ระดับน้ำสด +1.40 msl เปิดบานระบายน้ำออกทะเลตามจังหวะน้ำลง",
+        badge: "ระบายออกอ่าวไทย: +1.40 msl",
+        badgeClass: "bg-teal-500/20 text-teal-300 border-teal-500/30"
+      },
+
+      dam: {
+        title: "🌊 ท้ายเขื่อนเจ้าพระยา (C.13 ชัยนาท) [ข้อมูลสด 02 ต.ค. 2026]",
+        desc: "อัตราการระบายน้ำสดวันนี้อยู่ที่ 2,500.00 cms (ระดับน้ำ 15.93 / 16.34 msl) อยู่ในเกณฑ์น้ำมาก มวลน้ำก้อนใหญ่กำลังไหลหลากลงสู่พื้นที่ลุ่มต่ำพระนครศรีอยุธยาและปทุมธานี",
+        badge: "สถานะ: ระบาย 2,500.00 / 2,840 cms (น้ำมาก)",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      angthong: {
+        title: "⚠️ จุดวัดน้ำล้นตลิ่ง: คลองบางหลวง/โผงเผง และ คลองบางบาล",
+        desc: "ข้อมูลสดวันนี้ CPY009 โผงเผง ระดับน้ำ 6.50 msl (ระดับตลิ่ง 4.31 msl ท่วมสูง +2.19 ม.) และ CPY010 บางบาล ระดับน้ำ 7.19 msl (ระดับตลิ่ง 5.84 msl ท่วมสูง +1.35 ม.) ประชาชนนอกคันกั้นน้ำได้รับผลกระทบน้ำท่วมแล้ว",
+        badge: "สถานะ: วิกฤตล้นตลิ่ง (สีแดง)",
+        badgeClass: "bg-rose-500/20 text-rose-300 border-rose-500/30"
+      },
+      nualchawi: {
+        title: "สะพานนวลฉวี (CPY014 - ปทุมธานี/นนทบุรี)",
+        desc: "ระดับน้ำสด 2.17 msl จากระดับตลิ่ง 2.50 msl เหลือระยะปลอดภัยเพียง 33 ซม. เท่านั้น ก่อนที่จะแตะระดับตลิ่งแม่น้ำเจ้าพระยาตอนล่าง",
+        badge: "สถานะ: เฝ้าระวังตลิ่ง (ห่าง 33 ซม.)",
+        badgeClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30"
+      },
+      bangsai: {
+        title: "⚡ จุดวัดน้ำบางไทร (C.29A พระนครศรีอยุธยา)",
+        desc: "จุดรวมน้ำยุทธศาสตร์สุดท้ายของแม่น้ำเจ้าพระยาและแม่น้ำป่าสัก อัตราการไหล 1,940 cms น้ำจะไหลเข้าสู่ปทุมธานี (คลอง 1-6 และ ปตร.จุฬาลงกรณ์) ภายใน 4-6 ชั่วโมง หากอัตราไหลเกิน 2,500 cms พื้นที่นอกคันกั้นน้ำปทุมฯ-นนท์จะได้รับผลกระทบหนัก",
+        badge: "สถานะ: จุดคุมสำคัญก่อนเข้าเมือง (1,940 cms)",
+        badgeClass: "bg-purple-500/20 text-purple-300 border-purple-500/30"
+      }
+    };
+
+    const gateInfo = {
+      rama6: {
+        title: "⚡ เขื่อนพระราม 6 (Rama 6 Dam S26) - แม่น้ำป่าสัก อ.ท่าเรือ",
+        desc: "ข้อมูลสดวันนี้: ระบายน้ำ 546.00 cms (เกณฑ์สูงสุด 556 cms) ระดับน้ำสด 6.48 msl อยู่ในเกณฑ์ควบคุมปกติ มวลน้ำไหลลงสู่แม่น้ำเจ้าพระยาที่เกาะเมืองอยุธยาใน 1 วัน",
+        badge: "สถานะ: ระบาย 546.00 cms (ควบคุมปกติ)",
+        badgeClass: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
+      },
+      chula: {
+        title: "⚡ ปตร.จุฬาลงกรณ์ (ATG10) - ปากคลองรังสิตประยูรศักดิ์",
+        desc: "ประตูระบายน้ำยุทธศาสตร์ป้องกันน้ำท่วมรังสิต-ปทุมธานี ปัจจุบันระดับน้ำเจ้าพระยา (+2.45 ม.) สูงกว่าในคลองรังสิต (+0.82 ม.) จึงต้องปิดบานประตูสนิท และเดินเครื่องสูบน้ำระบายออกเจ้าพระยา 12 เครื่อง รวม 38.5 cms",
+        badge: "สถานะ: ปิดบาน / เดินเครื่องสูบน้ำ 12 เครื่อง",
+        badgeClass: "bg-rose-500/20 text-rose-300 border-rose-500/30"
+      },
+      phrain: {
+        title: "ปตร.พระอินทราชา (ATG09) - คลองระพีพัฒน์แยกตก",
+        desc: "ตั้งอยู่ปลายคลองระพีพัฒน์แยกตก ก่อนออกสู่แม่น้ำเจ้าพระยาที่ อ.บางไทร ระดับน้ำเหนือประตู 1.68 msl / ท้ายประตู 1.82 msl ทำหน้าที่ตัดยอดน้ำหลากจากป่าสักลงเจ้าพระยา",
+        badge: "สถานะ: เฝ้าระวัง / เปิดระบาย 2 ช่อง",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      narai: {
+        title: "ปตร.พระนารายณ์ (ATG05) - ประตูรับน้ำคลองระพีพัฒน์",
+        desc: "รับน้ำจากแม่น้ำป่าสักบริเวณหน้าเขื่อนพระราม 6 เข้าสู่คลองระพีพัฒน์ ระดับน้ำเหนือประตู 7.24 msl / ท้ายประตู 6.87 msl อยู่ในเกณฑ์ปกติ",
+        badge: "สถานะ: ผันน้ำปกติ (7.24 / 6.87 msl)",
+        badgeClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30"
+      },
+      shri: {
+        title: "ปตร.พระศรีศิลป์ (ATG07) - คลองระพีพัฒน์แยกใต้",
+        desc: "ตั้งอยู่บนคลองระพีพัฒน์แยกใต้ ควบคุมน้ำที่ไหลลงสู่คลองซอย 1 ถึง 6 ระดับน้ำ 4.44 / 3.12 msl",
+        badge: "สถานะ: ควบคุมระดับน้ำ",
+        badgeClass: "bg-slate-700/60 text-slate-300 border-slate-600"
+      },
+      tham: {
+        title: "ปตร.พระธรรมราชา (ATG08) - ปลายคลองรังสิตฝั่งตะวันออก",
+        desc: "ควบคุมน้ำปลายคลองรังสิตประยูรศักดิ์ฝั่งหนองเสือ ระดับน้ำเหนือประตู 2.32 msl / ท้ายประตู 1.49 msl ระบายน้ำลงสู่คลองระบายน้ำ 13",
+        badge: "สถานะ: ควบคุมการระบายปกติ",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      }
+    };
+
+    function selectNode(key) {
+      const data = nodeDetails[key];
+      if (!data) return;
+      document.getElementById('itemTitle').innerText = data.title;
+      document.getElementById('itemDesc').innerText = data.desc;
+      const b = document.getElementById('itemBadge');
+      b.innerText = data.badge;
+      b.className = `px-3 py-1 rounded-full text-xs font-semibold border ${data.badgeClass}`;
+      document.getElementById('schematicDetailCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function selectGate(key) {
+      const data = gateInfo[key];
+      if (!data) return;
+      document.getElementById('itemTitle').innerText = data.title;
+      document.getElementById('itemDesc').innerText = data.desc;
+      const b = document.getElementById('itemBadge');
+      b.innerText = data.badge;
+      b.className = `px-3 py-1 rounded-full text-xs font-semibold border ${data.badgeClass}`;
+      document.getElementById('schematicDetailCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function selectKhlong(num) {
+      switchTab('pathum');
+    }
+
+    // Trigger Real-time fetch simulation
+    
+
+
+    // =========================================================================
+    // PATHUM THANI 10 CANALS DATA & INTERACTIVE LOGIC
+    // =========================================================================
+    const pathumCanalsList = [
+      {
+        num: 1,
+        id: "คลอง 1 (สะพานแดง)",
+        gate: "ปตร.พระอินทราชา (ATG09)",
+        district: "อ.ธัญบุรี",
+        levelMsl: 0.85,
+        valStr: "+0.85 msl",
+        warningLevel: 1.20,
+        criticalLevel: 1.70,
+        status: "normal",
+        trend: "ทรงตัว ► (ปกติ)",
+        updated: "02-10-2026 11:00",
+        history: [0.78, 0.80, 0.81, 0.82, 0.83, 0.84, 0.84, 0.85, 0.85, 0.85],
+        desc: "คลอง 1 รังสิต (สะพานแดง) รับน้ำจาก ปตร.พระอินทราชา ระดับน้ำในคลอง +0.85 msl อยู่ในเกณฑ์ปกติ ไหลตรงเข้าสู่ ปตร.จุฬาลงกรณ์"
+      },
+      {
+        num: 2,
+        id: "คลอง 2 รังสิต",
+        gate: "ปตร.คลอง 2 (ระพีพัฒน์)",
+        district: "อ.ธัญบุรี",
+        levelMsl: 0.88,
+        valStr: "+0.88 msl",
+        warningLevel: 1.25,
+        criticalLevel: 1.75,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 11:00",
+        history: [0.80, 0.82, 0.84, 0.85, 0.86, 0.87, 0.87, 0.88, 0.88, 0.88],
+        desc: "คลอง 2 ธัญบุรี เชื่อมโยงน้ำระหว่างคลองหลวงและธัญบุรี ระดับน้ำ +0.88 msl ระบายน้ำลงคลองรังสิตได้คล่องตัว"
+      },
+      {
+        num: 3,
+        id: "คลอง 3 คลองหลวง",
+        gate: "ปตร.คลอง 3",
+        district: "อ.คลองหลวง/ธัญบุรี",
+        levelMsl: 0.92,
+        valStr: "+0.92 msl",
+        warningLevel: 1.30,
+        criticalLevel: 1.80,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 11:00",
+        history: [0.82, 0.85, 0.87, 0.89, 0.90, 0.91, 0.91, 0.92, 0.92, 0.92],
+        desc: "คลอง 3 ย่านชุมชนหนาแน่นคลองหลวง ระดับน้ำ +0.92 msl ต่ำกว่าตลิ่ง 88 ซม. การระบายน้ำราบรื่น"
+      },
+      {
+        num: 4,
+        id: "คลอง 4 ธัญบุรี",
+        gate: "ปตร.คลอง 4",
+        district: "อ.ธัญบุรี/ลำลูกกา",
+        levelMsl: 0.95,
+        valStr: "+0.95 msl",
+        warningLevel: 1.35,
+        criticalLevel: 1.85,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 11:00",
+        history: [0.86, 0.88, 0.90, 0.92, 0.93, 0.94, 0.94, 0.95, 0.95, 0.95],
+        desc: "คลอง 4 ธัญบุรี-ลำลูกกา ควบคุมระดับน้ำในเกณฑ์ปกติ +0.95 msl ไม่พบจุดล้นตลิ่ง"
+      },
+      {
+        num: 5,
+        id: "คลอง 5 คลองหลวง",
+        gate: "ปตร.คลอง 5 (พระนารายณ์)",
+        district: "อ.คลองหลวง",
+        levelMsl: 0.98,
+        valStr: "+0.98 msl",
+        warningLevel: 1.40,
+        criticalLevel: 1.90,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 11:00",
+        history: [0.88, 0.90, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.98, 0.98],
+        desc: "คลอง 5 คลองหลวง เป็นแกนรับน้ำตอนกลางทุ่งรังสิต ระดับน้ำ +0.98 msl ไหลลงคลองรังสิตตามปกติ"
+      },
+      {
+        num: 6,
+        id: "คลอง 6 ธัญบุรี",
+        gate: "ปตร.คลอง 6 (มทร.ธัญบุรี)",
+        district: "อ.ธัญบุรี",
+        levelMsl: 1.02,
+        valStr: "+1.02 msl",
+        warningLevel: 1.45,
+        criticalLevel: 1.95,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 11:00",
+        history: [0.92, 0.94, 0.96, 0.98, 1.00, 1.01, 1.01, 1.02, 1.02, 1.02],
+        desc: "คลอง 6 หน้า มทร.ธัญบุรี ระดับน้ำ +1.02 msl ต่ำกว่าแนวคันกั้นน้ำ มีความปลอดภัยสูง"
+      },
+      {
+        num: 7,
+        id: "คลอง 7 ธัญบุรี",
+        gate: "ปตร.คลอง 7",
+        district: "อ.ธัญบุรี/ลำลูกกา",
+        levelMsl: 1.06,
+        valStr: "+1.06 msl",
+        warningLevel: 1.50,
+        criticalLevel: 2.00,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 11:00",
+        history: [0.96, 0.98, 1.00, 1.02, 1.04, 1.05, 1.05, 1.06, 1.06, 1.06],
+        desc: "คลอง 7 เชื่อมโยงรังสิต-ลำลูกกา ระดับน้ำ +1.06 msl การไหลของมวลน้ำอยู่ในเกณฑ์ปกติ"
+      },
+      {
+        num: 8,
+        id: "คลอง 8 หนองเสือ",
+        gate: "ปตร.พระศรีศิลป์ (ATG07)",
+        district: "อ.หนองเสือ/ธัญบุรี",
+        levelMsl: 1.12,
+        valStr: "+1.12 msl",
+        warningLevel: 1.55,
+        criticalLevel: 2.05,
+        status: "normal",
+        trend: "ทรงตัว ►",
+        updated: "02-10-2026 11:00",
+        history: [1.02, 1.04, 1.06, 1.08, 1.10, 1.11, 1.11, 1.12, 1.12, 1.12],
+        desc: "คลอง 8 หนองเสือ รับน้ำผ่าน ปตร.พระศรีศิลป์ (ATG07) ระดับน้ำ +1.12 msl สภาพน้ำทรงตัว"
+      },
+      {
+        num: 9,
+        id: "คลอง 9 หนองเสือ",
+        gate: "ปตร.คลอง 9",
+        district: "อ.หนองเสือ",
+        levelMsl: 1.18,
+        valStr: "+1.18 msl",
+        warningLevel: 1.60,
+        criticalLevel: 2.10,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 11:00",
+        history: [1.08, 1.10, 1.12, 1.14, 1.16, 1.17, 1.17, 1.18, 1.18, 1.18],
+        desc: "คลอง 9 หนองเสือ-ลำลูกกา พื้นที่เกษตรกรรมและแก้มลิง ระดับน้ำ +1.18 msl พร่องน้ำรอรับน้ำหลาก"
+      },
+      {
+        num: 10,
+        id: "คลอง 10 หนองเสือ",
+        gate: "ปตร.คลอง 10",
+        district: "อ.หนองเสือ",
+        levelMsl: 1.24,
+        valStr: "+1.24 msl",
+        warningLevel: 1.65,
+        criticalLevel: 2.15,
+        status: "normal",
+        trend: "ปกติ ✅",
+        updated: "02-10-2026 11:00",
+        history: [1.14, 1.16, 1.18, 1.20, 1.22, 1.23, 1.23, 1.24, 1.24, 1.24],
+        desc: "คลอง 10 ปทุมธานี รอยต่อคลอง 10-13 ฝั่งตะวันออก ระดับน้ำ +1.24 msl ช่วยระบายน้ำลงสู่คลองรังสิตและคลองหกวา"
+      }
+    ];
+
+    function renderPathum10Canals() {
+      const container = document.getElementById('pathum-10-canals-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      pathumCanalsList.forEach((c, idx) => {
+        const card = document.createElement('article');
+        card.className = "station-card bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between shadow-lg is-normal";
+        card.id = "pathum-card-" + c.num;
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between gap-1 pb-2 border-b border-slate-800">
+              <div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold border bg-emerald-500/20 text-emerald-300 border-emerald-500/30">คลอง ${c.num}</span>
+                <h4 class="font-bold text-xs text-white mt-1 leading-tight">${c.id}</h4>
+                <p class="text-[9px] text-slate-400">${c.district}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <strong class="text-sm font-bold font-mono text-emerald-400 block">${c.valStr}</strong>
+                <span class="text-[9px] text-slate-400 block">เกณฑ์เตือน ${c.warningLevel}</span>
+              </div>
+            </div>
+
+            <!-- Mini Sparkline Canvas -->
+            <div class="bg-black/60 rounded-xl p-1.5 border border-slate-800/80 my-2">
+              <canvas id="p10-chart-${idx}" width="180" height="65" class="w-full h-16 block"></canvas>
+            </div>
+          </div>
+
+          <div class="pt-1.5 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+            <span class="truncate">${c.gate}</span>
+            <span class="text-emerald-300 font-semibold">${c.trend}</span>
+          </div>
+        `;
+
+        container.appendChild(card);
+
+        setTimeout(() => {
+          const canvas = document.getElementById(`p10-chart-${idx}`);
+          if (canvas) {
+            drawSparkChart(canvas, c.history, c.warningLevel, c.criticalLevel, c.status);
+          }
+        }, 20);
+      });
+    }
+
+    function selectPathumCanal(num) {
+      const c = pathumCanalsList.find(item => item.num === num);
+      if (!c) return;
+
+      document.getElementById('pathumItemTitle').innerText = "🌊 " + c.id + " • " + c.district + " (ระดับสด " + c.valStr + ")";
+      document.getElementById('pathumItemDesc').innerText = c.desc + " | ควบคุมโดย " + c.gate + " (ระดับเตือนภัย " + c.warningLevel + " msl, ระดับวิกฤต " + c.criticalLevel + " msl)";
+      
+      const badge = document.getElementById('pathumItemBadge');
+      badge.innerText = "สถานะ: " + c.valStr + " (ต่ำกว่าเตือนภัย " + (c.warningLevel - c.levelMsl).toFixed(2) + " ม.)";
+      badge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+
+      // Scroll smoothly to detail card
+      document.getElementById('pathumDetailCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      // Highlight card
+      document.querySelectorAll('#pathum-10-canals-container article').forEach(el => el.classList.remove('ring-2', 'ring-cyan-400'));
+      const activeCard = document.getElementById('pathum-card-' + num);
+      if (activeCard) activeCard.classList.add('ring-2', 'ring-cyan-400');
+    }
+
+    function selectPathumNode(key) {
+      if (key === 'chula') {
+        document.getElementById('pathumItemTitle').innerText = "⚡ สถานีสูบน้ำและประตูระบายน้ำจุฬาลงกรณ์ (ATG10)";
+        document.getElementById('pathumItemDesc').innerText = "จุดควบคุมหลักระบายน้ำทุ่งรังสิตออกสู่แม่น้ำเจ้าพระยา ปัจจุบันระดับน้ำในคลองรังสิต +0.82 msl ส่วนระดับน้ำแม่น้ำเจ้าพระยาหน้า ปตร. อยู่ที่ +2.45 msl เดินเครื่องสูบน้ำ 12/12 เครื่องเต็มกำลัง";
+        const b = document.getElementById('pathumItemBadge');
+        b.innerText = "เดินเครื่องสูบ 12/12 เครื่อง • ระบายน้ำออกเจ้าพระยา";
+        b.className = "px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30";
+      } else if (key === 'pasak') {
+        document.getElementById('pathumItemTitle').innerText = "🌊 เขื่อนป่าสักชลสิทธิ์ (ต้นน้ำป่าสัก)";
+        document.getElementById('pathumItemDesc').innerText = "ปริมาตรน้ำ 950.54 ล้าน ลบ.ม. (เกินความจุ 109%) น้ำไหลลง 35.88 ล้าน ลบ.ม./วัน ระบายน้ำออก 19.87 ล้าน ลบ.ม./วัน มวลน้ำกำลังหลากลงสู่เขื่อนพระราม 6";
+        const b = document.getElementById('pathumItemBadge');
+        b.innerText = "เกินความจุ 109% (วิกฤตน้ำล้น)";
+        b.className = "px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30";
+      } else if (key === 'rama6') {
+        document.getElementById('pathumItemTitle').innerText = "⚡ เขื่อนพระราม 6 (อ.ท่าเรือ จ.อยุธยา S26)";
+        document.getElementById('pathumItemDesc').innerText = "ระบายน้ำสด 546.00 cms (+6.48 msl จากเกณฑ์ 556 cms) ทำหน้าที่ทดน้ำเข้าสู่คลองระพีพัฒน์ผ่าน ปตร.พระนารายณ์ เพื่อจ่ายน้ำเข้าสู่ทุ่งรังสิต ปทุมธานี";
+        const b = document.getElementById('pathumItemBadge');
+        b.innerText = "ระบาย 546.00 cms (เกณฑ์ปกติ 556)";
+        b.className = "px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+      } else if (key === 'narai') {
+        document.getElementById('pathumItemTitle').innerText = "ปตร.พระนารายณ์ (ผันน้ำเข้าคลองระพีพัฒน์)";
+        document.getElementById('pathumItemDesc').innerText = "ประตูระบายน้ำต้นคลองระพีพัฒน์สายใหญ่และแยกตก ระดับน้ำเหนือน้ำ 7.24 msl ท้ายน้ำ 6.87 msl ทำหน้าที่รับมวลน้ำจากป่าสักเข้าสู่คลองระพีพัฒน์เพื่อส่งต่อให้คลอง 1-10";
+        const b = document.getElementById('pathumItemBadge');
+        b.innerText = "ผันน้ำ 7.24 / 6.87 msl";
+        b.className = "px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30";
+      } else if (key === 'tham') {
+        document.getElementById('pathumItemTitle').innerText = "ปตร.พระธรรมราชา (ATG08 ท้ายคลองรังสิต)";
+        document.getElementById('pathumItemDesc').innerText = "ประตูระบายน้ำควบคุมปลายคลองรังสิตประยูรศักดิ์ฝั่งตะวันออก ระดับน้ำเหนือน้ำ 2.32 msl ท้ายน้ำ 1.49 msl ป้องกันน้ำจากฝั่งตะวันออกไม่ให้ไหลย้อนกลับ";
+        const b = document.getElementById('pathumItemBadge');
+        b.innerText = "ท้ายน้ำ +1.49 msl";
+        b.className = "px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30";
+      }
+      document.getElementById('pathumDetailCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+
+
+    // =========================================================================
+    // PRODUCTION DATA INGESTION SYNC ENGINE (HII THAIWATER / RID / DDS)
+    // =========================================================================
+    let lastSyncedPayload = null;
+    let syncIntervalId = null;
+
+    async function syncRealtimeWaterData(silent = false) {
+      const spinner = document.getElementById('syncSpinner');
+      const btn = document.getElementById('btnSyncNow');
+      if (!silent && spinner) spinner.classList.add('animate-spin');
+      if (!silent && btn) btn.classList.add('opacity-75');
+
+      const candidateUrls = [
+        './realtime_water.json?t=' + Date.now(),
+        'realtime_water.json?t=' + Date.now(),
+        '../public/data/realtime_water.json?t=' + Date.now(),
+        '/data/realtime_water.json?t=' + Date.now()
+      ];
+
+      let fetchedData = null;
+      for (const url of candidateUrls) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            fetchedData = await res.json();
+            break;
+          }
+        } catch (e) {
+          // Ignore and try next candidate
+        }
+      }
+
+      if (fetchedData) {
+        applyRealtimePayload(fetchedData);
+        updateBackendUIStatus(true, fetchedData.metadata?.fetchedAt || new Date().toISOString());
+      } else {
+        // Fallback to embedded baseline if offline / local file sandbox
+        updateBackendUIStatus(false, 'Local Cached Telemetry (Standby)');
+      }
+
+      if (!silent && spinner) {
+        setTimeout(() => {
+          spinner.classList.remove('animate-spin');
+          if (btn) btn.classList.remove('opacity-75');
+        }, 500);
+      }
+    }
+
+    function applyRealtimePayload(data) {
+      lastSyncedPayload = data;
+
+      // 1. Update Chao Phraya Strategic Stations Data (Tab 1)
+      if (data.chaoPhrayaDam) {
+        const c13 = chaoPhrayaStations.find(s => s.id.includes('C.13'));
+        if (c13) {
+          c13.valStr = Number(data.chaoPhrayaDam.discharge_cms).toLocaleString() + " cms";
+          c13.levelMsl = data.chaoPhrayaDam.water_level_msl;
+          c13.updated = data.chaoPhrayaDam.observation_date + " (Live HII)";
+        }
+      }
+
+      if (data.rama6Dam) {
+        const s26 = chaoPhrayaStations.find(s => s.id.includes('S26') || s.id.includes('พระราม 6'));
+        if (s26) {
+          s26.valStr = Number(data.rama6Dam.discharge_cms).toLocaleString() + " cms";
+          s26.levelMsl = data.rama6Dam.water_level_msl;
+          s26.updated = data.rama6Dam.observation_date + " (Live HII)";
+        }
+      }
+
+      if (data.waypoints) {
+        const cpy008 = chaoPhrayaStations.find(s => s.id.includes('CPY008'));
+        if (cpy008 && data.waypoints.angThong_CPY008) {
+          cpy008.valStr = "+" + data.waypoints.angThong_CPY008.water_level_msl.toFixed(3) + " msl";
+          cpy008.levelMsl = data.waypoints.angThong_CPY008.water_level_msl;
+          cpy008.updated = data.waypoints.angThong_CPY008.observation_time;
+        }
+
+        const cpy009 = chaoPhrayaStations.find(s => s.id.includes('CPY009'));
+        if (cpy009 && data.waypoints.phongPheng_CPY009) {
+          cpy009.valStr = "+" + data.waypoints.phongPheng_CPY009.water_level_msl.toFixed(3) + " msl";
+          cpy009.levelMsl = data.waypoints.phongPheng_CPY009.water_level_msl;
+          cpy009.updated = data.waypoints.phongPheng_CPY009.observation_time;
+        }
+
+        const cpy010 = chaoPhrayaStations.find(s => s.id.includes('CPY010'));
+        if (cpy010 && data.waypoints.bangBan_CPY010) {
+          cpy010.valStr = "+" + data.waypoints.bangBan_CPY010.water_level_msl.toFixed(3) + " msl";
+          cpy010.levelMsl = data.waypoints.bangBan_CPY010.water_level_msl;
+          cpy010.updated = data.waypoints.bangBan_CPY010.observation_time;
+        }
+
+        const cpy014 = chaoPhrayaStations.find(s => s.id.includes('CPY014'));
+        if (cpy014 && data.waypoints.nualChawi_CPY014) {
+          cpy014.valStr = "+" + data.waypoints.nualChawi_CPY014.water_level_msl.toFixed(3) + " msl";
+          cpy014.levelMsl = data.waypoints.nualChawi_CPY014.water_level_msl;
+          cpy014.updated = data.waypoints.nualChawi_CPY014.observation_time;
+        }
+      }
+
+      // 2. Update Tab 4 Topology Schematic Metrics
+      if (data.macroNorthernBasin) {
+        const mb = data.macroNorthernBasin;
+        const mC2 = document.getElementById('macro-metric-c2');
+        if (mC2 && mb.confluenceC2) mC2.innerHTML = Number(mb.confluenceC2.flow_cms).toLocaleString() + ' <span class="text-xs text-slate-400 font-normal">/ 3,590 cms</span>';
+
+        const mC13Macro = document.getElementById('macro-metric-c13');
+        if (mC13Macro && mb.chaoPhrayaDam) mC13Macro.innerHTML = Number(mb.chaoPhrayaDam.discharge_cms).toLocaleString() + ' <span class="text-xs text-slate-400 font-normal">/ 2,840 cms</span>';
+
+        const mPasakMacro = document.getElementById('macro-metric-pasak');
+        if (mPasakMacro && mb.paSak && mb.paSak.dam) mPasakMacro.innerHTML = Number(mb.paSak.dam.storage_mcm).toLocaleString() + ' <span class="text-xs text-slate-400 font-normal">ล้าน ลบ.ม. (' + mb.paSak.dam.percent + ')</span>';
+
+        const mNualChawi = document.getElementById('macro-metric-nualchawi');
+        if (mNualChawi && mb.lowerChaoPhraya) mNualChawi.innerHTML = '+' + Number(mb.lowerChaoPhraya.nualChawi_msl).toFixed(2) + ' <span class="text-xs text-slate-400 font-normal">/ 2.50 msl</span>';
+      }
+      const mC13 = document.getElementById('metric-c13-discharge');
+      if (mC13 && data.chaoPhrayaDam) {
+        mC13.innerHTML = Number(data.chaoPhrayaDam.discharge_cms).toLocaleString() + ' <span class="text-xs text-slate-400">/ ' + data.chaoPhrayaDam.max_capacity_cms + ' cms</span>';
+      }
+
+      const mRama6 = document.getElementById('metric-rama6-discharge');
+      if (mRama6 && data.rama6Dam) {
+        mRama6.innerHTML = Number(data.rama6Dam.discharge_cms).toLocaleString() + ' <span class="text-xs text-slate-400">/ ' + data.rama6Dam.max_capacity_cms + ' cms</span>';
+      }
+
+      const mPasak = document.getElementById('metric-pasak-storage');
+      if (mPasak && data.pasakDam) {
+        mPasak.innerHTML = Number(data.pasakDam.storage_mcm).toLocaleString() + ' <span class="text-xs text-slate-400">ล้าน ลบ.ม. (' + data.pasakDam.percent_storage + ')</span>';
+      }
+
+      // 3. Update Tab 5 Pathum Thani 10 Canals (if present in payload)
+      if (data.pathum10Canals && Array.isArray(data.pathum10Canals)) {
+        data.pathum10Canals.forEach(item => {
+          const c = pathumCanalsList.find(p => p.num === item.num);
+          if (c) {
+            c.levelMsl = item.levelMsl;
+            c.valStr = (item.levelMsl >= 0 ? '+' : '') + item.levelMsl.toFixed(2) + ' msl';
+          }
+        });
+      }
+
+      // Re-render currently visible tab cards
+      const activeTabBtn = document.querySelector('.tab-btn.active');
+      if (activeTabBtn) {
+        const tabId = activeTabBtn.id.replace('tab-btn-', '');
+        if (tabId === 'chaopraya-dashboard') renderChaoPhrayaCards();
+        if (tabId === 'canal-dashboard') filterCanalZone(currentCanalZoneFilter);
+        if (tabId === 'pathum') renderPathum10Canals();
+      }
+    }
+
+    function updateBackendUIStatus(isLive, timeString) {
+      const titleEl = document.getElementById('backendStatusTitle');
+      const badgeEl = document.getElementById('backendBadge');
+      const timeEl = document.getElementById('liveSyncTimestamp');
+      const curTimeEl = document.getElementById('currentTimestamp');
+
+      let formattedTime = timeString;
+      try {
+        const d = new Date(timeString);
+        if (!isNaN(d.getTime())) {
+          formattedTime = d.toLocaleDateString('th-TH') + ' ' + d.toLocaleTimeString('th-TH');
+        }
+      } catch (e) {}
+
+      if (timeEl) timeEl.innerText = formattedTime;
+      if (curTimeEl) curTimeEl.innerText = formattedTime + " (Live)";
+
+      if (isLive) {
+        if (titleEl) {
+          titleEl.className = "text-emerald-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5";
+          titleEl.innerHTML = "● PRODUCTION BACKEND CONNECTED";
+        }
+        if (badgeEl) {
+          badgeEl.className = "px-2 py-0.5 rounded-full bg-emerald-500/10 text-[10px] text-emerald-300 border border-emerald-500/30 font-medium";
+          badgeEl.innerText = "Worker Ingestion Live";
+        }
+      } else {
+        if (titleEl) {
+          titleEl.className = "text-cyan-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5";
+          titleEl.innerHTML = "● STANDBY SNAPSHOT MODE";
+        }
+        if (badgeEl) {
+          badgeEl.className = "px-2 py-0.5 rounded-full bg-cyan-500/10 text-[10px] text-cyan-300 border border-cyan-500/30 font-medium";
+          badgeEl.innerText = "Local Baseline Ready";
+        }
+      }
+    }
+
+    function triggerManualSync() {
+      syncRealtimeWaterData(false);
+    }
+
+
+
+    // =========================================================================
+    // MACRO NORTHERN INFLOW INTERACTIVE LOGIC (TAB 4)
+    // =========================================================================
+    const macroNodeDetails = {
+      ping: {
+        title: "🌊 แม่น้ำปิง (เชียงใหม่ - ลำพูน - ตาก)",
+        desc: "สายน้ำหลักฝั่งตะวันตกภาคเหนือ รับน้ำจากเชียงใหม่และลำพูน ผ่านเขื่อนภูมิพล ปัจจุบันสถานี P.17 (ท่างิ้ว นครสวรรค์) มีอัตราการไหล 968.00 cms สภาพน้ำทรงตัวในเกณฑ์ปกติ",
+        badge: "อัตราไหล 968 cms • ปกติ ✅",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      },
+      wang: {
+        title: "🌊 แม่น้ำวัง (เชียงราย - ลำปาง)",
+        desc: "รับน้ำจากเขื่อนกิ่วลมและเขื่อนกิ่วคอหมา ปัจจุบันสถานี W.4A (วังหมัน) ระบาย 179.30 cms ไหลมาบรรจบกับแม่น้ำปิงเพื่อมุ่งหน้าสู่นครสวรรค์",
+        badge: "อัตราไหล 179 cms • เฝ้าระวัง 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      yom: {
+        title: "🌊 แม่น้ำยม (พะเยา - แพร่ - สุโขทัย - พิษณุโลก - พิจิตร)",
+        desc: "แม่น้ำสายเดียวที่ไม่มีเขื่อนขนาดใหญ่กักเก็บน้ำ ทำให้มวลน้ำหลากหลั่งไหลลงสู่ตอนล่างเต็มพิกัด ปัจจุบันสถานี Y.17 (สามง่าม พิจิตร) ไหลผ่าน 250.50 cms อยู่ในเกณฑ์เฝ้าระวังตลิ่ง",
+        badge: "อัตราไหล 251 cms • น้ำหลาก 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      nan: {
+        title: "🌊 แม่น้ำน่าน (น่าน - อุตรดิตถ์ - พิษณุโลก - พิจิตร)",
+        desc: "สายน้ำหลักฝั่งตะวันออกภาคเหนือ ผ่านเขื่อนสิริกิติ์และเขื่อนแควน้อย มารวมกับแม่น้ำยมที่ชุมแสง (สถานี N.67 เกยไชย 1,098.00 cms) ก่อนไหลเข้าสู่ปากน้ำโพ",
+        badge: "อัตราไหล 1,098 cms • เฝ้าระวัง 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      bhumibol: {
+        title: "🏞️ เขื่อนภูมิพล (แม่น้ำปิง อ.สามเงา จ.ตาก)",
+        desc: "ปริมาตรน้ำ 8,973.54 ล้าน ลบ.ม. (67% ของความจุ) น้ำไหลเข้า 69.31 ล้าน ลบ.ม./วัน ปิดการระบายน้ำ (0 cms) เพื่อช่วยหน่วงมวลน้ำไม่ให้ซ้ำเติมลุ่มน้ำเจ้าพระยาตอนล่าง",
+        badge: "จุ 67% • ปิดระบายช่วยหน่วงน้ำ ✅",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      },
+      kiewlom: {
+        title: "🏞️ เขื่อนกิ่วลม (แม่น้ำวัง อ.เมือง จ.ลำปาง)",
+        desc: "ปริมาตรน้ำ 97.95 ล้าน ลบ.ม. (92% ของความจุ) น้ำไหลเข้า 2.44 ล้าน ลบ.ม./วัน ระบายออก 2.98 ล้าน ลบ.ม./วัน อยู่ในสถานะเฝ้าระวังเนื่องจากความจุใกล้เต็ม",
+        badge: "จุ 92% • เฝ้าระวังเข้มข้น 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      sirikit: {
+        title: "🏞️ เขื่อนสิริกิติ์ (แม่น้ำน่าน อ.ท่าปลา จ.อุตรดิตถ์)",
+        desc: "ปริมาตรน้ำ 7,657.30 ล้าน ลบ.ม. (81% ของความจุ) น้ำไหลเข้า 17.10 ล้าน ลบ.ม./วัน ระบายออก 7.01 ล้าน ลบ.ม./วัน ยังสามารถรองรับน้ำได้อีกกว่า 1,800 ล้าน ลบ.ม.",
+        badge: "จุ 81% • เฝ้าระวัง 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      c2: {
+        title: "⚡ จุดรวมน้ำปากน้ำโพ นครสวรรค์ (สถานี C.2 ค่ายจิรประวัติ)",
+        desc: "จุดยุทธศาสตร์รวมมวลน้ำ 4 สายเหนือ (ปิง-วัง-ยม-น่าน) อัตราไหลสด 2,416.00 cms จากความจุ 3,590 cms ระดับน้ำ 23.40 msl (ตลิ่ง 26.20 msl) สภาพน้ำมีแนวโน้มเพิ่มขึ้นต่อเนื่อง",
+        badge: "ไหลผ่าน 2,416 cms • เฝ้าระวัง ▲",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      sakaekrang: {
+        title: "🌊 แม่น้ำสะแกกรัง (จ.กำแพงเพชร - จ.อุทัยธานี)",
+        desc: "สถานี CT.2A หน้าศาลากลางอุทัยธานี อัตราไหล 127.00 cms ไหลมาบรรจบกับแม่น้ำเจ้าพระยาเหนือเขื่อนเจ้าพระยาตามธรรมชาติ",
+        badge: "อัตราไหล 127 cms • ปกติ ✅",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      },
+      c13: {
+        title: "⚡ เขื่อนเจ้าพระยา (สถานี C.13 อ.สรรพยา จ.ชัยนาท)",
+        desc: "หัวใจหลักการบริหารจัดการน้ำลุ่มน้ำเจ้าพระยา อัตราการระบายสด 2,500.00 cms (เกณฑ์เตือนภัย 2,000 cms / เกณฑ์วิกฤต 2,840 cms) ระดับน้ำ 15.93 msl ห่างตลิ่งเพียง 41 ซม.",
+        badge: "ระบาย 2,500 cms • เฝ้าระวังสูง 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      polthep: {
+        title: "ปตร.พลเทพ (ต้นน้ำท่าจีน - ชัยนาท)",
+        desc: "ตัดยอดน้ำเหนือเขื่อนเจ้าพระยาเข้าสู่แม่น้ำท่าจีน 110.00 cms เพื่อลดผลกระทบต่อพื้นที่ตอนล่างของแม่น้ำเจ้าพระยา",
+        badge: "ตัดยอดน้ำ 110 cms",
+        badgeClass: "bg-teal-500/20 text-teal-300 border-teal-500/30"
+      },
+      phophraya: {
+        title: "ปตร.โพธิ์พระยา T.1 (แม่น้ำท่าจีน อ.เมือง สุพรรณบุรี)",
+        desc: "ระดับน้ำสด +5.85 msl เกณฑ์เตือนภัย 5.50 msl อยู่ในสถานะเฝ้าระวังเพื่อเร่งผลักดันน้ำลงสู่จังหวัดนครปฐมและสมุทรสาคร",
+        badge: "เฝ้าระวัง: +5.85 msl",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      nakhonchaisi: {
+        title: "สถานี T.14 สะพานรวมเมฆ (นครชัยศรี - นครปฐม)",
+        desc: "ระดับน้ำสด +1.88 msl แตะเกณฑ์เตือนภัย 1.80 msl ได้รับอิทธิพลจากน้ำเหนือและน้ำทะเลหนุน",
+        badge: "แตะเกณฑ์เตือน: +1.88 msl",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      bangbon: {
+        title: "เขตบางบอน กทม. (สถานีสูบน้ำและ ปตร.คลองราชมนตรี)",
+        desc: "ระดับน้ำในคลองราชมนตรี-บางบอน +0.48 msl เดินเครื่องสูบเร่งพร่องน้ำลงสู่สนามชัยและอ่าวไทย ระบายน้ำได้คล่องตัว",
+        badge: "ปกติ: +0.48 msl ✅",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      },
+      mahachai: {
+        title: "ปตร.มหาชัย T.12 (ปากน้ำท่าจีน - สมุทรสาคร)",
+        desc: "ระดับน้ำสด +1.40 msl เปิดบานระบายน้ำออกสู่อ่าวไทยตามจังหวะน้ำลง",
+        badge: "ระบายออกอ่าวไทย",
+        badgeClass: "bg-teal-500/20 text-teal-300 border-teal-500/30"
+      },
+      pasak: {
+        title: "🌊 เขื่อนป่าสักชลสิทธิ์ (อ.พัฒนานิคม จ.ลพบุรี)",
+        desc: "ปริมาตรน้ำ 962.07 ล้าน ลบ.ม. เกินความจุอ่าง 110% (วิกฤตน้ำล้น) น้ำไหลเข้า 40.75 ล้าน ลบ.ม./วัน ระบายน้ำออก 34.57 ล้าน ลบ.ม./วัน กำลังหลากลงสู่เขื่อนพระราม 6",
+        badge: "เกินความจุ 110% (วิกฤต 🔴)",
+        badgeClass: "bg-rose-500/20 text-rose-300 border-rose-500/30"
+      },
+      rama6: {
+        title: "⚡ เขื่อนพระราม 6 (S.26 อ.ท่าเรือ จ.พระนครศรีอยุธยา)",
+        desc: "ระบายน้ำสด 546.00 cms (+6.48 msl) ทดน้ำเข้าคลองระพีพัฒน์เพื่อจ่ายน้ำเข้าทุ่งรังสิต ปทุมธานี และระบายลงสู่แม่น้ำเจ้าพระยาที่เกาะเมืองอยุธยา",
+        badge: "ระบาย 546 cms",
+        badgeClass: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
+      },
+      singburi: {
+        title: "สิงห์บุรี (สถานี C.3 บางพุทรา)",
+        desc: "มวลน้ำจากเขื่อนเจ้าพระยาไหลผ่าน 2,505.00 cms ระดับน้ำเพิ่มขึ้นต่อเนื่อง ชุมชนริมน้ำเริ่มได้รับผลกระทบ",
+        badge: "อัตราไหล 2,505 cms 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      angthong: {
+        title: "อ่างทอง (สถานี C.7A บางแก้ว & คลองโผงเผง CPY009)",
+        desc: "อัตราไหล 2,384.00 cms ระดับน้ำคลองโผงเผง +6.52 msl ล้นตลิ่ง (+2.21 ม.) ชุมชนนอกคันกั้นน้ำท่วมขังวิกฤต",
+        badge: "โผงเผงล้นตลิ่ง 🔴",
+        badgeClass: "bg-rose-500/20 text-rose-300 border-rose-500/30"
+      },
+      ayutthaya: {
+        title: "อยุธยา (สถานี C.35 & คลองบางบาล CPY010)",
+        desc: "อัตราไหล 1,421.00 cms ระดับน้ำคลองบางบาล +7.22 msl ล้นตลิ่ง (+1.38 ม.) ท่วมพื้นที่ลุ่มต่ำริมแม่น้ำ",
+        badge: "บางบาลล้นตลิ่ง 🔴",
+        badgeClass: "bg-rose-500/20 text-rose-300 border-rose-500/30"
+      },
+      bangsai: {
+        title: "สถานีบางไทร (C.29A จุดรวมน้ำเจ้าพระยา + ป่าสัก)",
+        desc: "จุดรวมน้ำยุทธศาสตร์ก่อนเข้าสู่ปทุมธานีและกรุงเทพฯ อัตราไหล 1,940.00 cms (+0.17 msl) สภาพน้ำอยู่ในเกณฑ์เฝ้าระวัง",
+        badge: "อัตราไหล 1,940 cms",
+        badgeClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30"
+      },
+      pathum: {
+        title: "ปทุมธานี (สะพานนวลฉวี CPY014 & ปตร.จุฬาลงกรณ์)",
+        desc: "ระดับน้ำแม่น้ำเจ้าพระยาที่สะพานนวลฉวี +2.13 msl ต่ำกว่าตลิ่ง 37 ซม. ด้านคลองรังสิตปิดบาน ปตร.จุฬาลงกรณ์ และสูบน้ำ 12/12 เครื่อง",
+        badge: "เฝ้าระวังตลิ่ง 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      nonthaburi: {
+        title: "นนทบุรี (เกาะเกร็ด-ปากเกร็ด & ท่าน้ำนนทบุรี)",
+        desc: "ปากเกร็ด +2.15 msl (ท่วมแถบเหลือง) ส่วนท่าน้ำนนทบุรี +1.95 msl ห่างสันเขื่อน 85 ซม. ยังรับน้ำได้",
+        badge: "แตะเกณฑ์เตือน 🟡",
+        badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      },
+      bangkok: {
+        title: "กรุงเทพมหานคร & สมุทรปราการ (ปากน้ำอ่าวไทย)",
+        desc: "เดินเครื่องผลักดันน้ำที่ ปตร.คลองลัดโพธิ์ และเปิดปิดบานตามจังหวะน้ำทะเลหนุน เพื่อเร่งระบายน้ำออกสู่อ่าวไทยอย่างรวดเร็ว",
+        badge: "เร่งระบายออกทะเล ✅",
+        badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      }
+    };
+
+    function selectMacroNode(key) {
+      const item = macroNodeDetails[key];
+      if (!item) return;
+
+      document.getElementById('macroItemTitle').innerText = item.title;
+      document.getElementById('macroItemDesc').innerText = item.desc;
+      const b = document.getElementById('macroItemBadge');
+      b.innerText = item.badge;
+      b.className = "px-3 py-1 rounded-full text-xs font-semibold border " + item.badgeClass;
+
+      document.getElementById('macroDetailCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+
+
+    function showLiveToast(title, msg) {
+      const toast = document.getElementById('liveToast');
+      if (!toast) return;
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMsg').innerText = msg;
+      document.getElementById('toastTime').innerText = new Date().toLocaleTimeString('th-TH');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // Interactive CCTV High-Res Inspection Modal
+    function openCCTVModal(name, loc, imgSrc, telemetry, directUrl) {
+      const modal = document.getElementById('cctvModal');
+      if (!modal) return;
+      document.getElementById('modalCamTitle').innerText = name;
+      document.getElementById('modalCamLoc').innerText = loc;
+      document.getElementById('modalCamImg').src = imgSrc;
+      document.getElementById('modalCamTelemetry').innerText = telemetry;
+      const link = document.getElementById('modalCamLink');
+      if (link) link.href = directUrl;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCCTVModal() {
+      const modal = document.getElementById('cctvModal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCCTVModal();
+    });
+
+</script>
+
+  <!-- Interactive CCTV Inspection Modal (Ground-Truth Viewer) -->
+  <div id="cctvModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="if(event.target === this) closeCCTVModal()">
+    <div class="relative w-full max-w-4xl bg-slate-900 border border-cyan-500/40 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          <div>
+            <h3 id="modalCamTitle" class="text-base font-bold text-white leading-tight">กล้อง CCTV สด</h3>
+            <p id="modalCamLoc" class="text-xs text-slate-400">จุดติดตั้งหน้างาน</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="hidden sm:inline-block px-2.5 py-1 rounded-full text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+            OPTICAL GROUND-TRUTH VERIFIED
+          </span>
+          <button onclick="closeCCTVModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition border border-slate-700">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Image Viewport -->
+      <div class="relative bg-black flex-1 flex items-center justify-center overflow-hidden min-h-[300px]">
+        <img id="modalCamImg" src="" alt="ภาพสดกล้อง CCTV" class="max-h-[65vh] w-auto object-contain">
+        
+        <!-- Viewport Overlays -->
+        <div class="absolute top-3 left-3 bg-black/70 px-2.5 py-1 rounded text-[11px] font-mono text-emerald-400 border border-emerald-500/30">
+          LIVE MJPEG STREAM ● 1080p
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="text-slate-400 block text-[10px]">สถานะโทรมาตรหน้าน้ำ:</span>
+          <strong id="modalCamTelemetry" class="text-amber-300 font-mono text-sm">+2.45 msl</strong>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <a id="modalCamLink" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition flex items-center gap-1.5 shadow-lg shadow-cyan-950/40 text-xs">
+            🌐 เปิดสตรีมสดแท้ต้นทาง ↗
+          </a>
+          <button onclick="closeCCTVModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition text-xs border border-slate-700">
+            ปิดหน้าต่าง
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Floating Live Feedback Toast -->
+  <div id="liveToast" class="fixed top-5 right-5 z-50 max-w-md bg-slate-900 border border-emerald-500/40 rounded-2xl p-4 shadow-2xl flex items-start gap-3 backdrop-blur-xl">
+    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div class="flex-1">
+      <div class="flex items-center justify-between">
+        <h4 id="toastTitle" class="text-xs font-bold text-white">ซิงค์ฐานข้อมูลสดสำเร็จ</h4>
+        <span class="text-[10px] text-slate-400 font-mono" id="toastTime">เมื่อสักครู่</span>
+      </div>
+      <p id="toastMsg" class="text-xs text-slate-300 mt-0.5 leading-relaxed">
+        ดึงข้อมูลโทรมาตรล่าสุดจากคลังข้อมูลน้ำแห่งชาติ สสน. เรียบร้อย
+      </p>
+    </div>
+  </div>
+</body>
+</html>

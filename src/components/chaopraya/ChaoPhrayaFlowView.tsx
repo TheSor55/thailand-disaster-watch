@@ -42,6 +42,19 @@ export function ChaoPhrayaFlowView({ onBack }: ChaoPhrayaFlowViewProps) {
         {/* Action Button Strip */}
         <div className="chaopraya-actions-strip">
           <a
+            href="/water_level_cctv_alert_app.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-pro-action btn-pro-action--primary"
+            style={{ background: 'linear-gradient(135deg, #0891b2, #0284c7)', borderColor: '#38bdf8' }}
+            title="เปิดแดชบอร์ดระดับน้ำและกล้อง CCTV สด Real-Time 5 แท็บ"
+          >
+            <span className="btn-pro-icon">⚡</span>
+            <span className="btn-pro-text">ระดับน้ำ &amp; CCTV สด (5 แท็บ)</span>
+            <span className="btn-pro-arrow">↗</span>
+          </a>
+
+          <a
             href={HII_FLOW_URL}
             target="_blank"
             rel="noopener noreferrer"
