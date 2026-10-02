@@ -1,2 +1,3 @@
 /api/* https://thailand-disaster-watch-api.the-sor.workers.dev/api/:splat 200
+/water_level_cctv_alert_app.html /water_level_cctv_alert_app.html 200
 /* /index.html 200
